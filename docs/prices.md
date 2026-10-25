@@ -37,6 +37,15 @@ tokens, in USD per 1,000 calls. Use it where a channel bills a model's built-in 
 request, such as a gateway pricing a search model's search per call. It appears in the
 call's cost and in its `request_usd` component.
 
+A row may also set `batch_cache_read_per_mtok`: the non-negative rate a batch call's
+cache reads bill at, in USD per million tokens. Set it only where the provider
+publishes a distinct batch cache rate; never derive it from another rate. A batch call
+with cached tokens uses it in place of `cache_read_per_mtok`, and a standard call never
+does. It may be set without `cache_read_per_mtok`, in which case a cached batch call can
+be fully priced while a cached standard call is `partial`. A row without it keeps billing
+batch cache reads at `cache_read_per_mtok`, unchanged; that fallback is not a claim that
+the provider bills batch cache reads at the standard rate.
+
 `rules` options:
 - `input_includes_cache_read` — whether the provider reports cached tokens inside
   `input_tokens`, in which case cache reads are deducted from billable input. Assumed for

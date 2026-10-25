@@ -214,6 +214,14 @@ def test_a_change_to_a_row_with_rates_the_source_does_not_represent_escalates():
     assert [(e.reason, e.dimension) for e in result.escalations] == [("unrepresented_dimension", "batch_input_per_mtok")]
 
 
+def test_a_change_to_a_row_with_a_batch_cache_rate_escalates_instead_of_dropping_it():
+    # No source reads batch cache rates, so an automated replacement could
+    # not carry the rate forward with the others.
+    result = _plan(_with_gpt_x(**dict(GPT_X, output_per_mtok=9.0, batch_cache_read_per_mtok=0.05)))
+    assert result.delta["operations"] == []
+    assert [(e.reason, e.dimension) for e in result.escalations] == [("unrepresented_dimension", "batch_cache_read_per_mtok")]
+
+
 def test_an_unchanged_row_with_unrepresented_rates_is_fine():
     result = _plan(_with_gpt_x(**dict(GPT_X, batch_input_per_mtok=1.0)))
     assert result.escalations == ()
