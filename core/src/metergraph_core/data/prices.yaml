@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-10-24"
+version: "2026-10-25"
 currency: USD
-pricing_verified_at: "2026-10-24"
+pricing_verified_at: "2026-10-25"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -1599,18 +1599,32 @@ models:
       - channel: google-api
         region: global
         effective_from: "2026-10-13"
-        effective_to: "2026-12-01"
+        effective_to: "2026-10-25"
         input_per_mtok: 2.00
         output_per_mtok: 10.00
         cache_read_per_mtok: 0.10
         source_url: https://ai.google.dev/gemini-api/docs/generate-content/latest-model
       - channel: google-api
         region: global
+        effective_from: "2026-10-25"
+        effective_to: "2026-12-01"
+        input_per_mtok: 2.00
+        output_per_mtok: 10.00
+        cache_read_per_mtok: 0.10
+        batch_input_per_mtok: 1.00
+        batch_output_per_mtok: 5.00
+        batch_cache_read_per_mtok: 0.05
+        source_url: https://ai.google.dev/gemini-api/docs/pricing
+      - channel: google-api
+        region: global
         effective_from: "2026-12-01"
         input_per_mtok: 4.00
         output_per_mtok: 20.00
         cache_read_per_mtok: 0.20
-        source_url: https://ai.google.dev/gemini-api/docs/generate-content/latest-model
+        batch_input_per_mtok: 2.00
+        batch_output_per_mtok: 10.00
+        batch_cache_read_per_mtok: 0.10
+        source_url: https://ai.google.dev/gemini-api/docs/pricing
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-13"

@@ -2816,22 +2816,57 @@ def test_installed_catalog_moves_gateway_mimo_v2_5_to_the_lower_rate_on_october_
     assert resolved.cost_usd == Decimal(cost)
 
 
-@pytest.mark.parametrize(
-    "at",
-    [
-        datetime(2026, 10, 23, tzinfo=timezone.utc),
-        datetime(2026, 12, 1, tzinfo=timezone.utc),
-    ],
-)
-def test_installed_catalog_keeps_gemini_4_argon_batch_cache_partial(at):
+def test_installed_catalog_keeps_gemini_4_argon_batch_cache_partial():
     resolved = load_catalog().price(
         model="gemini-4-argon", channel="google-api",
-        at=at,
+        at=datetime(2026, 10, 23, tzinfo=timezone.utc),
         input_tokens=1_000_000, output_tokens=0,
         cache_read_tokens=1_000_000, batch=True,
     )
     assert resolved.status == "partial"
     assert "batch_rate_unavailable" in resolved.reasons
+
+
+@pytest.mark.parametrize(
+    ("at", "cost"),
+    [
+        (datetime(2026, 10, 25, tzinfo=timezone.utc), "6.00000000"),
+        (datetime(2026, 12, 1, tzinfo=timezone.utc), "12.00000000"),
+    ],
+)
+def test_installed_catalog_prices_gemini_4_argon_batch_tokens(at, cost):
+    resolved = load_catalog().price(
+        model="gemini-4-argon", channel="google-api", at=at,
+        input_tokens=1_000_000, output_tokens=1_000_000, batch=True,
+    )
+    assert resolved.status == "priced"
+    assert resolved.cost_usd == Decimal(cost)
+
+
+@pytest.mark.parametrize(
+    ("at", "batch_cache_cost", "standard_cache_cost"),
+    [
+        (datetime(2026, 10, 25, tzinfo=timezone.utc), "0.05", "0.10"),
+        (datetime(2026, 12, 1, tzinfo=timezone.utc), "0.10", "0.20"),
+    ],
+)
+def test_installed_catalog_prices_gemini_4_argon_batch_cache_reads(
+    at, batch_cache_cost, standard_cache_cost
+):
+    usage = dict(input_tokens=1_000_000, output_tokens=0, cache_read_tokens=1_000_000)
+    batch = load_catalog().price(
+        model="gemini-4-argon", channel="google-api", at=at,
+        batch=True, **usage,
+    )
+    standard = load_catalog().price(
+        model="gemini-4-argon", channel="google-api", at=at,
+        batch=False, **usage,
+    )
+    assert batch.status == standard.status == "priced"
+    assert batch.components.cache_read == Decimal(batch_cache_cost)
+    assert standard.components.cache_read == Decimal(standard_cache_cost)
+    assert batch.cost_usd == Decimal(batch_cache_cost)
+    assert standard.cost_usd == Decimal(standard_cache_cost)
 
 
 @pytest.mark.parametrize(
