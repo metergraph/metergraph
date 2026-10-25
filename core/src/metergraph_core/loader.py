@@ -388,6 +388,17 @@ def parse_catalog(
                         f"{canonical}: overlapping {channel}/{region} price windows"
                     )
             seen_windows.append((channel, region, effective_from, effective_to))
+            batch_cache_read = price.get("batch_cache_read_per_mtok")
+            batch_cache_read_per_mtok = _decimal(batch_cache_read)
+            # A stated batch cache rate replaces the standard one on batch
+            # calls, so one that cannot be read must not quietly fall back.
+            if batch_cache_read is not None and (
+                batch_cache_read_per_mtok is None or batch_cache_read_per_mtok < 0
+            ):
+                raise CatalogError(
+                    f"{canonical}: invalid batch_cache_read_per_mtok "
+                    f"{batch_cache_read!r}"
+                )
             prices.append(
                 Price(
                     id=f"{canonical}:{channel}:{region}:{_id_date(effective_from)}",
@@ -412,6 +423,7 @@ def parse_catalog(
                     source_url=str(price["source_url"]).strip(),
                     publisher=publisher,
                     currency=currency,
+                    batch_cache_read_per_mtok=batch_cache_read_per_mtok,
                 )
             )
     return version, {key: tuple(value) for key, value in aliases.items()}, _unique_ids(prices)

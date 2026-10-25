@@ -225,6 +225,22 @@ class Price:
     # The currency every rate on this row is stated in. The `_usd` names on
     # rates and results predate it and are kept for existing callers.
     currency: str = "USD"
+    # The rate a batch call's cache reads bill at, when the provider publishes
+    # one. Absent, batch cache reads keep the standard cache-read rate; it is
+    # never inferred from another rate.
+    batch_cache_read_per_mtok: Decimal | None = None
+
+    def __post_init__(self) -> None:
+        # The loader checks the rate it reads, but a row built or replaced
+        # directly must not bill a negative or undefined cache component.
+        rate = self.batch_cache_read_per_mtok
+        if rate is not None and not (
+            isinstance(rate, Decimal) and rate.is_finite() and rate >= 0
+        ):
+            raise ValueError(
+                "batch_cache_read_per_mtok must be a finite non-negative "
+                f"Decimal or None, not {rate!r}"
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -353,6 +369,7 @@ def _billed_terms(resolved: ResolvedPrice) -> tuple[Any, ...]:
         price.cache_write_1h_per_mtok,
         price.batch_input_per_mtok,
         price.batch_output_per_mtok,
+        price.batch_cache_read_per_mtok,
         price.request_fee_per_1k_usd,
         resolved.rules,
     )
@@ -505,12 +522,17 @@ def _price_tokens(
 
     input_rate = price.input_per_mtok
     output_rate = price.output_per_mtok
+    cache_read_rate = price.cache_read_per_mtok
     if batch:
         if price.batch_input_per_mtok is None or price.batch_output_per_mtok is None:
             reasons.append("batch_rate_unavailable")
         else:
             input_rate = price.batch_input_per_mtok
             output_rate = price.batch_output_per_mtok
+        # A row without a batch cache rate keeps billing batch cache reads at
+        # the standard rate, as it always has.
+        if price.batch_cache_read_per_mtok is not None:
+            cache_read_rate = price.batch_cache_read_per_mtok
 
     input_multiplier = Decimal("1")
     output_multiplier = Decimal("1")
@@ -547,12 +569,12 @@ def _price_tokens(
     else:
         output_usd = Decimal(output_count) * output_rate * output_multiplier / _MILLION
     if cache_read_count:
-        if price.cache_read_per_mtok is None:
+        if cache_read_rate is None:
             reasons.append("cache_read_rate_unavailable")
         else:
             cache_read_usd = (
                 Decimal(cache_read_count)
-                * price.cache_read_per_mtok
+                * cache_read_rate
                 * input_multiplier
                 / _MILLION
             )

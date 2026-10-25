@@ -387,6 +387,55 @@ def test_add_price_appends_a_row_for_a_new_channel():
     assert len(result["models"][0]["prices"]) == 4
 
 
+def _resolved_after(document, at="2026-10-21"):
+    return load_catalog_document(document).snapshot.resolve_price(
+        model="example/model-a",
+        channel="openai-api",
+        at=datetime.fromisoformat(at).replace(tzinfo=timezone.utc),
+    )
+
+
+def test_a_new_price_keeps_its_batch_cache_rate():
+    price = _new_price(
+        batch_input_per_mtok="0.625",
+        batch_output_per_mtok="2.5",
+        batch_cache_read_per_mtok="0.05",
+    )
+    result = apply_catalog_delta(_document(), _delta(_replace(price=price)))
+    assert _rows(result, effective_from="2026-10-20") == [price]
+    assert str(_resolved_after(result).price.batch_cache_read_per_mtok) == "0.05"
+
+
+def test_a_zero_batch_cache_rate_is_a_rate():
+    price = _new_price(batch_cache_read_per_mtok="0")
+    result = apply_catalog_delta(_document(), _delta(_replace(price=price)))
+    assert str(_resolved_after(result).price.batch_cache_read_per_mtok) == "0"
+
+
+def test_a_new_price_without_a_batch_cache_rate_has_none():
+    result = apply_catalog_delta(_document(), _delta(_replace()))
+    assert "batch_cache_read_per_mtok" not in _rows(result, effective_from="2026-10-20")[0]
+    assert _resolved_after(result).price.batch_cache_read_per_mtok is None
+
+
+@pytest.mark.parametrize("value", ["-0.05", 0.05, "NaN", None])
+def test_a_batch_cache_rate_must_be_a_non_negative_decimal_string(value):
+    with pytest.raises(
+        CatalogDeltaError,
+        match="operation 0: price batch_cache_read_per_mtok must be a non-negative decimal string",
+    ):
+        parse_catalog_delta(
+            _delta(_replace(price=_new_price(batch_cache_read_per_mtok=value)))
+        )
+
+
+def test_add_model_rejects_a_negative_batch_cache_rate():
+    operation = _add_model()
+    operation["model"]["prices"][0]["batch_cache_read_per_mtok"] = -0.05
+    with pytest.raises(CatalogDeltaError, match="invalid model: .*batch_cache_read_per_mtok"):
+        parse_catalog_delta(_delta(operation))
+
+
 def test_add_model_appends_a_complete_priceable_entry():
     result = apply_catalog_delta(_document(), _delta(_add_model()))
 

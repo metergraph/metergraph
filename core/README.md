@@ -149,6 +149,14 @@ of the applied price. The bundled catalog is USD. `cost` and
 `components.input`, `output`, `cache_read`, `cache_write` and `request` are in
 that currency; the older `cost_usd` and `*_usd` names return the same values.
 
+`ModelUsage(batch=True)`, or `batch=True` on `price` and `cost`, bills at the
+row's batch input and output rates. Its cache reads bill at
+`Price.batch_cache_read_per_mtok` when the row has one, and otherwise at the
+standard `cache_read_per_mtok`, as before. A standard call always uses the
+standard cache-read rate. A row with only a batch cache rate fully prices a
+cached batch call, while a cached standard call on it is `partial` with
+`cache_read_rate_unavailable`.
+
 A `ModelUsage` count left `None` is unknown, not zero. A missing input or
 output count keeps the subtotal that is known, marks the result `partial`, and
 lists `input_tokens` or `output_tokens` in `missing_dimensions`.
@@ -212,7 +220,8 @@ The price in effect when the response was created applies, from `created`,
 creation time is priced now. `catalog=` costs against a catalog you loaded;
 the default is the bundled one.
 
-A batch service tier bills at batch rates. Pass `service_tier=` when the
+A batch service tier bills at batch rates, with cache reads priced as for
+`ModelUsage(batch=True)` above. Pass `service_tier=` when the
 response does not state its tier, such as an OpenAI batch output line. Any other tier besides standard,
 such as `priority` or `flex`, returns `partial` with `service_tier` in
 `missing_dimensions`, since the catalog carries no tier rates. Cost a streamed

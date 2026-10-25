@@ -36,7 +36,7 @@ CORE_DIR = Path(__file__).resolve().parents[2]  # core/
 DIST_DIR = CORE_DIR / "dist"
 
 EXPECTED_NAME = "metergraph-core"
-EXPECTED_VERSION = "0.7.2"
+EXPECTED_VERSION = "0.7.3"
 EXPECTED_REQUIRES_PYTHON = ">=3.10"
 EXPECTED_SUMMARY = (
     "Open, effective-dated LLM pricing catalog and deterministic cost calculator "
