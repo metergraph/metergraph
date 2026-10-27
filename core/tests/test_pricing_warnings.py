@@ -98,6 +98,23 @@ _CATALOG = textwrap.dedent(
             input_per_mtok: 0.6
             output_per_mtok: 1.8
             source_url: https://example.test/google
+      - canonical_id: anthropic/claude-geo
+        aliases:
+          - {provider: bedrock, alias: claude-geo, channel: aws-bedrock}
+          - {provider: bedrock-geo, alias: claude-geo, channel: aws-bedrock-geo}
+        prices:
+          - channel: aws-bedrock
+            region: global
+            effective_from: "2026-01-01"
+            input_per_mtok: 3.0
+            output_per_mtok: 15.0
+            source_url: https://example.test/bedrock
+          - channel: aws-bedrock-geo
+            region: global
+            effective_from: "2026-01-01"
+            input_per_mtok: 3.3
+            output_per_mtok: 16.5
+            source_url: https://example.test/bedrock
     """
 )
 
@@ -187,6 +204,15 @@ def test_an_alias_pinned_to_another_region_names_its_regions(catalog):
     warning = _warning(catalog.lookup_price(model="gem-eu", provider="google", region="us-east-1", at=_AT))
     assert warning.code == "model_not_in_region"
     assert warning.message == 'model "gem-eu" resolves on channel "google-api" only in eu-west-1, not us-east-1.'
+
+
+def test_a_global_bedrock_id_follows_the_resolver_fallback_rules(catalog):
+    # Dropping "global." resolves on aws-bedrock only, so on the geo channel
+    # the id is unknown and the warning points at the bare id.
+    assert catalog.lookup_price(model="global.claude-geo", channel="aws-bedrock", at=_AT).status == "priced"
+    warning = _warning(catalog.lookup_price(model="global.claude-geo", channel="aws-bedrock-geo", at=_AT))
+    assert warning.code == "unknown_model"
+    assert warning.message == 'model "global.claude-geo" is not in the catalog. Did you mean "claude-geo"?'
 
 
 def test_a_gap_between_prices_is_explained(catalog):

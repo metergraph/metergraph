@@ -982,20 +982,35 @@ class CatalogSnapshot:
         model_key = str(model or "").strip().lower()
         if not model_key:
             return ()
-        keys = [model_key]
+        # Bedrock fallback ids, under the rules _resolve applies: dropping
+        # "global." is valid only on aws-bedrock, and never across a price
+        # region.
+        keys, dropped, forbidden = [model_key], set(), []
         if channel_key in _BEDROCK_CHANNELS:
-            keys += [candidate for candidate, _ in _bedrock_fallback_ids(model_key)]
+            for candidate, dropped_global in _bedrock_fallback_ids(model_key):
+                if dropped_global and channel_key != _BEDROCK_CHANNEL:
+                    forbidden.append(candidate)
+                    continue
+                keys.append(candidate)
+                if dropped_global:
+                    dropped.add(candidate)
         name = str(model).strip()
         if not any(key in self._sold for key in keys):
+            # A "global." id on a geo channel points at the bare id that
+            # channel sells.
+            guess = next(
+                (key for key in forbidden if channel_key in self._sold.get(key, ())), None
+            )
             return (PricingWarning(
                 UNKNOWN_MODEL,
                 f'model "{name}" is not in the catalog.'
-                f"{_did_you_mean(model_key, self._sold, cutoff=0.8)}",
+                f"{_did_you_mean(model_key, self._sold, guess, cutoff=0.8)}",
             ),)
         candidates = tuple(
             alias
             for key in keys
             for alias in self._deployment_aliases.get((key, channel_key), ())
+            if key not in dropped or not _crosses_price_region(alias)
         )
         sold = sorted({channel for key in keys for channel in self._sold.get(key, ())})
         if not candidates or channel_key not in sold:
