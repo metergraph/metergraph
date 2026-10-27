@@ -889,11 +889,13 @@ def _table_features(content: str) -> Any:
 def _price_prose_evidence(content: str) -> dict[str, Any]:
     text = page_text(content)
     mentions = []
+    amounts = []
     for match in _AMOUNT.finditer(text):
+        amounts.append(match.group()[1:].replace(",", ""))
         excerpt = text[max(0, match.start() - 300):match.end() + 100].strip(" |")
         if excerpt not in mentions:
             mentions.append(excerpt)
-    return {"kind": "price_mentions", "mentions": mentions[:100]}
+    return {"kind": "price_mentions", "mentions": mentions[:100], "amounts": amounts[:100]}
 
 
 def _price_prose_features(content: str) -> Any:
@@ -978,6 +980,12 @@ def redact_evidence(evidence: Mapping[str, Any]) -> dict[str, Any]:
             "redacted": True,
             "statement_count": len(evidence.get("statements") or []),
             "candidates": dict(evidence.get("candidates") or {}),
+        }
+    if kind == "price_mentions":
+        return {
+            "kind": kind,
+            "redacted": True,
+            "amounts": list(evidence.get("amounts") or []),
         }
     return {"kind": kind, "redacted": True}
 
