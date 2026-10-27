@@ -4985,7 +4985,7 @@ models:
         cache_read_per_mtok: 0.125
         batch_input_per_mtok: 0.625
         batch_output_per_mtok: 5
-        source_url: https://ai-gateway.vercel.sh/v1/models
+        source_url: https://developers.openai.com/api/docs/models/gpt-5
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-02"
@@ -5010,7 +5010,7 @@ models:
         input_per_mtok: 1.75
         output_per_mtok: 14
         cache_read_per_mtok: 0.175
-        source_url: https://ai-gateway.vercel.sh/v1/models
+        source_url: https://developers.openai.com/api/docs/models/gpt-5.3-codex
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-02"
@@ -5141,11 +5141,22 @@ models:
       - channel: openai-api
         region: global
         effective_from: "2026-07-09"
+        effective_to: "2026-10-27"
         input_per_mtok: 12.5
         output_per_mtok: 75
         cache_read_per_mtok: 1.25
         cache_write_5m_per_mtok: 15.625
-        source_url: https://ai-gateway.vercel.sh/v1/models
+        source_url: https://developers.openai.com/api/docs/models/gpt-5.6-cyber
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-27"
+        input_per_mtok: 12.5
+        output_per_mtok: 75
+        cache_read_per_mtok: 1.25
+        cache_write_5m_per_mtok: 15.625
+        rules:
+          long_context: {threshold: 272000, threshold_counts_cached_tokens: true, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://developers.openai.com/api/docs/models/gpt-5.6-cyber
   - canonical_id: openai/o4-mini
     publisher: openai
     aliases:
@@ -5163,7 +5174,7 @@ models:
         cache_read_per_mtok: 0.275
         batch_input_per_mtok: 0.55
         batch_output_per_mtok: 2.2
-        source_url: https://ai-gateway.vercel.sh/v1/models
+        source_url: https://developers.openai.com/api/docs/models/o4-mini
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2025-04-16"
