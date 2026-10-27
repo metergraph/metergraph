@@ -94,6 +94,7 @@ UNKNOWN_PROVIDER = "unknown_provider"
 UNKNOWN_MODEL = "unknown_model"
 MODEL_NOT_ON_CHANNEL = "model_not_on_channel"
 MODEL_NOT_IN_EFFECT = "model_not_in_effect"
+MODEL_NOT_IN_REGION = "model_not_in_region"
 PRICE_NOT_IN_EFFECT = "price_not_in_effect"
 
 
@@ -1011,23 +1012,7 @@ class CatalogSnapshot:
         stated = str(region or "").strip().lower() or None
         alias = self._alias_for(candidates, when, stated)
         if alias is None:
-            ended = [found.effective_to for found in candidates
-                     if found.effective_to is not None and found.effective_to <= when]
-            starts = [found.effective_from for found in candidates
-                      if found.effective_from is not None and when < found.effective_from]
-            if ended and not starts:
-                return (PricingWarning(
-                    MODEL_NOT_IN_EFFECT,
-                    f'model "{name}" stopped resolving on channel "{channel_key}" on '
-                    f"{max(ended).date().isoformat()}.",
-                ),)
-            if starts and not ended:
-                return (PricingWarning(
-                    MODEL_NOT_IN_EFFECT,
-                    f'model "{name}" resolves on channel "{channel_key}" from '
-                    f"{min(starts).date().isoformat()}.",
-                ),)
-            return ()
+            return (self._unresolved(name, channel_key, candidates, when, stated),)
         price, _ = self._price_for(alias, when, stated)
         if price is None:
             scope = f' in region "{stated}"' if stated else ""
@@ -1037,6 +1022,52 @@ class CatalogSnapshot:
                 f"{when.isoformat()}.",
             ),)
         return ()
+
+    def _unresolved(
+        self,
+        name: str,
+        channel: str,
+        candidates: tuple[Alias, ...],
+        when: datetime,
+        region: str | None,
+    ) -> PricingWarning:
+        """Why no alias for ``name`` on ``channel`` applies at ``when``: its
+        windows close before or open after it, or the aliases in effect are
+        pinned to other regions."""
+        current = [
+            alias for alias in candidates
+            if (alias.effective_from is None or alias.effective_from <= when)
+            and (alias.effective_to is None or when < alias.effective_to)
+        ]
+        if current:
+            regions = sorted({pin for alias in current for pin in alias.price_region})
+            asked = region or self._region
+            return PricingWarning(
+                MODEL_NOT_IN_REGION,
+                f'model "{name}" resolves on channel "{channel}" only in '
+                f"{', '.join(regions)}, not {asked}.",
+            )
+        ended = [alias.effective_to for alias in candidates
+                 if alias.effective_to is not None and alias.effective_to <= when]
+        starts = [alias.effective_from for alias in candidates
+                  if alias.effective_from is not None and when < alias.effective_from]
+        if ended and starts:
+            when_text = (
+                f"between {max(ended).date().isoformat()} and "
+                f"{min(starts).date().isoformat()}"
+            )
+            message = f'model "{name}" does not resolve on channel "{channel}" {when_text}.'
+        elif ended:
+            message = (
+                f'model "{name}" stopped resolving on channel "{channel}" on '
+                f"{max(ended).date().isoformat()}."
+            )
+        else:
+            message = (
+                f'model "{name}" resolves on channel "{channel}" from '
+                f"{min(starts).date().isoformat()}."
+            )
+        return PricingWarning(MODEL_NOT_IN_EFFECT, message)
 
     def cost(
         self,

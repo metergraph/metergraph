@@ -194,6 +194,7 @@ missing.
 | `unknown_model` | The catalog has no model under that name. |
 | `model_not_on_channel` | The name is known, but the channel has no alias and price for it. The message lists the channels that do. |
 | `model_not_in_effect` | The name resolved on the channel only before or after the given time, such as an alias a provider retired. |
+| `model_not_in_region` | The name resolves on the channel only in other regions. The message lists them. |
 | `price_not_in_effect` | The name resolves, but no price covers that time or region. |
 
 `cost_from_response` judges the provider it priced with, so an Anthropic

@@ -59,6 +59,17 @@ _CATALOG = textwrap.dedent(
             channel: google-api
             effective_from: "2026-09-01"
             source_url: https://example.test/google
+          - provider: google
+            alias: gem-swap
+            channel: google-api
+            effective_from: "2026-01-01"
+            effective_to: "2026-04-01"
+            source_url: https://example.test/google
+          - provider: google
+            alias: gem-swap
+            channel: google-api
+            effective_from: "2026-09-01"
+            source_url: https://example.test/google
         prices:
           - channel: google-api
             region: global
@@ -72,6 +83,20 @@ _CATALOG = textwrap.dedent(
             effective_from: "2026-09-01"
             input_per_mtok: 0.4
             output_per_mtok: 1.2
+            source_url: https://example.test/google
+      - canonical_id: google/gem-eu
+        aliases:
+          - provider: google
+            alias: gem-eu
+            channel: google-api
+            price_region: eu-west-1
+            source_url: https://example.test/google
+        prices:
+          - channel: google-api
+            region: eu-west-1
+            effective_from: "2026-01-01"
+            input_per_mtok: 0.6
+            output_per_mtok: 1.8
             source_url: https://example.test/google
     """
 )
@@ -148,6 +173,20 @@ def test_a_retired_or_future_name_says_when(catalog):
     future = _warning(catalog.lookup_price(model="gem-next", provider="google", at=_AT))
     assert future.code == "model_not_in_effect"
     assert "from 2026-09-01" in future.message
+
+
+def test_a_gap_between_alias_windows_says_when(catalog):
+    warning = _warning(catalog.lookup_price(model="gem-swap", provider="google", at=_GAP))
+    assert warning.code == "model_not_in_effect"
+    assert warning.message == (
+        'model "gem-swap" does not resolve on channel "google-api" between 2026-04-01 and 2026-09-01.'
+    )
+
+
+def test_an_alias_pinned_to_another_region_names_its_regions(catalog):
+    warning = _warning(catalog.lookup_price(model="gem-eu", provider="google", region="us-east-1", at=_AT))
+    assert warning.code == "model_not_in_region"
+    assert warning.message == 'model "gem-eu" resolves on channel "google-api" only in eu-west-1, not us-east-1.'
 
 
 def test_a_gap_between_prices_is_explained(catalog):
