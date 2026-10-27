@@ -247,32 +247,6 @@ IDs may intentionally repeat across execution profiles when gateway and
 Bedrock use different physical routes; each route therefore also has a unique
 internal `key`.
 
-Each offer group is reachable through one credential and one route provider:
-
-| Offer group | Credential | Route provider | Pricing channel |
-| --- | --- | --- | --- |
-| `gateway` | `AI_GATEWAY_API_KEY` | `vercel` | `vercel-ai-gateway` |
-| `fireworks` | `FIREWORKS_API_KEY` | `fireworks` | `fireworks-api` |
-| `openai-direct` | `OPENAI_API_KEY` | `openai` | `openai-api` |
-| `anthropic-direct` | `ANTHROPIC_API_KEY` | `anthropic` | `anthropic-api` |
-| `moonshot-direct` | `MOONSHOT_API_KEY` | `moonshotai` | `moonshot-api` |
-| `bedrock` | none (AWS credentials) | `bedrock` | `aws-bedrock` |
-
-A route's `provider` is the catalog's normalized provider name, so Moonshot
-routes use `moonshotai`, not the `moonshot` input alias. Direct route IDs take
-the form `<provider>:<provider model ID>`, for example
-`moonshotai:kimi-k3.1-pro` with `model_id` `kimi-k3.1-pro`; Moonshot's API is
-served at `https://api.moonshot.ai/v1`.
-
-Adding a route provider is a minor release, even though it only adds data: a
-client that executes every default-profile route and checks providers against
-a fixed list would reject the new one. `metergraph-core` 0.8.0 adds the
-`moonshotai` provider and `moonshot-direct` offer group, and puts Moonshot
-routes in the default profile. A client that executes default routes must
-support the `moonshotai` provider, or skip providers it does not support,
-before it allows `metergraph-core>=0.8`. Clients pinned below 0.8 keep the
-0.7 provider set. Clients that only price calls are unaffected.
-
 A model entry may record `released`, the publisher's general-availability
 date as an ISO date. `models.release_date(canonical_id, load_catalog())`
 returns that date with basis `released`, or, when none is recorded, the
@@ -552,9 +526,7 @@ as described in
 [Provider review and contributions](#provider-review-and-contributions). Price
 corrections close or add effective windows; they never rewrite historical
 prices in place. Either data change increments
-its own declared version and produces a patch release of `metergraph-core`,
-unless it adds a route provider or offer group, which is a minor release (see
-[Model registry](#model-registry)).
+its own declared version and produces a patch release of `metergraph-core`.
 Software and data versions remain separate because they have different
 lifecycles.
 
