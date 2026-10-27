@@ -180,6 +180,11 @@ A call after it ended resolves to that price, stays `priced`, and carries
 applied `price.effective_to` says when it ended. A closed price followed by a
 later one never extends, so a gap before a scheduled price stays `unpriced`.
 
+An `unpriced` result whose cause is a value you passed, such as an unknown
+channel, provider or model, says why in `warnings`. Each `PricingWarning` has
+a stable `code` and a `message` that may suggest the value you meant. Match on
+`code`; the message text may change.
+
 ### Costing a provider response
 
 `cost_from_response` reads the usage out of a response you already have and

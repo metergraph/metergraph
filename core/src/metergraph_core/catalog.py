@@ -1,5 +1,6 @@
 """Effective-dated model catalog and deterministic token-cost enrichment."""
 
+import difflib
 import re
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
@@ -85,6 +86,16 @@ _BEDROCK_GLOBAL_PREFIX = "global."
 _GLOBAL_REGION = "global"
 # Reason for a result priced at a price that ended and was not replaced.
 PRICE_ENDED = "price_ended"
+
+# Warning codes: why a result is unpriced, when the cause is a value the
+# caller sent. The codes are stable; the messages may change.
+UNKNOWN_CHANNEL = "unknown_channel"
+UNKNOWN_PROVIDER = "unknown_provider"
+UNKNOWN_MODEL = "unknown_model"
+MODEL_NOT_ON_CHANNEL = "model_not_on_channel"
+MODEL_NOT_IN_EFFECT = "model_not_in_effect"
+MODEL_NOT_IN_REGION = "model_not_in_region"
+PRICE_NOT_IN_EFFECT = "price_not_in_effect"
 
 
 def _bedrock_fallback_ids(model_key: str) -> tuple[tuple[str, bool], ...]:
@@ -301,6 +312,9 @@ class CostResult:
     # Inputs the caller did not supply that the figure depends on: "region",
     # "channel", "input_tokens", "output_tokens".
     missing_dimensions: tuple[str, ...] = ()
+    # Why an unpriced result is unpriced, when the cause is a value the
+    # caller sent. Empty otherwise.
+    warnings: tuple["PricingWarning", ...] = ()
 
     @property
     def model_id(self) -> str | None:
@@ -343,6 +357,30 @@ class PriceResult:
     missing_dimensions: tuple[str, ...] = ()
     # Notes that do not make the result partial, such as ``price_ended``.
     reasons: tuple[str, ...] = ()
+    # Why an unpriced result is unpriced, when the cause is a value the
+    # caller sent. Empty otherwise.
+    warnings: tuple["PricingWarning", ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class PricingWarning:
+    """Why a result is unpriced, when the cause is a value the caller sent:
+    a channel or provider the catalog cannot bill on, a model name it does
+    not know, or a model the channel does not sell at that time. ``code`` is
+    stable; ``message`` names the value and, when one is close, the value
+    the caller probably meant."""
+
+    code: str
+    message: str
+
+
+def _did_you_mean(
+    value: str, options: Any, guess: str | None = None, cutoff: float = 0.6
+) -> str:
+    options = sorted(options)
+    close = difflib.get_close_matches(value, options, 1, cutoff)
+    match = guess if guess in options else next(iter(close), None)
+    return f' Did you mean "{match}"?' if match else ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -713,6 +751,17 @@ class CatalogSnapshot:
             )
         for candidates in self._prices.values():
             candidates.sort(key=lambda price: price.effective_from, reverse=True)
+        # For explaining an unpriced result: the channels some price row
+        # bills on, and each model name with the channels that sell it under
+        # that name, an alias there and a price there, at any time.
+        priced = {(model_id, channel.lower()) for model_id, channel in self._prices}
+        self._priced_channels = frozenset(channel for _, channel in priced)
+        sold: dict[str, set[str]] = {}
+        for (model, channel), candidates in self._deployment_aliases.items():
+            found = sold.setdefault(model, set())
+            if any((alias.model_id, channel) in priced for alias in candidates):
+                found.add(channel)
+        self._sold = {model: frozenset(channels) for model, channels in sold.items()}
         # Every named region a price or pin exists for: the regions an omitted
         # query region could have meant.
         self._regions = tuple(sorted(
@@ -893,6 +942,147 @@ class CatalogSnapshot:
         if any(_billed_terms(found) != _billed_terms(resolved) for found in regional):
             return resolved, ("region",)
         return resolved, ()
+
+    def _explain(
+        self, *, model: Any, channel: Any, provider: Any, at: Any, region: Any
+    ) -> tuple[PricingWarning, ...]:
+        """Why :meth:`_lookup` found no price, when the cause is a value the
+        caller sent. Each check follows the step of the lookup it explains:
+        the channel, or the provider's direct channel, then the model name on
+        that channel, then the alias and price windows at ``at``."""
+        channel_key = str(channel or "").strip().lower()
+        if channel_key:
+            if channel_key not in self._priced_channels:
+                # A provider's name, with or without "-api", points at its
+                # direct channel.
+                guess = direct_channel_for_provider(
+                    channel_key
+                ) or direct_channel_for_provider(channel_key.removesuffix("-api"))
+                return (PricingWarning(
+                    UNKNOWN_CHANNEL,
+                    f'channel "{str(channel).strip()}" is not a channel the catalog prices.'
+                    f"{_did_you_mean(channel_key, self._priced_channels, guess)}",
+                ),)
+        else:
+            if provider is None or not str(provider).strip():
+                return ()
+            channel_key = direct_channel_for_provider(provider)
+            if channel_key is None:
+                providers = set(_DIRECT_CHANNEL_BY_PROVIDER) | {
+                    spelling for spelling, name in _PROVIDER_ALIASES.items()
+                    if name in _DIRECT_CHANNEL_BY_PROVIDER
+                }
+                return (PricingWarning(
+                    UNKNOWN_PROVIDER,
+                    f'provider "{str(provider).strip()}" has no billing channel of its own.'
+                    f"{_did_you_mean(str(provider).strip().lower(), providers)} If a gateway or "
+                    "proxy relayed the call, name the provider that served it or the channel "
+                    "that billed it.",
+                ),)
+        model_key = str(model or "").strip().lower()
+        if not model_key:
+            return ()
+        # Bedrock fallback ids, under the rules _resolve applies: dropping
+        # "global." is valid only on aws-bedrock, and never across a price
+        # region.
+        keys, dropped, forbidden = [model_key], set(), []
+        if channel_key in _BEDROCK_CHANNELS:
+            for candidate, dropped_global in _bedrock_fallback_ids(model_key):
+                if dropped_global and channel_key != _BEDROCK_CHANNEL:
+                    forbidden.append(candidate)
+                    continue
+                keys.append(candidate)
+                if dropped_global:
+                    dropped.add(candidate)
+        name = str(model).strip()
+        if not any(key in self._sold for key in keys):
+            # A "global." id on a geo channel points at the bare id that
+            # channel sells.
+            guess = next(
+                (key for key in forbidden if channel_key in self._sold.get(key, ())), None
+            )
+            return (PricingWarning(
+                UNKNOWN_MODEL,
+                f'model "{name}" is not in the catalog.'
+                f"{_did_you_mean(model_key, self._sold, guess, cutoff=0.8)}",
+            ),)
+        candidates = tuple(
+            alias
+            for key in keys
+            for alias in self._deployment_aliases.get((key, channel_key), ())
+            if key not in dropped or not _crosses_price_region(alias)
+        )
+        sold = sorted({channel for key in keys for channel in self._sold.get(key, ())})
+        if not candidates or channel_key not in sold:
+            where = (
+                f"It is priced on {', '.join(sold)}."
+                if sold
+                else "No channel prices it under that name."
+            )
+            return (PricingWarning(
+                MODEL_NOT_ON_CHANNEL,
+                f'model "{name}" has no price on channel "{channel_key}". {where}',
+            ),)
+        when = _coerce_datetime(at)
+        stated = str(region or "").strip().lower() or None
+        alias = self._alias_for(candidates, when, stated)
+        if alias is None:
+            return (self._unresolved(name, channel_key, candidates, when, stated),)
+        price, _ = self._price_for(alias, when, stated)
+        if price is None:
+            scope = f' in region "{stated}"' if stated else ""
+            return (PricingWarning(
+                PRICE_NOT_IN_EFFECT,
+                f'model "{name}" has no price on channel "{channel_key}"{scope} in effect at '
+                f"{when.isoformat()}.",
+            ),)
+        return ()
+
+    def _unresolved(
+        self,
+        name: str,
+        channel: str,
+        candidates: tuple[Alias, ...],
+        when: datetime,
+        region: str | None,
+    ) -> PricingWarning:
+        """Why no alias for ``name`` on ``channel`` applies at ``when``: its
+        windows close before or open after it, or the aliases in effect are
+        pinned to other regions."""
+        current = [
+            alias for alias in candidates
+            if (alias.effective_from is None or alias.effective_from <= when)
+            and (alias.effective_to is None or when < alias.effective_to)
+        ]
+        if current:
+            regions = sorted({pin for alias in current for pin in alias.price_region})
+            asked = region or self._region
+            return PricingWarning(
+                MODEL_NOT_IN_REGION,
+                f'model "{name}" resolves on channel "{channel}" only in '
+                f"{', '.join(regions)}, not {asked}.",
+            )
+        ended = [alias.effective_to for alias in candidates
+                 if alias.effective_to is not None and alias.effective_to <= when]
+        starts = [alias.effective_from for alias in candidates
+                  if alias.effective_from is not None and when < alias.effective_from]
+        if ended and starts:
+            when_text = (
+                f"between {max(ended).date().isoformat()} and "
+                f"{min(starts).date().isoformat()}"
+            )
+            message = f'model "{name}" does not resolve on channel "{channel}" {when_text}.'
+        elif ended:
+            message = (
+                f'model "{name}" stopped resolving on channel "{channel}" on '
+                f"{max(ended).date().isoformat()}."
+            )
+        else:
+            message = (
+                f'model "{name}" resolves on channel "{channel}" from '
+                f"{min(starts).date().isoformat()}."
+            )
+        return PricingWarning(MODEL_NOT_IN_EFFECT, message)
 
     def cost(
         self,
