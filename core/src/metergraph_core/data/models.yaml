@@ -863,7 +863,7 @@ models:
     pricing_channel: openai-api
     execution_profiles:
     - default
-    display_name: GPT-6.1 Terra (direct)
+    display_name: GPT-6.1 Terra
 - canonical_id: moonshotai/kimi-k3.1-pro
   display_name: Kimi K3.1 Pro
   publisher: moonshotai
