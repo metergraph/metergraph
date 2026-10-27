@@ -2799,6 +2799,61 @@ def test_installed_catalog_prices_gpt_5_6_terra_direct_by_date(at, input_rate, o
     assert resolved.cost_usd == (Decimal(input_rate) + Decimal(output_rate)) / 10
 
 
+_GPT_6_1_TERRA_RELEASE = datetime(2026, 10, 26, tzinfo=timezone.utc)
+
+
+def test_installed_catalog_prices_gpt_6_1_terra_from_its_release_day():
+    catalog = load_catalog()
+
+    def cost(at, **usage):
+        return catalog.snapshot.cost(
+            provider="openai", model="gpt-6.1-terra", at=at, **usage
+        )
+
+    before = cost(
+        _GPT_6_1_TERRA_RELEASE - timedelta(seconds=1),
+        input_tokens=1_000, output_tokens=1_000,
+    )
+    standard = cost(
+        _GPT_6_1_TERRA_RELEASE, input_tokens=100_000, output_tokens=100_000
+    )
+    at_threshold = cost(_GPT_6_1_TERRA_RELEASE, input_tokens=272_000, output_tokens=0)
+    over_threshold = cost(_GPT_6_1_TERRA_RELEASE, input_tokens=272_001, output_tokens=0)
+    resolved = catalog.snapshot.resolve_price(
+        model="gpt-6.1-terra", channel="openai-api", at=_GPT_6_1_TERRA_RELEASE
+    )
+
+    assert before.status == "unpriced"
+    assert standard.status == "priced"
+    assert standard.canonical_model == "openai/gpt-6.1-terra"
+    assert standard.cost_usd == Decimal("0.60000000")
+    assert at_threshold.cost_usd == Decimal("0.27200000")
+    assert over_threshold.cost_usd == Decimal("0.54400200")
+    assert resolved.price.cache_read_per_mtok == Decimal("0.05")
+    assert resolved.price.cache_write_5m_per_mtok == Decimal("1.25")
+    assert resolved.price.batch_input_per_mtok == Decimal("0.50")
+    assert resolved.price.batch_output_per_mtok == Decimal("2.50")
+
+
+def test_installed_catalog_prices_gpt_6_1_terra_batch_cache_components():
+    catalog = load_catalog()
+    at = _GPT_6_1_TERRA_RELEASE
+    read_usage = dict(input_tokens=100_000, output_tokens=0, cache_read_tokens=100_000)
+    write_usage = dict(input_tokens=100_000, output_tokens=0, cache_write_5m_tokens=100_000)
+
+    standard_read = catalog.price(model="gpt-6.1-terra", channel="openai-api", at=at, **read_usage)
+    batch_read = catalog.price(model="gpt-6.1-terra", channel="openai-api", at=at, batch=True, **read_usage)
+    standard_write = catalog.price(model="gpt-6.1-terra", channel="openai-api", at=at, **write_usage)
+    batch_write = catalog.price(model="gpt-6.1-terra", channel="openai-api", at=at, batch=True, **write_usage)
+
+    assert standard_read.status == batch_read.status == "priced"
+    assert standard_read.cost_usd == Decimal("0.00500000")
+    assert batch_read.cost_usd == Decimal("0.00250000")
+    assert standard_write.status == batch_write.status == "priced"
+    assert standard_write.cost_usd == Decimal("0.12500000")
+    assert batch_write.cost_usd == Decimal("0.06250000")
+
+
 @pytest.mark.parametrize("channel", ["vercel-ai-gateway", "openrouter-api"])
 @pytest.mark.parametrize(
     ("at", "cost"),
