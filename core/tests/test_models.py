@@ -224,7 +224,7 @@ def test_registry_document_shape_is_required(mutation):
 
 def test_bundled_registry_preserves_current_execution_and_product_fields():
     registry = load_model_registry()
-    assert registry.version == "2026-10-19"
+    assert registry.version == "2026-10-27"
     assert [route.id for route in registry.candidates("gateway")] == [
         "anthropic/claude-sonnet-5",
         "anthropic/claude-opus-5",
@@ -298,6 +298,11 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "openai:gpt-5.4-mini",
         "openai:gpt-5.4-nano",
         "openai:gpt-6.1-sol",
+        "openai:gpt-6.1-terra",
+    ]
+    assert [route.id for route in registry.candidates("moonshot-direct")] == [
+        "moonshotai:kimi-k3.1-pro",
+        "moonshotai:kimi-k3.1-pro-highspeed",
     ]
     assert [route.id for route in registry.candidates("anthropic-direct")] == [
         "anthropic:claude-opus-5",
@@ -317,7 +322,7 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "deepseek/deepseek-v3.2",
         "deepseek/deepseek-v3.1",
     ]
-    assert len(registry.routes_for_execution_profile("default")) == 69
+    assert len(registry.routes_for_execution_profile("default")) == 72
     assert len(registry.routes_for_execution_profile("bedrock")) == 8
 
 
@@ -405,16 +410,41 @@ def test_release_date_fallback_reads_timestamp_price_windows():
     )
 
 
-def test_every_bundled_model_records_a_release_date():
-    """The bundled registry answers from a recorded date, never the price
-    fallback, and no model is dated after its registry version."""
+# Models with no primary launch-date source record no `released`; their release
+# date is the documented first-price fallback, never a launch date inferred
+# from a price window.
+FIRST_PRICE_RELEASE_MODELS = {
+    "openai/gpt-6.1-terra": date(2026, 10, 26),
+    "moonshotai/kimi-k3.1-pro": date(2026, 10, 24),
+    "moonshotai/kimi-k3.1-pro-highspeed": date(2026, 10, 24),
+}
+
+
+def test_every_bundled_model_has_a_sourced_release_date():
+    """Every bundled model answers from a recorded date, except the listed
+    models without a primary launch source, which answer from their earliest
+    sourced catalog price and say so. No date falls after the registry
+    version."""
     registry = load_model_registry()
     catalog = load_catalog()
     version_day = date.fromisoformat(registry.version.split(".", 1)[0])
     for canonical_id, model in registry.models.items():
-        assert model.released is not None, canonical_id
-        assert model.released <= version_day, canonical_id
-        assert registry.release_date(canonical_id, catalog).basis == "released"
+        release = registry.release_date(canonical_id, catalog)
+        assert release is not None, canonical_id
+        assert release.date <= version_day, canonical_id
+        if canonical_id in FIRST_PRICE_RELEASE_MODELS:
+            assert model.released is None, canonical_id
+            assert release == ReleaseDate(
+                FIRST_PRICE_RELEASE_MODELS[canonical_id], "first_price"
+            ), canonical_id
+            entry = next(
+                entry for entry in catalog.document["models"]
+                if entry["canonical_id"] == canonical_id
+            )
+            assert all(price.get("source_url") for price in entry["prices"]), canonical_id
+        else:
+            assert model.released is not None, canonical_id
+            assert release.basis == "released", canonical_id
 
 
 def test_bundled_registry_routes_resolve_in_pricing_catalog():
@@ -642,6 +672,158 @@ def test_new_benchmark_candidates_are_priced_gateway_candidates(model, display_n
     assert resolved is not None and resolved.canonical_model == model
     assert resolved.price.input_per_mtok == Decimal(input_rate)
     assert resolved.price.output_per_mtok == Decimal(output_rate)
+
+
+@pytest.mark.parametrize(
+    (
+        "offer_group", "credential", "route_key", "canonical_id", "provider",
+        "model_id", "pricing_channel", "at", "input_rate", "output_rate",
+    ),
+    [
+        (
+            "openai-direct", "OPENAI_API_KEY", "default:openai:gpt-6.1-terra",
+            "openai/gpt-6.1-terra", "openai", "gpt-6.1-terra", "openai-api",
+            datetime(2026, 10, 26, tzinfo=timezone.utc), "1.00", "5.00",
+        ),
+        (
+            "moonshot-direct", "MOONSHOT_API_KEY",
+            "default:moonshotai:kimi-k3.1-pro", "moonshotai/kimi-k3.1-pro",
+            "moonshotai", "kimi-k3.1-pro", "moonshot-api",
+            datetime(2026, 10, 24, tzinfo=timezone.utc), "2.00", "10.00",
+        ),
+        (
+            "moonshot-direct", "MOONSHOT_API_KEY",
+            "default:moonshotai:kimi-k3.1-pro-highspeed",
+            "moonshotai/kimi-k3.1-pro-highspeed", "moonshotai",
+            "kimi-k3.1-pro-highspeed", "moonshot-api",
+            datetime(2026, 10, 24, tzinfo=timezone.utc), "4.00", "20.00",
+        ),
+    ],
+)
+def test_direct_only_routes_need_their_provider_credential(
+    offer_group, credential, route_key, canonical_id, provider, model_id,
+    pricing_channel, at, input_rate, output_rate,
+):
+    registry = load_model_registry()
+    route = registry.route(route_key)
+
+    assert (route.canonical_id, route.provider, route.model_id, route.pricing_channel) == (
+        canonical_id, provider, model_id, pricing_channel,
+    )
+    assert route.execution_profiles == ("default",)
+    assert registry.offer_groups[offer_group].credential == credential
+    assert route in registry.candidates(offer_group)
+    assert route in registry.reachable_candidates({credential})
+    # No gateway route is registered for these models, so the gateway key and
+    # the other direct credentials never reach them.
+    assert [r.key for r in registry.model(canonical_id).routes] == [route_key]
+    others = {"AI_GATEWAY_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
+              "FIREWORKS_API_KEY", "MOONSHOT_API_KEY"} - {credential}
+    assert route not in registry.reachable_candidates(others)
+
+    resolved = load_catalog().snapshot.resolve_price(
+        model=route.model_id, channel=route.pricing_channel, at=at,
+    )
+    assert resolved is not None and resolved.canonical_model == canonical_id
+    assert resolved.price.input_per_mtok == Decimal(input_rate)
+    assert resolved.price.output_per_mtok == Decimal(output_rate)
+
+
+def moonshot_document():
+    value = document()
+    value["models"].append(
+        {
+            "canonical_id": "moonshotai/kimi-k3.1-pro",
+            "display_name": "Kimi K3.1 Pro",
+            "publisher": "moonshotai",
+            "routes": [
+                {
+                    "key": "moonshot-direct:moonshotai:kimi-k3.1-pro",
+                    "id": "moonshotai:kimi-k3.1-pro",
+                    "provider": "moonshotai",
+                    "model_id": "kimi-k3.1-pro",
+                    "pricing_channel": "moonshot-api",
+                    "execution_profiles": ["default"],
+                }
+            ],
+        }
+    )
+    value["execution_profiles"][0]["routes"].append(
+        "moonshot-direct:moonshotai:kimi-k3.1-pro"
+    )
+    value["offer_groups"].append(
+        {
+            "id": "moonshot-direct",
+            "credential": "MOONSHOT_API_KEY",
+            "routes": ["moonshot-direct:moonshotai:kimi-k3.1-pro"],
+        }
+    )
+    return value
+
+
+def test_moonshot_direct_offer_group_is_gated_by_its_credential():
+    registry = parse_model_registry(moonshot_document())
+    assert [route.id for route in registry.candidates("moonshot-direct")] == [
+        "moonshotai:kimi-k3.1-pro"
+    ]
+    assert [
+        route.id for route in registry.reachable_candidates({"MOONSHOT_API_KEY"})
+    ] == ["moonshotai:kimi-k3.1-pro"]
+    assert "moonshotai:kimi-k3.1-pro" not in {
+        route.id
+        for route in registry.reachable_candidates(
+            {"AI_GATEWAY_API_KEY", "OPENAI_API_KEY"}
+        )
+    }
+
+
+@pytest.mark.parametrize(
+    "channel", ["vercel-ai-gateway", "openai-api", "aws-bedrock", "moonshot"]
+)
+def test_moonshot_route_rejects_any_other_pricing_channel(channel):
+    value = moonshot_document()
+    value["models"][1]["routes"][0]["pricing_channel"] = channel
+    with pytest.raises(ModelRegistryError, match="cannot use pricing channel"):
+        parse_model_registry(value)
+
+
+def test_moonshot_route_needs_the_normalized_provider_name():
+    # "moonshot" is accepted on catalog lookups and normalized to
+    # "moonshotai"; a registry route names the normalized provider only.
+    value = moonshot_document()
+    value["models"][1]["routes"][0]["provider"] = "moonshot"
+    with pytest.raises(ModelRegistryError, match="unknown route provider"):
+        parse_model_registry(value)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        ("wrong_credential", "requires credential 'MOONSHOT_API_KEY'"),
+        ("missing_credential", "requires credential 'MOONSHOT_API_KEY'"),
+        ("foreign_route", "requires provider 'moonshotai'"),
+    ],
+)
+def test_moonshot_direct_offer_group_contract_fails_closed(mutation, message):
+    value = moonshot_document()
+    group = value["offer_groups"][-1]
+    if mutation == "wrong_credential":
+        group["credential"] = "KIMI_API_KEY"
+    elif mutation == "missing_credential":
+        group["credential"] = None
+    else:
+        group["routes"] = ["openai-direct:openai:gpt-5.6"]
+    with pytest.raises(ModelRegistryError, match=message):
+        parse_model_registry(value)
+
+
+def test_moonshot_route_validates_against_its_direct_catalog_price():
+    value = moonshot_document()
+    value["version"] = "2026-10-24"
+    validate_model_registry(parse_model_registry(value), load_catalog())
+    value["version"] = "2026-10-23"
+    with pytest.raises(ModelRegistryError, match="no price for pricing channel"):
+        validate_model_registry(parse_model_registry(value), load_catalog())
 
 
 def test_validation_rejects_canonical_drift():

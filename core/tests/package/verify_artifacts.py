@@ -36,7 +36,7 @@ CORE_DIR = Path(__file__).resolve().parents[2]  # core/
 DIST_DIR = CORE_DIR / "dist"
 
 EXPECTED_NAME = "metergraph-core"
-EXPECTED_VERSION = "0.7.6"
+EXPECTED_VERSION = "0.8.0"
 EXPECTED_REQUIRES_PYTHON = ">=3.10"
 EXPECTED_SUMMARY = (
     "Open, effective-dated LLM pricing catalog and deterministic cost calculator "
@@ -312,7 +312,13 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert loaded.pricing_verified_at.isoformat() == {CATALOG_VERSION!r}
         assert len(loaded.content_hash) == 64, loaded.content_hash
         registry = load_model_registry()
-        assert registry.version == "2026-10-19", registry.version
+        assert registry.version == "2026-10-27", registry.version
+        moonshot_candidates = [route.id for route in registry.candidates("moonshot-direct")]
+        assert moonshot_candidates == [
+            "moonshotai:kimi-k3.1-pro",
+            "moonshotai:kimi-k3.1-pro-highspeed",
+        ], moonshot_candidates
+        assert registry.offer_groups["moonshot-direct"].credential == "MOONSHOT_API_KEY"
         gateway_candidates = [route.id for route in registry.candidates("gateway")]
         assert len(gateway_candidates) == 52, len(gateway_candidates)
         assert gateway_candidates[:2] == [

@@ -1,4 +1,4 @@
-version: '2026-10-19'
+version: '2026-10-27'
 models:
 - canonical_id: openai/gpt-5.6-sol
   display_name: GPT-5.6 Sol
@@ -852,6 +852,42 @@ models:
     pricing_channel: vercel-ai-gateway
     execution_profiles:
     - default
+- canonical_id: openai/gpt-6.1-terra
+  display_name: GPT-6.1 Terra
+  publisher: openai
+  routes:
+  - key: default:openai:gpt-6.1-terra
+    id: openai:gpt-6.1-terra
+    provider: openai
+    model_id: gpt-6.1-terra
+    pricing_channel: openai-api
+    execution_profiles:
+    - default
+    display_name: GPT-6.1 Terra (direct)
+- canonical_id: moonshotai/kimi-k3.1-pro
+  display_name: Kimi K3.1 Pro
+  publisher: moonshotai
+  routes:
+  - key: default:moonshotai:kimi-k3.1-pro
+    id: moonshotai:kimi-k3.1-pro
+    provider: moonshotai
+    model_id: kimi-k3.1-pro
+    pricing_channel: moonshot-api
+    execution_profiles:
+    - default
+    display_name: Kimi K3.1 Pro (direct)
+- canonical_id: moonshotai/kimi-k3.1-pro-highspeed
+  display_name: Kimi K3.1 Pro Highspeed
+  publisher: moonshotai
+  routes:
+  - key: default:moonshotai:kimi-k3.1-pro-highspeed
+    id: moonshotai:kimi-k3.1-pro-highspeed
+    provider: moonshotai
+    model_id: kimi-k3.1-pro-highspeed
+    pricing_channel: moonshot-api
+    execution_profiles:
+    - default
+    display_name: Kimi K3.1 Pro Highspeed (direct)
 execution_profiles:
 - id: default
   routes:
@@ -924,6 +960,9 @@ execution_profiles:
   - default:openai:gpt-6.1-sol
   - default:anthropic:claude-sonnet-5-5
   - default:anthropic:claude-haiku-5-5
+  - default:openai:gpt-6.1-terra
+  - default:moonshotai:kimi-k3.1-pro
+  - default:moonshotai:kimi-k3.1-pro-highspeed
 - id: bedrock
   routes:
   - bedrock:anthropic/claude-sonnet-5
@@ -1005,6 +1044,7 @@ offer_groups:
   - default:openai:gpt-5.4-mini
   - default:openai:gpt-5.4-nano
   - default:openai:gpt-6.1-sol
+  - default:openai:gpt-6.1-terra
 - id: anthropic-direct
   credential: ANTHROPIC_API_KEY
   routes:
@@ -1014,6 +1054,11 @@ offer_groups:
   - default:anthropic:claude-haiku-4-5
   - default:anthropic:claude-sonnet-5-5
   - default:anthropic:claude-haiku-5-5
+- id: moonshot-direct
+  credential: MOONSHOT_API_KEY
+  routes:
+  - default:moonshotai:kimi-k3.1-pro
+  - default:moonshotai:kimi-k3.1-pro-highspeed
 - id: bedrock
   credential: null
   routes:
