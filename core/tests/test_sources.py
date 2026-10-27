@@ -272,7 +272,16 @@ def test_bundled_registry_covers_every_seeded_provider():
         "nvidia",
         "vercel",
         "openrouter",
+        "moonshotai",
     }
+
+
+def test_kimi_pricing_source_is_registered_for_reviewed_discovery():
+    source = load_source_registry().get("moonshot-api-pricing")
+    assert source.provider == "moonshotai"
+    assert source.channel == "moonshot-api"
+    assert source.url == "https://platform.kimi.ai/"
+    assert source.low_risk.eligible is False
 
 
 def test_gateway_model_feeds_are_registered_for_reviewed_discovery():

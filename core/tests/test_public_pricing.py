@@ -2854,6 +2854,44 @@ def test_installed_catalog_prices_gpt_6_1_terra_batch_cache_components():
     assert batch_write.cost_usd == Decimal("0.06250000")
 
 
+@pytest.mark.parametrize(
+    ("model", "input_rate", "output_rate", "cache_rate", "write_rate"),
+    [
+        ("kimi-k3.1-pro", "2.00", "10.00", "0.20", "2.00"),
+        ("kimi-k3.1-pro-highspeed", "4.00", "20.00", "0.20", "4.00"),
+    ],
+)
+def test_installed_catalog_prices_kimi_k3_1_direct_models(
+    model, input_rate, output_rate, cache_rate, write_rate
+):
+    catalog = load_catalog()
+    at = datetime(2026, 10, 24, tzinfo=timezone.utc)
+    usage = dict(input_tokens=100_000, output_tokens=100_000)
+    before = catalog.price(model=model, channel="moonshot-api", at=at - timedelta(seconds=1), **usage)
+    standard = catalog.price(model=model, channel="moonshot-api", at=at, **usage)
+    cached = catalog.price(
+        model=model, channel="moonshot-api", at=at,
+        input_tokens=100_000, output_tokens=0,
+        cache_read_tokens=50_000, cache_write_5m_tokens=50_000,
+    )
+
+    assert before.status == "unpriced"
+    assert standard.status == "priced"
+    assert standard.cost_usd == (Decimal(input_rate) + Decimal(output_rate)) / 10
+    assert cached.status == "priced"
+    assert cached.components.input == Decimal("0")
+    assert cached.components.cache_read == Decimal(cache_rate) / 20
+    assert cached.components.cache_write == Decimal(write_rate) / 20
+
+    # Moonshot publishes a 1h tier but does not list a verified K3.1 rate.
+    one_hour = catalog.price(
+        model=model, channel="moonshot-api", at=at,
+        input_tokens=100_000, output_tokens=0, cache_write_1h_tokens=50_000,
+    )
+    assert one_hour.status == "partial"
+    assert "cache_write_1h_rate_unavailable" in one_hour.notes
+
+
 @pytest.mark.parametrize("channel", ["vercel-ai-gateway", "openrouter-api"])
 @pytest.mark.parametrize(
     ("at", "cost"),
