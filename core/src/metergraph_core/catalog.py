@@ -229,18 +229,20 @@ class Price:
     # one. Absent, batch cache reads keep the standard cache-read rate; it is
     # never inferred from another rate.
     batch_cache_read_per_mtok: Decimal | None = None
+    # OpenAI publishes a separate Batch/Flex cache-write rate.
+    batch_cache_write_5m_per_mtok: Decimal | None = None
 
     def __post_init__(self) -> None:
         # The loader checks the rate it reads, but a row built or replaced
         # directly must not bill a negative or undefined cache component.
-        rate = self.batch_cache_read_per_mtok
-        if rate is not None and not (
-            isinstance(rate, Decimal) and rate.is_finite() and rate >= 0
-        ):
-            raise ValueError(
-                "batch_cache_read_per_mtok must be a finite non-negative "
-                f"Decimal or None, not {rate!r}"
-            )
+        for name in ("batch_cache_read_per_mtok", "batch_cache_write_5m_per_mtok"):
+            rate = getattr(self, name)
+            if rate is not None and not (
+                isinstance(rate, Decimal) and rate.is_finite() and rate >= 0
+            ):
+                raise ValueError(
+                    f"{name} must be a finite non-negative Decimal or None, not {rate!r}"
+                )
 
 
 @dataclass(frozen=True, slots=True)
@@ -370,6 +372,7 @@ def _billed_terms(resolved: ResolvedPrice) -> tuple[Any, ...]:
         price.batch_input_per_mtok,
         price.batch_output_per_mtok,
         price.batch_cache_read_per_mtok,
+        price.batch_cache_write_5m_per_mtok,
         price.request_fee_per_1k_usd,
         resolved.rules,
     )
@@ -523,6 +526,7 @@ def _price_tokens(
     input_rate = price.input_per_mtok
     output_rate = price.output_per_mtok
     cache_read_rate = price.cache_read_per_mtok
+    cache_write_5m_rate = price.cache_write_5m_per_mtok
     if batch:
         if price.batch_input_per_mtok is None or price.batch_output_per_mtok is None:
             reasons.append("batch_rate_unavailable")
@@ -533,6 +537,8 @@ def _price_tokens(
         # the standard rate, as it always has.
         if price.batch_cache_read_per_mtok is not None:
             cache_read_rate = price.batch_cache_read_per_mtok
+        if price.batch_cache_write_5m_per_mtok is not None:
+            cache_write_5m_rate = price.batch_cache_write_5m_per_mtok
 
     input_multiplier = Decimal("1")
     output_multiplier = Decimal("1")
@@ -579,12 +585,12 @@ def _price_tokens(
                 / _MILLION
             )
     if cache_write_5m_count:
-        if price.cache_write_5m_per_mtok is None:
+        if cache_write_5m_rate is None:
             reasons.append("cache_write_5m_rate_unavailable")
         else:
             cache_write_usd += (
                 Decimal(cache_write_5m_count)
-                * price.cache_write_5m_per_mtok
+                * cache_write_5m_rate
                 * input_multiplier
                 / _MILLION
             )

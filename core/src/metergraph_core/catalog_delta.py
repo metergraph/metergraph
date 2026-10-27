@@ -46,6 +46,7 @@ RATE_FIELDS = (
     "batch_input_per_mtok",
     "batch_output_per_mtok",
     "batch_cache_read_per_mtok",
+    "batch_cache_write_5m_per_mtok",
     "request_fee_per_1k_usd",
 )
 _PRICE_FIELDS = frozenset(

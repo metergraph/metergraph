@@ -306,7 +306,11 @@ models:
         cache_write_5m_per_mtok: 1.25
         batch_input_per_mtok: 0.50
         batch_output_per_mtok: 2.50
+        batch_cache_read_per_mtok: 0.025
+        batch_cache_write_5m_per_mtok: 0.625
         rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://developers.openai.com/api/docs/models/gpt-6.1-terra
 

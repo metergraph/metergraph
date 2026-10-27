@@ -2835,6 +2835,25 @@ def test_installed_catalog_prices_gpt_6_1_terra_from_its_release_day():
     assert resolved.price.batch_output_per_mtok == Decimal("2.50")
 
 
+def test_installed_catalog_prices_gpt_6_1_terra_batch_cache_components():
+    catalog = load_catalog()
+    at = _GPT_6_1_TERRA_RELEASE
+    read_usage = dict(input_tokens=100_000, output_tokens=0, cache_read_tokens=100_000)
+    write_usage = dict(input_tokens=100_000, output_tokens=0, cache_write_5m_tokens=100_000)
+
+    standard_read = catalog.price(model="gpt-6.1-terra", channel="openai-api", at=at, **read_usage)
+    batch_read = catalog.price(model="gpt-6.1-terra", channel="openai-api", at=at, batch=True, **read_usage)
+    standard_write = catalog.price(model="gpt-6.1-terra", channel="openai-api", at=at, **write_usage)
+    batch_write = catalog.price(model="gpt-6.1-terra", channel="openai-api", at=at, batch=True, **write_usage)
+
+    assert standard_read.status == batch_read.status == "priced"
+    assert standard_read.cost_usd == Decimal("0.00500000")
+    assert batch_read.cost_usd == Decimal("0.00250000")
+    assert standard_write.status == batch_write.status == "priced"
+    assert standard_write.cost_usd == Decimal("0.12500000")
+    assert batch_write.cost_usd == Decimal("0.06250000")
+
+
 @pytest.mark.parametrize("channel", ["vercel-ai-gateway", "openrouter-api"])
 @pytest.mark.parametrize(
     ("at", "cost"),
