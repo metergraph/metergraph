@@ -272,7 +272,16 @@ def test_bundled_registry_covers_every_seeded_provider():
         "nvidia",
         "vercel",
         "openrouter",
+        "moonshotai",
     }
+
+
+def test_kimi_pricing_source_is_registered_for_reviewed_discovery():
+    source = load_source_registry().get("moonshot-api-pricing")
+    assert source.provider == "moonshotai"
+    assert source.channel == "moonshot-api"
+    assert source.url == "https://platform.kimi.ai/"
+    assert source.low_risk.eligible is False
 
 
 def test_gateway_model_feeds_are_registered_for_reviewed_discovery():
@@ -409,8 +418,16 @@ GPU_LICENSE_PAGE = (
     "<p>Licenses start at $1000 per GPU per year, or about $0.50 per GPU per hour in the cloud.</p>"
     "<p>Developers can prototype at no cost.</p>"
 )
+PRICE_CARD_PAGE = (
+    "<section><h2>Example Model</h2><div>Input $2.00 / MTok "
+    "Output $10.00 / MTok Cache Hit $0.20 / MTok</div></section>"
+)
 # The generic synthetic page each discovery parser is exercised on.
-GENERIC_PAGES = {"html-tables": TOKEN_TABLE_PAGE, "gpu-license-prose": GPU_LICENSE_PAGE}
+GENERIC_PAGES = {
+    "html-tables": TOKEN_TABLE_PAGE,
+    "html-price-prose": PRICE_CARD_PAGE,
+    "gpu-license-prose": GPU_LICENSE_PAGE,
+}
 
 
 def test_only_low_risk_and_demoted_official_sources_have_source_specific_fixtures():
@@ -442,6 +459,9 @@ def test_every_generic_discovery_source_yields_normalized_discovery_evidence():
         assert evidence["redacted"] is True, source.id
         if evidence["kind"] == "tables":
             assert evidence["tables"][0]["rows"][0] == {"label": "example-model-large", "amounts": ["2.00", "0.20", "8.00"]}
+        elif evidence["kind"] == "price_mentions":
+            assert evidence["amounts"] == ["2.00", "10.00", "0.20"]
+            assert "Example Model" not in str(evidence)
         else:
             assert evidence["candidates"] == {"license_per_gpu_year_usd": "1000", "gpu_hour_usd": "0.50"}
 

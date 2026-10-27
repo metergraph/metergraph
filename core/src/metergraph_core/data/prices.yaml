@@ -3188,6 +3188,40 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
+  - canonical_id: moonshotai/kimi-k3.1-pro
+    publisher: moonshotai
+    aliases:
+      - {provider: moonshotai, alias: kimi-k3.1-pro, channel: moonshot-api}
+      - {provider: unknown, alias: kimi-k3.1-pro, channel: moonshot-api}
+      - {provider: litellm, alias: kimi-k3.1-pro, channel: moonshot-api}
+    prices:
+      - channel: moonshot-api
+        region: global
+        effective_from: "2026-10-24"
+        input_per_mtok: 2.00
+        output_per_mtok: 10.00
+        cache_read_per_mtok: 0.20
+        cache_write_5m_per_mtok: 2.00
+        rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+        source_url: https://platform.kimi.ai/
+
+  - canonical_id: moonshotai/kimi-k3.1-pro-highspeed
+    publisher: moonshotai
+    aliases:
+      - {provider: moonshotai, alias: kimi-k3.1-pro-highspeed, channel: moonshot-api}
+      - {provider: unknown, alias: kimi-k3.1-pro-highspeed, channel: moonshot-api}
+      - {provider: litellm, alias: kimi-k3.1-pro-highspeed, channel: moonshot-api}
+    prices:
+      - channel: moonshot-api
+        region: global
+        effective_from: "2026-10-24"
+        input_per_mtok: 4.00
+        output_per_mtok: 20.00
+        cache_read_per_mtok: 0.20
+        cache_write_5m_per_mtok: 4.00
+        rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+        source_url: https://platform.kimi.ai/
+
   - canonical_id: moonshotai/kimi-k3
     publisher: moonshotai
     aliases:

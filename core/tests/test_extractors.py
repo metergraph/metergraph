@@ -89,6 +89,23 @@ def test_extracted_rates_are_immutable():
         rate.rates["input_per_mtok"] = D("0")
 
 
+def test_html_price_prose_captures_model_card_prices_for_review():
+    page = (
+        "<section><h2>K3.1 Pro</h2><p>Flagship model</p>"
+        "<div>Input $2.00 / MTok Output $10.00 / MTok "
+        "Cache Write $2.00 / MTok Cache Hit $0.20 / MTok</div></section>"
+    )
+    extraction = extract("html-price-prose", page)
+    assert extraction.applicable is False
+    assert extraction.rates == ()
+    assert extraction.evidence["kind"] == "price_mentions"
+    assert any("K3.1 Pro" in item and "$2.00" in item for item in extraction.evidence["mentions"])
+    assert any("$0.20" in item for item in extraction.evidence["mentions"])
+    assert structural_fingerprint("html-price-prose", page) == structural_fingerprint(
+        "html-price-prose", page.replace("$2.00", "$3.00")
+    )
+
+
 def test_vercel_gateway_json_extracts_paid_language_rates_and_rules():
     content = json.dumps(
         {

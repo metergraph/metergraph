@@ -152,6 +152,16 @@ sources:
     fingerprint: null
     low_risk: {eligible: false, dimensions: []}
 
+  - id: moonshot-api-pricing
+    provider: moonshotai
+    channel: moonshot-api
+    catalog_channel: true
+    url: https://platform.kimi.ai/
+    parser: html-price-prose
+    dimensions: [input_per_mtok, output_per_mtok, cache_read_per_mtok, cache_write_5m_per_mtok]
+    fingerprint: null
+    low_risk: {eligible: false, dimensions: []}
+
   # Gemini and partner models on Vertex AI. Prices vary by model, context
   # length, tier and processing mode; reviewed discovery only. The URL is the
   # current destination of Google's Vertex AI generative pricing page

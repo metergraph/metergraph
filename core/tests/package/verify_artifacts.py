@@ -36,7 +36,7 @@ CORE_DIR = Path(__file__).resolve().parents[2]  # core/
 DIST_DIR = CORE_DIR / "dist"
 
 EXPECTED_NAME = "metergraph-core"
-EXPECTED_VERSION = "0.7.5"
+EXPECTED_VERSION = "0.7.6"
 EXPECTED_REQUIRES_PYTHON = ">=3.10"
 EXPECTED_SUMMARY = (
     "Open, effective-dated LLM pricing catalog and deterministic cost calculator "
@@ -416,7 +416,7 @@ def _verify_isolated_install(wheel: Path) -> None:
             "google-api-pricing",
             "xai-api-pricing",
         ], low_risk
-        assert len(sources.sources) == 16, len(sources.sources)
+        assert len(sources.sources) == 17, len(sources.sources)
         assert sources.get("google-vertex-ai-pricing").low_risk.eligible is False
         [model] = [
             entry for entry in loaded.document["models"]

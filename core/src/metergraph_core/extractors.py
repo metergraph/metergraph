@@ -7,8 +7,8 @@ the parser id a source registry entry names.
 Official parsers (OpenAI, Anthropic, Google, DeepSeek, Mistral, xAI and
 Perplexity) turn a page into ``{model name: {field: Decimal}}`` tables keyed
 by the page's own model spelling; :func:`extract` maps those to catalog
-price columns. The two generic discovery parsers, ``html-tables`` and
-``gpu-license-prose``, record normalized evidence from any page for a
+price columns. The generic discovery parsers, ``html-tables``,
+``html-price-prose``, and ``gpu-license-prose`` record normalized evidence for a
 reviewer and never produce applicable price rows; the license parser's
 evidence is GPU or license pricing, never token rates.
 
@@ -886,6 +886,23 @@ def _table_features(content: str) -> Any:
     return {"headers": sorted(list(row) for row in headers)}
 
 
+def _price_prose_evidence(content: str) -> dict[str, Any]:
+    text = page_text(content)
+    mentions = []
+    amounts = []
+    for match in _AMOUNT.finditer(text):
+        amounts.append(match.group()[1:].replace(",", ""))
+        excerpt = text[max(0, match.start() - 300):match.end() + 100].strip(" |")
+        if excerpt not in mentions:
+            mentions.append(excerpt)
+    return {"kind": "price_mentions", "mentions": mentions[:100], "amounts": amounts[:100]}
+
+
+def _price_prose_features(content: str) -> Any:
+    text = _AMOUNT.sub("$#", page_text(content))
+    return {"has_prices": "$#" in text, "has_model": "model" in text.lower()}
+
+
 _LICENSE_CANDIDATES = {
     "license_per_gpu_year_usd": re.compile(r"\$([0-9][0-9,]*(?:\.[0-9]+)?) per GPU per year"),
     "gpu_hour_usd": re.compile(r"\$([0-9][0-9,]*(?:\.[0-9]+)?) per GPU per hour"),
@@ -964,6 +981,12 @@ def redact_evidence(evidence: Mapping[str, Any]) -> dict[str, Any]:
             "statement_count": len(evidence.get("statements") or []),
             "candidates": dict(evidence.get("candidates") or {}),
         }
+    if kind == "price_mentions":
+        return {
+            "kind": kind,
+            "redacted": True,
+            "amounts": list(evidence.get("amounts") or []),
+        }
     return {"kind": kind, "redacted": True}
 
 
@@ -1006,6 +1029,7 @@ PARSERS: Mapping[str, ParserSpec] = MappingProxyType(
         # Generic discovery parsers: any page's tables, or GPU and license
         # pricing stated in prose. They describe no provider's layout.
         "html-tables": ParserSpec(False, _table_features, evidence=_table_evidence),
+        "html-price-prose": ParserSpec(False, _price_prose_features, evidence=_price_prose_evidence),
         "gpu-license-prose": ParserSpec(False, _license_features, evidence=_license_evidence),
     }
 )
