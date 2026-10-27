@@ -153,7 +153,8 @@ class LoadedCatalog:
             model=model, channel=channel, provider=provider, at=when, region=region
         )
         if resolved is None:
-            return PriceResult("unpriced", None, None, when, missing)
+            warnings = self._explain(model, channel, provider, when, region, missing)
+            return PriceResult("unpriced", None, None, when, missing, warnings=warnings)
         return PriceResult(
             "partial" if missing else "priced",
             resolved.canonical_model,
@@ -161,6 +162,15 @@ class LoadedCatalog:
             when,
             missing,
             (PRICE_ENDED,) if resolved.ended else (),
+        )
+
+    def _explain(self, model, channel, provider, at, region, missing):
+        """Warnings for an unpriced result. A missing region already says
+        why, so it gets none."""
+        if "region" in missing:
+            return ()
+        return self.snapshot._explain(
+            model=model, channel=channel, provider=provider, at=at, region=region
         )
 
     def calculate_cost(
@@ -190,6 +200,7 @@ class LoadedCatalog:
                 reasons or ("unknown_deployment",),
                 effective_at=when,
                 missing_dimensions=missing,
+                warnings=self._explain(model, channel, provider, when, region, missing),
             )
         return _cost_result(resolved, at=when, usage=usage, missing=missing)
 

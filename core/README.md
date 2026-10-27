@@ -180,6 +180,26 @@ A call after it ended resolves to that price, stays `priced`, and carries
 applied `price.effective_to` says when it ended. A closed price followed by a
 later one never extends, so a gap before a scheduled price stays `unpriced`.
 
+An `unpriced` result says why in `warnings` when the cause is a value you
+passed, on both `PriceResult` and `CostResult`. Each `PricingWarning` has a
+stable `code` and a `message` that names the value and, when one is close,
+the value you probably meant. Nothing raises, and `priced` or `partial`
+results never carry warnings, nor does an `unpriced` one with `region`
+missing.
+
+| Code | Meaning |
+| --- | --- |
+| `unknown_channel` | No price row bills on the channel. `gemini-api` suggests `google-api`. |
+| `unknown_provider` | No channel was passed and the provider has no direct channel: a misspelling, or a gateway or proxy such as LiteLLM. |
+| `unknown_model` | The catalog has no model under that name. |
+| `model_not_on_channel` | The name is known, but the channel has no alias and price for it. The message lists the channels that do. |
+| `model_not_in_effect` | The name resolved on the channel only before or after the given time, such as an alias a provider retired. |
+| `price_not_in_effect` | The name resolves, but no price covers that time or region. |
+
+`cost_from_response` judges the provider it priced with, so an Anthropic
+response naming a model the Anthropic API does not sell warns
+`model_not_on_channel`.
+
 ### Costing a provider response
 
 `cost_from_response` reads the usage out of a response you already have and
