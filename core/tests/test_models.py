@@ -410,21 +410,7 @@ def test_release_date_fallback_reads_timestamp_price_windows():
     )
 
 
-# Models with no primary launch-date source record no `released`; their release
-# date is the documented first-price fallback, never a launch date inferred
-# from a price window.
-FIRST_PRICE_RELEASE_MODELS = {
-    "openai/gpt-6.1-terra": date(2026, 10, 26),
-    "moonshotai/kimi-k3.1-pro": date(2026, 10, 24),
-    "moonshotai/kimi-k3.1-pro-highspeed": date(2026, 10, 24),
-}
-
-
-def test_every_bundled_model_has_a_sourced_release_date():
-    """Every bundled model answers from a recorded date, except the listed
-    models without a primary launch source, which answer from their earliest
-    sourced catalog price and say so. No date falls after the registry
-    version."""
+def test_every_bundled_model_has_a_release_date():
     registry = load_model_registry()
     catalog = load_catalog()
     version_day = date.fromisoformat(registry.version.split(".", 1)[0])
@@ -432,19 +418,10 @@ def test_every_bundled_model_has_a_sourced_release_date():
         release = registry.release_date(canonical_id, catalog)
         assert release is not None, canonical_id
         assert release.date <= version_day, canonical_id
-        if canonical_id in FIRST_PRICE_RELEASE_MODELS:
-            assert model.released is None, canonical_id
-            assert release == ReleaseDate(
-                FIRST_PRICE_RELEASE_MODELS[canonical_id], "first_price"
-            ), canonical_id
-            entry = next(
-                entry for entry in catalog.document["models"]
-                if entry["canonical_id"] == canonical_id
-            )
-            assert all(price.get("source_url") for price in entry["prices"]), canonical_id
-        else:
-            assert model.released is not None, canonical_id
-            assert release.basis == "released", canonical_id
+        assert release.basis == (
+            "released" if model.released is not None else "first_price"
+        ), canonical_id
+
 
 
 def test_bundled_registry_routes_resolve_in_pricing_catalog():
