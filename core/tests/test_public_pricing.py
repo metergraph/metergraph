@@ -2889,7 +2889,7 @@ def test_installed_catalog_prices_kimi_k3_1_direct_models(
         input_tokens=100_000, output_tokens=0, cache_write_1h_tokens=50_000,
     )
     assert one_hour.status == "partial"
-    assert "cache_write_1h_rate_unavailable" in one_hour.notes
+    assert "cache_write_1h_rate_unavailable" in one_hour.reasons
 
 
 @pytest.mark.parametrize("channel", ["vercel-ai-gateway", "openrouter-api"])
