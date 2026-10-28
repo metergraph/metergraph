@@ -15,7 +15,15 @@ catalog already has:
 It also supports reviewed catalog expansion:
 
 - ``add_model`` appends one complete model entry.
-- ``add_alias`` appends one alias to an existing model.
+- ``add_alias`` appends one alias to an existing model. A spelling another
+  model holds conflicts only while both aliases are in effect, so a spelling
+  can move to another model from a date.
+- ``close_alias`` sets ``effective_to`` on the open alias its ``expect``
+  names, so a spelling closed and reopened on one model keeps its earlier
+  window. With an
+  ``add_alias`` for the same spelling on another model in one delta, it
+  moves that spelling: calls before the date keep the old model, calls from
+  it resolve to the new one.
 
 ``provenance`` references the observations and evidence the delta came
 from.
@@ -34,7 +42,7 @@ from .loader import CatalogError, _canonical_json, load_catalog_document
 CATALOG_DELTA_SCHEMA_VERSION = 2
 PRICING_DELTA_KIND = "pricing_delta"
 PRICE_OPERATIONS = ("add_price", "replace_price", "close_price")
-CATALOG_OPERATIONS = ("add_model", "add_alias")
+CATALOG_OPERATIONS = ("add_model", "add_alias", "close_alias")
 OPERATIONS = PRICE_OPERATIONS + CATALOG_OPERATIONS
 
 RATE_FIELDS = (
@@ -116,12 +124,14 @@ class DeltaOperation:
     expect: Mapping[str, Any] | None
     # The new row for add/replace; None for close.
     price: Mapping[str, Any] | None
-    # The closing date for close_price.
+    # The closing date for close_price and close_alias.
     effective_to: str | None
     # The complete entry for add_model.
     model: Mapping[str, Any] | None = None
     # The alias row for add_alias.
     alias: Mapping[str, Any] | None = None
+    # The source a close_alias cites, for an alias that cites none.
+    source_url: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -197,7 +207,7 @@ def _parse_model_key(raw: Any, label: str) -> ModelKey:
     return ModelKey(_text(raw["canonical_id"]))
 
 
-def _parse_alias_key(raw: Any, label: str) -> AliasKey:
+def _parse_alias_key(raw: Any, label: str, op: str) -> AliasKey:
     if not isinstance(raw, Mapping):
         raise CatalogDeltaError(f"{label}: key must be a mapping")
     fields = ("canonical_id", "provider", "alias", "channel")
@@ -205,7 +215,7 @@ def _parse_alias_key(raw: Any, label: str) -> AliasKey:
         if _text(raw.get(field)) is None:
             raise CatalogDeltaError(f"{label}: key needs {field}")
     if set(raw) != set(fields):
-        raise CatalogDeltaError(f"{label}: add_alias key has unknown fields")
+        raise CatalogDeltaError(f"{label}: {op} key has unknown fields")
     return AliasKey(
         _text(raw["canonical_id"]),
         _text(raw["provider"]).lower(),
@@ -324,8 +334,8 @@ def _parse_operation(index: int, raw: Any) -> DeltaOperation:
         raise CatalogDeltaError(f"{label}: unknown op {op!r}")
     if op == "add_model":
         key: OperationKey = _parse_model_key(raw.get("key"), label)
-    elif op == "add_alias":
-        key = _parse_alias_key(raw.get("key"), label)
+    elif op in ("add_alias", "close_alias"):
+        key = _parse_alias_key(raw.get("key"), label, op)
     else:
         key = _parse_key(raw.get("key"), label)
     expect = raw.get("expect")
@@ -338,6 +348,7 @@ def _parse_operation(index: int, raw: Any) -> DeltaOperation:
     effective_to = None
     model = None
     alias = None
+    source_url = None
     if op == "add_model":
         if "price" in raw or "alias" in raw or "effective_to" in raw:
             raise CatalogDeltaError(f"{label}: add_model takes only model")
@@ -346,6 +357,18 @@ def _parse_operation(index: int, raw: Any) -> DeltaOperation:
         if "price" in raw or "model" in raw or "effective_to" in raw:
             raise CatalogDeltaError(f"{label}: add_alias takes only alias")
         alias = _parse_alias(raw.get("alias"), key, label)
+    elif op == "close_alias":
+        if set(raw) - {"op", "key", "expect", "effective_to", "source_url"}:
+            raise CatalogDeltaError(
+                f"{label}: close_alias takes only effective_to and source_url"
+            )
+        effective_to = _iso_date(raw.get("effective_to"))
+        if effective_to is None:
+            raise CatalogDeltaError(f"{label}: invalid effective_to")
+        if "source_url" in raw:
+            source_url = _text(raw.get("source_url"))
+            if source_url is None:
+                raise CatalogDeltaError(f"{label}: invalid source_url")
     elif op == "close_price":
         if "price" in raw:
             raise CatalogDeltaError(f"{label}: close_price takes no price")
@@ -369,6 +392,7 @@ def _parse_operation(index: int, raw: Any) -> DeltaOperation:
         effective_to=effective_to,
         model=model,
         alias=alias,
+        source_url=source_url,
     )
 
 
@@ -480,8 +504,53 @@ def _key_label(key: OperationKey) -> str:
     return key.canonical_id
 
 
-def _precondition(document: Mapping[str, Any], operation: DeltaOperation) -> str | None:
-    """Why ``operation`` does not apply to ``document``, or None when it does."""
+def _alias_rows(
+    entry: Mapping[str, Any], key: AliasKey
+) -> list[Mapping[str, Any]]:
+    return [
+        alias
+        for alias in entry.get("aliases") or []
+        if isinstance(alias, Mapping)
+        and (_text(alias.get("provider")) or "").lower() == key.provider
+        and (_text(alias.get("alias")) or "").lower() == key.alias
+        and _text(alias.get("channel")) == key.channel
+    ]
+
+
+def _expected_aliases(
+    entry: Mapping[str, Any], operation: DeltaOperation
+) -> list[Mapping[str, Any]]:
+    """The rows under a close_alias key that equal its ``expect``. A key can
+    hold several windows of one spelling; ``expect`` names the one to end."""
+    expected = _canonical_json(operation.expect)
+    return [
+        alias
+        for alias in _alias_rows(entry, operation.key)
+        if _canonical_json(alias) == expected
+    ]
+
+
+def _windows_overlap(
+    left_from: Any, left_to: Any, right_from: Any, right_to: Any
+) -> bool:
+    """Whether two alias windows share an instant; a missing bound is open,
+    as the catalog loader reads it."""
+    left_from, left_to = _instant(left_from), _instant(left_to)
+    right_from, right_to = _instant(right_from), _instant(right_to)
+    return (left_to is None or right_from is None or right_from < left_to) and (
+        right_to is None or left_from is None or left_from < right_to
+    )
+
+
+def _precondition(
+    document: Mapping[str, Any],
+    operation: DeltaOperation,
+    closing: Mapping[AliasKey, str] | None = None,
+) -> str | None:
+    """Why ``operation`` does not apply to ``document``, or None when it does.
+
+    ``closing`` maps the key of each alias a close_alias in the same delta
+    ends to its ``effective_to``, so an alias can move in one delta."""
     if operation.op == "add_model":
         key = operation.key
         if _model_indexes(document, key.canonical_id):
@@ -502,13 +571,69 @@ def _precondition(document: Mapping[str, Any], operation: DeltaOperation) -> str
             return "unknown_model"
         if len(models) > 1:
             return "duplicate_model"
-        for canonical_id, provider, name in _aliases(document):
-            if (provider, name) == (key.provider, key.alias):
-                return (
-                    "alias_exists"
-                    if canonical_id == key.canonical_id
-                    else "alias_conflict"
-                )
+        closing = closing or {}
+        new = operation.alias or {}
+        for entry in document.get("models") or []:
+            if not isinstance(entry, Mapping):
+                continue
+            canonical_id = str(entry.get("canonical_id") or "")
+            for alias in entry.get("aliases") or []:
+                if not isinstance(alias, Mapping):
+                    continue
+                provider = (_text(alias.get("provider")) or "").lower()
+                name = (_text(alias.get("alias")) or "").lower()
+                if (provider, name) != (key.provider, key.alias):
+                    continue
+                ends = alias.get("effective_to")
+                if ends is None:
+                    ends = closing.get(
+                        AliasKey(
+                            canonical_id,
+                            provider,
+                            name,
+                            _text(alias.get("channel")) or "",
+                        )
+                    )
+                if _windows_overlap(
+                    alias.get("effective_from"),
+                    ends,
+                    new.get("effective_from"),
+                    new.get("effective_to"),
+                ):
+                    return (
+                        "alias_exists"
+                        if canonical_id == key.canonical_id
+                        else "alias_conflict"
+                    )
+        return None
+    if operation.op == "close_alias":
+        key = operation.key
+        models = _model_indexes(document, key.canonical_id)
+        if not models:
+            return "unknown_model"
+        if len(models) > 1:
+            return "duplicate_model"
+        entry = document["models"][models[0]]
+        if not _alias_rows(entry, key):
+            return "alias_missing"
+        rows = _expected_aliases(entry, operation)
+        if not rows:
+            return "expect_mismatch"
+        if len(rows) > 1:
+            return "duplicate_alias"
+        row = rows[0]
+        if row.get("effective_to") is not None:
+            return "alias_not_open"
+        starts = _instant(row.get("effective_from"))
+        if starts is not None and _instant(operation.effective_to) <= starts:
+            return "not_after_start"
+        # A dated alias must cite its source, so a close supplies one for an
+        # alias that has none, and never replaces one it has.
+        if _text(row.get("source_url")) is None:
+            if operation.source_url is None:
+                return "source_url_needed"
+        elif operation.source_url is not None:
+            return "source_url_exists"
         return None
     model_index, rows, reason = _locate(document, operation)
     if reason is not None:
@@ -565,10 +690,15 @@ def apply_catalog_delta(
     delta = parse_catalog_delta(delta_document)
     if not isinstance(document, Mapping):
         raise CatalogDeltaError("catalog document must be a mapping")
+    closing = {
+        operation.key: operation.effective_to
+        for operation in delta.operations
+        if operation.op == "close_alias"
+    }
     conflicts = tuple(
         DeltaConflict(operation.index, operation.op, operation.key, reason)
         for operation in delta.operations
-        if (reason := _precondition(document, operation)) is not None
+        if (reason := _precondition(document, operation, closing)) is not None
     )
     if conflicts:
         raise CatalogDeltaConflict(conflicts)
@@ -585,6 +715,16 @@ def apply_catalog_delta(
             result["models"][model_index].setdefault("aliases", []).append(
                 copy.deepcopy(dict(operation.alias))
             )
+            continue
+        if operation.op == "close_alias":
+            [model_index] = _model_indexes(result, operation.key.canonical_id)
+            # The first equal row is the one checked: an alias this delta
+            # adds under the same key starts after this one ends, so it never
+            # equals ``expect``.
+            alias = _expected_aliases(result["models"][model_index], operation)[0]
+            alias["effective_to"] = operation.effective_to
+            if operation.source_url is not None:
+                alias["source_url"] = operation.source_url
             continue
         model_index, rows, _ = _locate(result, operation)
         prices = result["models"][model_index].setdefault("prices", [])
