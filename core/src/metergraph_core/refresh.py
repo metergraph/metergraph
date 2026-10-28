@@ -663,6 +663,27 @@ def _current_identity(
     return canonical_id, current
 
 
+def _channel_models(
+    document: Mapping[str, Any], source: PriceSource, model_key: str, day: date
+) -> list[Mapping[str, Any]]:
+    """Models with an alias in effect on ``day`` that spells ``model_key`` on
+    the source's own channel. That alias is the reviewed mapping for this
+    gateway, so it decides even while another channel still gives the
+    spelling to a different model."""
+    provider, wanted = source.provider.lower(), model_key.strip().lower()
+    return [
+        entry
+        for entry in document.get("models") or []
+        if isinstance(entry, Mapping)
+        and any(
+            str(alias.get("provider") or "").strip().lower() == provider
+            and str(alias.get("alias") or "").strip().lower() == wanted
+            and alias.get("channel") == source.channel
+            for alias in _current_identity(entry, day)[1]
+        )
+    ]
+
+
 def _exact_models(
     document: Mapping[str, Any], model_key: str, day: date
 ) -> list[Mapping[str, Any]]:
@@ -722,7 +743,9 @@ def _gateway_additions(
     operations: list[dict[str, Any]] = []
     identity_exclusions: list[dict[str, Any]] = []
     for rate in extraction.rates:
-        matches = _exact_models(document, rate.model_key, observed_on)
+        matches = _channel_models(
+            document, source, rate.model_key, observed_on
+        ) or _exact_models(document, rate.model_key, observed_on)
         if not matches:
             near = _near_models(document, rate.model_key, observed_on)
             if near:

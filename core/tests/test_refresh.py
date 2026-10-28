@@ -1800,3 +1800,20 @@ def test_gateway_discovery_follows_a_spelling_to_the_model_it_moved_to():
         ("replace_price", "meta/llama-x")
     ]
     assert changed["identity_exclusions"] == []
+
+
+def test_gateway_discovery_follows_a_moved_spelling_another_gateway_keeps():
+    # The duplicate keeps the spelling on Vercel, while OpenRouter's own
+    # alias for it now names meta/llama-x.
+    document = _moved_spelling_document(gateway_input=2)
+    document["models"][1]["aliases"].append(
+        {"provider": "vercel", "alias": "meta-llama/llama-x-instruct", "channel": "vercel-ai-gateway"}
+    )
+    page = _openrouter_page(_openrouter_model("meta-llama/llama-x-instruct"))
+
+    evidence = discovery_evidence(_gateway_source(), page, document, observed_on=OBSERVED_ON)
+
+    assert [(o["op"], o["key"]["canonical_id"]) for o in evidence["operations"]] == [
+        ("replace_price", "meta/llama-x")
+    ]
+    assert evidence["identity_exclusions"] == []

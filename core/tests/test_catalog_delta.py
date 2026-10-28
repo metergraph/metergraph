@@ -1095,3 +1095,47 @@ def test_close_alias_preconditions(document_alias, overrides, reason):
 def test_close_alias_schema(overrides, message):
     with pytest.raises(CatalogDeltaError, match=message):
         parse_catalog_delta(_delta(_close_alias(**overrides)))
+
+
+def _reopened():
+    """The duplicate's spelling closed on 2026-09-01 and reopened on
+    2026-09-15: two windows under one close_alias key."""
+    document = _with_duplicate()
+    document["models"][1]["aliases"] = [
+        dict(GATEWAY_ALIAS, effective_to="2026-09-01", source_url=MOVE_SOURCE),
+        dict(GATEWAY_ALIAS, effective_from="2026-09-15", source_url=MOVE_SOURCE),
+    ]
+    return document
+
+
+def test_close_alias_ends_the_window_its_expect_names():
+    reopened = dict(GATEWAY_ALIAS, effective_from="2026-09-15", source_url=MOVE_SOURCE)
+    operation = _close_alias(expect=reopened)
+    del operation["source_url"]
+    closed = apply_catalog_delta(_reopened(), _delta(operation))
+    assert closed["models"][1]["aliases"] == [
+        dict(GATEWAY_ALIAS, effective_to="2026-09-01", source_url=MOVE_SOURCE),
+        dict(reopened, effective_to="2026-10-20"),
+    ]
+
+
+def test_a_move_applies_with_the_add_before_the_close():
+    reopened = dict(GATEWAY_ALIAS, effective_from="2026-09-15", source_url=MOVE_SOURCE)
+    close = _close_alias(expect=reopened)
+    del close["source_url"]
+    # The add lands on the same model and key as the close it follows.
+    reopen = _add_alias(
+        canonical_id="example-host/model-a-instruct",
+        alias=dict(GATEWAY_ALIAS, effective_from="2026-11-01", source_url=MOVE_SOURCE),
+    )
+    applied = apply_catalog_delta(_reopened(), _delta(reopen, close))
+    assert applied["models"][1]["aliases"][1:] == [
+        dict(reopened, effective_to="2026-10-20"),
+        dict(GATEWAY_ALIAS, effective_from="2026-11-01", source_url=MOVE_SOURCE),
+    ]
+
+
+def test_a_close_alias_expect_matching_no_window_is_a_mismatch():
+    operation = _close_alias(expect=dict(GATEWAY_ALIAS, source_url=MOVE_SOURCE))
+    del operation["source_url"]
+    assert _conflicts(_reopened(), _delta(operation)) == [(0, "expect_mismatch")]

@@ -18,7 +18,9 @@ It also supports reviewed catalog expansion:
 - ``add_alias`` appends one alias to an existing model. A spelling another
   model holds conflicts only while both aliases are in effect, so a spelling
   can move to another model from a date.
-- ``close_alias`` sets ``effective_to`` on an open alias. With an
+- ``close_alias`` sets ``effective_to`` on the open alias its ``expect``
+  names, so a spelling closed and reopened on one model keeps its earlier
+  window. With an
   ``add_alias`` for the same spelling on another model in one delta, it
   moves that spelling: calls before the date keep the old model, calls from
   it resolve to the new one.
@@ -515,6 +517,19 @@ def _alias_rows(
     ]
 
 
+def _expected_aliases(
+    entry: Mapping[str, Any], operation: DeltaOperation
+) -> list[Mapping[str, Any]]:
+    """The rows under a close_alias key that equal its ``expect``. A key can
+    hold several windows of one spelling; ``expect`` names the one to end."""
+    expected = _canonical_json(operation.expect)
+    return [
+        alias
+        for alias in _alias_rows(entry, operation.key)
+        if _canonical_json(alias) == expected
+    ]
+
+
 def _windows_overlap(
     left_from: Any, left_to: Any, right_from: Any, right_to: Any
 ) -> bool:
@@ -598,14 +613,15 @@ def _precondition(
             return "unknown_model"
         if len(models) > 1:
             return "duplicate_model"
-        rows = _alias_rows(document["models"][models[0]], key)
-        if not rows:
+        entry = document["models"][models[0]]
+        if not _alias_rows(entry, key):
             return "alias_missing"
+        rows = _expected_aliases(entry, operation)
+        if not rows:
+            return "expect_mismatch"
         if len(rows) > 1:
             return "duplicate_alias"
         row = rows[0]
-        if _canonical_json(row) != _canonical_json(operation.expect):
-            return "expect_mismatch"
         if row.get("effective_to") is not None:
             return "alias_not_open"
         starts = _instant(row.get("effective_from"))
@@ -702,7 +718,10 @@ def apply_catalog_delta(
             continue
         if operation.op == "close_alias":
             [model_index] = _model_indexes(result, operation.key.canonical_id)
-            [alias] = _alias_rows(result["models"][model_index], operation.key)
+            # The first equal row is the one checked: an alias this delta
+            # adds under the same key starts after this one ends, so it never
+            # equals ``expect``.
+            alias = _expected_aliases(result["models"][model_index], operation)[0]
             alias["effective_to"] = operation.effective_to
             if operation.source_url is not None:
                 alias["source_url"] = operation.source_url
