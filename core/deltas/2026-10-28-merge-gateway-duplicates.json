@@ -1,0 +1,708 @@
+{
+  "schema_version": 2,
+  "kind": "pricing_delta",
+  "base": "5f6a5904027c88daf675fdc22f9e57921c5ba52ddb9fd4464e4ef3680dceeb62",
+  "provenance": {
+    "observations": [
+      "catalog-duplicate-review@2026-11-02"
+    ],
+    "evidence": [
+      {
+        "url": "https://openrouter.ai/meta-llama/llama-3.1-70b-instruct"
+      },
+      {
+        "url": "https://openrouter.ai/meta-llama/llama-3.1-8b-instruct"
+      },
+      {
+        "url": "https://openrouter.ai/meta-llama/llama-3.3-70b-instruct"
+      },
+      {
+        "url": "https://openrouter.ai/meta-llama/llama-4-maverick"
+      },
+      {
+        "url": "https://openrouter.ai/meta-llama/llama-4-scout"
+      },
+      {
+        "url": "https://openrouter.ai/bytedance-seed/seed-2-1-turbo"
+      },
+      {
+        "url": "https://openrouter.ai/qwen/qwen3-coder-30b-a3b-instruct"
+      },
+      {
+        "url": "https://vercel.com/ai-gateway/models/deepseek-v3.1"
+      }
+    ]
+  },
+  "operations": [
+    {
+      "op": "close_alias",
+      "key": {
+        "canonical_id": "meta-llama/llama-3.1-70b-instruct",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-3.1-70b-instruct",
+        "channel": "openrouter-api"
+      },
+      "expect": {
+        "alias": "meta-llama/llama-3.1-70b-instruct",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        }
+      },
+      "effective_to": "2026-11-02",
+      "source_url": "https://openrouter.ai/meta-llama/llama-3.1-70b-instruct"
+    },
+    {
+      "op": "close_price",
+      "key": {
+        "canonical_id": "meta-llama/llama-3.1-70b-instruct",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-10-20"
+      },
+      "expect": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-10-20",
+        "input_per_mtok": 0.4,
+        "output_per_mtok": 0.4,
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      },
+      "effective_to": "2026-11-02"
+    },
+    {
+      "op": "add_alias",
+      "key": {
+        "canonical_id": "meta/llama-3.1-70b",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-3.1-70b-instruct",
+        "channel": "openrouter-api"
+      },
+      "expect": null,
+      "alias": {
+        "alias": "meta-llama/llama-3.1-70b-instruct",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        },
+        "effective_from": "2026-11-02",
+        "source_url": "https://openrouter.ai/meta-llama/llama-3.1-70b-instruct"
+      }
+    },
+    {
+      "op": "add_price",
+      "key": {
+        "canonical_id": "meta/llama-3.1-70b",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-11-02"
+      },
+      "expect": null,
+      "price": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-11-02",
+        "input_per_mtok": "0.4",
+        "output_per_mtok": "0.4",
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      }
+    },
+    {
+      "op": "close_alias",
+      "key": {
+        "canonical_id": "meta-llama/llama-3.1-8b-instruct",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-3.1-8b-instruct",
+        "channel": "openrouter-api"
+      },
+      "expect": {
+        "alias": "meta-llama/llama-3.1-8b-instruct",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        }
+      },
+      "effective_to": "2026-11-02",
+      "source_url": "https://openrouter.ai/meta-llama/llama-3.1-8b-instruct"
+    },
+    {
+      "op": "close_price",
+      "key": {
+        "canonical_id": "meta-llama/llama-3.1-8b-instruct",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-10-20"
+      },
+      "expect": {
+        "cache_read_per_mtok": 0.025,
+        "channel": "openrouter-api",
+        "effective_from": "2026-10-20",
+        "input_per_mtok": 0.05,
+        "output_per_mtok": 0.08,
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      },
+      "effective_to": "2026-11-02"
+    },
+    {
+      "op": "add_alias",
+      "key": {
+        "canonical_id": "meta/llama-3.1-8b",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-3.1-8b-instruct",
+        "channel": "openrouter-api"
+      },
+      "expect": null,
+      "alias": {
+        "alias": "meta-llama/llama-3.1-8b-instruct",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        },
+        "effective_from": "2026-11-02",
+        "source_url": "https://openrouter.ai/meta-llama/llama-3.1-8b-instruct"
+      }
+    },
+    {
+      "op": "add_price",
+      "key": {
+        "canonical_id": "meta/llama-3.1-8b",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-11-02"
+      },
+      "expect": null,
+      "price": {
+        "cache_read_per_mtok": "0.025",
+        "channel": "openrouter-api",
+        "effective_from": "2026-11-02",
+        "input_per_mtok": "0.05",
+        "output_per_mtok": "0.08",
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      }
+    },
+    {
+      "op": "close_alias",
+      "key": {
+        "canonical_id": "meta-llama/llama-3.3-70b-instruct",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-3.3-70b-instruct",
+        "channel": "openrouter-api"
+      },
+      "expect": {
+        "alias": "meta-llama/llama-3.3-70b-instruct",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        }
+      },
+      "effective_to": "2026-11-02",
+      "source_url": "https://openrouter.ai/meta-llama/llama-3.3-70b-instruct"
+    },
+    {
+      "op": "close_price",
+      "key": {
+        "canonical_id": "meta-llama/llama-3.3-70b-instruct",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-10-20"
+      },
+      "expect": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-10-20",
+        "input_per_mtok": 0.1,
+        "output_per_mtok": 0.32,
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      },
+      "effective_to": "2026-11-02"
+    },
+    {
+      "op": "add_alias",
+      "key": {
+        "canonical_id": "meta/llama-3.3-70b",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-3.3-70b-instruct",
+        "channel": "openrouter-api"
+      },
+      "expect": null,
+      "alias": {
+        "alias": "meta-llama/llama-3.3-70b-instruct",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        },
+        "effective_from": "2026-11-02",
+        "source_url": "https://openrouter.ai/meta-llama/llama-3.3-70b-instruct"
+      }
+    },
+    {
+      "op": "add_price",
+      "key": {
+        "canonical_id": "meta/llama-3.3-70b",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-11-02"
+      },
+      "expect": null,
+      "price": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-11-02",
+        "input_per_mtok": "0.1",
+        "output_per_mtok": "0.32",
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      }
+    },
+    {
+      "op": "close_alias",
+      "key": {
+        "canonical_id": "meta-llama/llama-4-maverick",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-4-maverick",
+        "channel": "openrouter-api"
+      },
+      "expect": {
+        "alias": "meta-llama/llama-4-maverick",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        }
+      },
+      "effective_to": "2026-11-02",
+      "source_url": "https://openrouter.ai/meta-llama/llama-4-maverick"
+    },
+    {
+      "op": "close_price",
+      "key": {
+        "canonical_id": "meta-llama/llama-4-maverick",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-10-20"
+      },
+      "expect": {
+        "cache_read_per_mtok": 0.05,
+        "channel": "openrouter-api",
+        "effective_from": "2026-10-20",
+        "input_per_mtok": 0.1875,
+        "output_per_mtok": 0.6525,
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      },
+      "effective_to": "2026-11-02"
+    },
+    {
+      "op": "add_alias",
+      "key": {
+        "canonical_id": "meta/llama-4-maverick",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-4-maverick",
+        "channel": "openrouter-api"
+      },
+      "expect": null,
+      "alias": {
+        "alias": "meta-llama/llama-4-maverick",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        },
+        "effective_from": "2026-11-02",
+        "source_url": "https://openrouter.ai/meta-llama/llama-4-maverick"
+      }
+    },
+    {
+      "op": "add_price",
+      "key": {
+        "canonical_id": "meta/llama-4-maverick",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-11-02"
+      },
+      "expect": null,
+      "price": {
+        "cache_read_per_mtok": "0.05",
+        "channel": "openrouter-api",
+        "effective_from": "2026-11-02",
+        "input_per_mtok": "0.1875",
+        "output_per_mtok": "0.6525",
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      }
+    },
+    {
+      "op": "close_alias",
+      "key": {
+        "canonical_id": "meta-llama/llama-4-scout",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-4-scout",
+        "channel": "openrouter-api"
+      },
+      "expect": {
+        "alias": "meta-llama/llama-4-scout",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        }
+      },
+      "effective_to": "2026-11-02",
+      "source_url": "https://openrouter.ai/meta-llama/llama-4-scout"
+    },
+    {
+      "op": "close_price",
+      "key": {
+        "canonical_id": "meta-llama/llama-4-scout",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-10-20"
+      },
+      "expect": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-10-20",
+        "input_per_mtok": 0.1,
+        "output_per_mtok": 0.3,
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      },
+      "effective_to": "2026-11-02"
+    },
+    {
+      "op": "add_alias",
+      "key": {
+        "canonical_id": "meta/llama-4-scout",
+        "provider": "openrouter",
+        "alias": "meta-llama/llama-4-scout",
+        "channel": "openrouter-api"
+      },
+      "expect": null,
+      "alias": {
+        "alias": "meta-llama/llama-4-scout",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        },
+        "effective_from": "2026-11-02",
+        "source_url": "https://openrouter.ai/meta-llama/llama-4-scout"
+      }
+    },
+    {
+      "op": "add_price",
+      "key": {
+        "canonical_id": "meta/llama-4-scout",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-11-02"
+      },
+      "expect": null,
+      "price": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-11-02",
+        "input_per_mtok": "0.1",
+        "output_per_mtok": "0.3",
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      }
+    },
+    {
+      "op": "close_alias",
+      "key": {
+        "canonical_id": "bytedance-seed/seed-2-1-turbo",
+        "provider": "openrouter",
+        "alias": "bytedance-seed/seed-2-1-turbo",
+        "channel": "openrouter-api"
+      },
+      "expect": {
+        "alias": "bytedance-seed/seed-2-1-turbo",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        }
+      },
+      "effective_to": "2026-11-02",
+      "source_url": "https://openrouter.ai/bytedance-seed/seed-2-1-turbo"
+    },
+    {
+      "op": "close_price",
+      "key": {
+        "canonical_id": "bytedance-seed/seed-2-1-turbo",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-10-20"
+      },
+      "expect": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-10-20",
+        "input_per_mtok": 0.5,
+        "output_per_mtok": 2.5,
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      },
+      "effective_to": "2026-11-02"
+    },
+    {
+      "op": "add_alias",
+      "key": {
+        "canonical_id": "bytedance/seed-2.1-turbo",
+        "provider": "openrouter",
+        "alias": "bytedance-seed/seed-2-1-turbo",
+        "channel": "openrouter-api"
+      },
+      "expect": null,
+      "alias": {
+        "alias": "bytedance-seed/seed-2-1-turbo",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        },
+        "effective_from": "2026-11-02",
+        "source_url": "https://openrouter.ai/bytedance-seed/seed-2-1-turbo"
+      }
+    },
+    {
+      "op": "add_price",
+      "key": {
+        "canonical_id": "bytedance/seed-2.1-turbo",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-11-02"
+      },
+      "expect": null,
+      "price": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-11-02",
+        "input_per_mtok": "0.5",
+        "output_per_mtok": "2.5",
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      }
+    },
+    {
+      "op": "close_alias",
+      "key": {
+        "canonical_id": "alibaba/qwen3-coder-30b-a3b-instruct",
+        "provider": "openrouter",
+        "alias": "qwen/qwen3-coder-30b-a3b-instruct",
+        "channel": "openrouter-api"
+      },
+      "expect": {
+        "alias": "qwen/qwen3-coder-30b-a3b-instruct",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        }
+      },
+      "effective_to": "2026-11-02",
+      "source_url": "https://openrouter.ai/qwen/qwen3-coder-30b-a3b-instruct"
+    },
+    {
+      "op": "close_price",
+      "key": {
+        "canonical_id": "alibaba/qwen3-coder-30b-a3b-instruct",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-10-20"
+      },
+      "expect": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-10-20",
+        "input_per_mtok": 0.07,
+        "output_per_mtok": 0.28,
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      },
+      "effective_to": "2026-11-02"
+    },
+    {
+      "op": "add_alias",
+      "key": {
+        "canonical_id": "alibaba/qwen3-coder-30b-a3b",
+        "provider": "openrouter",
+        "alias": "qwen/qwen3-coder-30b-a3b-instruct",
+        "channel": "openrouter-api"
+      },
+      "expect": null,
+      "alias": {
+        "alias": "qwen/qwen3-coder-30b-a3b-instruct",
+        "channel": "openrouter-api",
+        "provider": "openrouter",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        },
+        "effective_from": "2026-11-02",
+        "source_url": "https://openrouter.ai/qwen/qwen3-coder-30b-a3b-instruct"
+      }
+    },
+    {
+      "op": "add_price",
+      "key": {
+        "canonical_id": "alibaba/qwen3-coder-30b-a3b",
+        "channel": "openrouter-api",
+        "region": "global",
+        "effective_from": "2026-11-02"
+      },
+      "expect": null,
+      "price": {
+        "channel": "openrouter-api",
+        "effective_from": "2026-11-02",
+        "input_per_mtok": "0.07",
+        "output_per_mtok": "0.28",
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://openrouter.ai/api/v1/models"
+      }
+    },
+    {
+      "op": "close_alias",
+      "key": {
+        "canonical_id": "deepseek/deepseek-v3.1",
+        "provider": "vercel",
+        "alias": "deepseek/deepseek-v3.1",
+        "channel": "vercel-ai-gateway"
+      },
+      "expect": {
+        "alias": "deepseek/deepseek-v3.1",
+        "channel": "vercel-ai-gateway",
+        "provider": "vercel",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        }
+      },
+      "effective_to": "2026-11-02",
+      "source_url": "https://vercel.com/ai-gateway/models/deepseek-v3.1"
+    },
+    {
+      "op": "close_price",
+      "key": {
+        "canonical_id": "deepseek/deepseek-v3.1",
+        "channel": "vercel-ai-gateway",
+        "region": "global",
+        "effective_from": "2026-10-20"
+      },
+      "expect": {
+        "cache_read_per_mtok": 0.13,
+        "channel": "vercel-ai-gateway",
+        "effective_from": "2026-10-20",
+        "input_per_mtok": 0.25,
+        "output_per_mtok": 0.95,
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://ai-gateway.vercel.sh/v1/models"
+      },
+      "effective_to": "2026-11-02"
+    },
+    {
+      "op": "add_alias",
+      "key": {
+        "canonical_id": "deepseek/v3.1",
+        "provider": "vercel",
+        "alias": "deepseek/deepseek-v3.1",
+        "channel": "vercel-ai-gateway"
+      },
+      "expect": null,
+      "alias": {
+        "alias": "deepseek/deepseek-v3.1",
+        "channel": "vercel-ai-gateway",
+        "provider": "vercel",
+        "rules": {
+          "input_includes_cache_read": true,
+          "input_includes_cache_write": true
+        },
+        "effective_from": "2026-11-02",
+        "source_url": "https://vercel.com/ai-gateway/models/deepseek-v3.1"
+      }
+    },
+    {
+      "op": "add_price",
+      "key": {
+        "canonical_id": "deepseek/v3.1",
+        "channel": "vercel-ai-gateway",
+        "region": "global",
+        "effective_from": "2026-11-02"
+      },
+      "expect": null,
+      "price": {
+        "cache_read_per_mtok": "0.13",
+        "channel": "vercel-ai-gateway",
+        "effective_from": "2026-11-02",
+        "input_per_mtok": "0.25",
+        "output_per_mtok": "0.95",
+        "region": "global",
+        "rules": {
+          "varies_by_provider": true
+        },
+        "source_url": "https://ai-gateway.vercel.sh/v1/models"
+      }
+    }
+  ]
+}
