@@ -2296,3 +2296,29 @@ def test_a_row_without_a_request_fee_charges_none():
     )
     assert result.components.request_usd == 0
     assert result.cost_usd == result.components.input_usd
+
+
+@pytest.mark.parametrize(
+    'day,input_tokens,expected',
+    [
+        ('2026-10-26', 300000, '3.82500000'),
+        ('2026-10-27', 272000, '3.47500000'),
+        ('2026-10-27', 272001, '6.91252500'),
+    ],
+)
+def test_gpt56_cyber_long_context_correction_preserves_prior_prices(day, input_tokens, expected):
+    result = SNAPSHOT.cost(
+        provider='openai', model='gpt-5.6-cyber', at=_at(day),
+        input_tokens=input_tokens, output_tokens=1000,
+    )
+    assert result.status == 'priced'
+    assert result.cost_usd == Decimal(expected)
+
+
+def test_gpt56_cyber_long_context_counts_separate_cache_writes():
+    result = SNAPSHOT.cost(
+        provider='openai', model='gpt-5.6-cyber', at=_at('2026-10-27'),
+        input_tokens=270000, cache_write_tokens=3000, output_tokens=1000,
+    )
+    assert result.status == 'priced'
+    assert result.cost_usd == Decimal('6.95625000')
