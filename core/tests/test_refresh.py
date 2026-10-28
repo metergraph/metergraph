@@ -1713,3 +1713,90 @@ def test_a_regional_ambiguity_escalates_even_an_unchanged_row():
     assert [(e.reason, e.region, e.key.canonical_id) for e in result.escalations] == [
         ("ambiguous_parse", "us", "example/grok-x")
     ]
+
+
+def test_gateway_discovery_maps_meta_llama_and_bytedance_seed_prefixes():
+    source = _gateway_source()
+    document = _document(
+        _model(
+            "meta/llama-x",
+            "meta/llama-x",
+            _row(channel="vercel-ai-gateway", input_per_mtok=1, output_per_mtok=4),
+            channel="vercel-ai-gateway",
+            provider="vercel",
+        )
+    )
+    page = _openrouter_page(
+        _openrouter_model("meta-llama/llama-x"),
+        _openrouter_model("bytedance-seed/seed-x"),
+    )
+
+    operations = discovery_evidence(
+        source, page, document, observed_on=OBSERVED_ON
+    )["operations"]
+    assert sorted(
+        (operation["op"], operation["key"]["canonical_id"])
+        for operation in operations
+    ) == [
+        ("add_alias", "meta/llama-x"),
+        ("add_model", "bytedance/seed-x"),
+        ("add_price", "meta/llama-x"),
+    ]
+    [added] = [o for o in operations if o["op"] == "add_model"]
+    assert added["model"]["publisher"] == "bytedance"
+    assert added["model"]["aliases"][0]["alias"] == "bytedance-seed/seed-x"
+
+
+def _moved_spelling_document(gateway_input=1):
+    """meta/llama-x took over the gateway spelling a duplicate entry held
+    until 2026-10-01."""
+    moved = {"effective_from": "2026-10-01", "source_url": "https://example.com/review"}
+    gateway_row = _row(channel="openrouter-api", input_per_mtok=gateway_input, output_per_mtok=4)
+    return _document(
+        {
+            "canonical_id": "meta/llama-x",
+            "publisher": "meta",
+            "aliases": [
+                {"provider": "vercel", "alias": "meta/llama-x", "channel": "vercel-ai-gateway"},
+                {"provider": "openrouter", "alias": "meta-llama/llama-x-instruct", "channel": "openrouter-api", **moved},
+            ],
+            "prices": [
+                _row(channel="vercel-ai-gateway", input_per_mtok=1, output_per_mtok=4),
+                dict(gateway_row, effective_from="2026-10-01"),
+            ],
+        },
+        {
+            "canonical_id": "meta-llama/llama-x-instruct",
+            "publisher": "meta-llama",
+            "aliases": [
+                {
+                    "provider": "openrouter",
+                    "alias": "meta-llama/llama-x-instruct",
+                    "channel": "openrouter-api",
+                    "effective_to": "2026-10-01",
+                    "source_url": "https://example.com/review",
+                }
+            ],
+            "prices": [dict(gateway_row, effective_to="2026-10-01")],
+        },
+    )
+
+
+def test_gateway_discovery_follows_a_spelling_to_the_model_it_moved_to():
+    source = _gateway_source()
+    page = _openrouter_page(_openrouter_model("meta-llama/llama-x-instruct"))
+
+    unchanged = discovery_evidence(
+        source, page, _moved_spelling_document(), observed_on=OBSERVED_ON
+    )
+    assert unchanged["operations"] == []
+    assert unchanged["identity_exclusions"] == []
+
+    # A later price change lands on the model the spelling now names.
+    changed = discovery_evidence(
+        source, page, _moved_spelling_document(gateway_input=2), observed_on=OBSERVED_ON
+    )
+    assert [(o["op"], o["key"]["canonical_id"]) for o in changed["operations"]] == [
+        ("replace_price", "meta/llama-x")
+    ]
+    assert changed["identity_exclusions"] == []

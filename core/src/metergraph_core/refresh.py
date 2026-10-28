@@ -619,6 +619,8 @@ def _gateway_price(
 
 # Reviewed gateway spellings for publishers the catalog already names.
 _GATEWAY_PUBLISHER_PREFIXES = {
+    "bytedance-seed": "bytedance",
+    "meta-llama": "meta",
     "mistralai": "mistral",
     "qwen": "alibaba",
     "z-ai": "zai",
@@ -642,8 +644,27 @@ def _identity_shape(model_key: str) -> tuple[str, str]:
     return prefix, "".join(character for character in suffix if character.isalnum())
 
 
+def _current_identity(
+    entry: Mapping[str, Any], day: date
+) -> tuple[str | None, list[Mapping[str, Any]]]:
+    """``entry``'s canonical id and its aliases in effect on ``day``.
+
+    An alias that has ended no longer names the model, so a spelling moved to
+    another model matches only there. The canonical id is left out when it is
+    also one of the model's alias spellings and none of those is in effect,
+    as ``_names`` treats the canonical tail."""
+    aliases = [a for a in entry.get("aliases") or [] if isinstance(a, Mapping)]
+    current = [a for a in aliases if _in_effect(a, day, dated=False)]
+    canonical_id = str(entry.get("canonical_id") or "").strip().lower()
+    spelled = {str(a.get("alias") or "").strip().lower() for a in aliases}
+    active = {str(a.get("alias") or "").strip().lower() for a in current}
+    if canonical_id in spelled and canonical_id not in active:
+        return None, current
+    return canonical_id, current
+
+
 def _exact_models(
-    document: Mapping[str, Any], model_key: str
+    document: Mapping[str, Any], model_key: str, day: date
 ) -> list[Mapping[str, Any]]:
     publisher, _, _ = _catalog_gateway_identity(model_key).partition("/")
     wanted = {
@@ -654,17 +675,15 @@ def _exact_models(
     for entry in document.get("models") or []:
         if not isinstance(entry, Mapping):
             continue
-        names = {str(entry.get("canonical_id") or "").strip().lower()}
+        canonical_id, aliases = _current_identity(entry, day)
+        names = {canonical_id} if canonical_id else set()
         names.update(
-            str(alias.get("alias") or "").strip().lower()
-            for alias in entry.get("aliases") or []
-            if isinstance(alias, Mapping)
+            str(alias.get("alias") or "").strip().lower() for alias in aliases
         )
         names.update(
             f"{publisher}/{str(alias.get('alias') or '').strip().lower()}"
-            for alias in entry.get("aliases") or []
-            if isinstance(alias, Mapping)
-            and _catalog_publisher(alias.get("provider")) == publisher
+            for alias in aliases
+            if _catalog_publisher(alias.get("provider")) == publisher
         )
         if wanted & names:
             found.append(entry)
@@ -672,21 +691,21 @@ def _exact_models(
 
 
 def _near_models(
-    document: Mapping[str, Any], model_key: str
+    document: Mapping[str, Any], model_key: str, day: date
 ) -> list[Mapping[str, Any]]:
     wanted = _identity_shape(model_key)
     found = []
     for entry in document.get("models") or []:
         if not isinstance(entry, Mapping):
             continue
-        shapes = {_identity_shape(str(entry.get("canonical_id") or ""))}
+        canonical_id, aliases = _current_identity(entry, day)
+        shapes = {_identity_shape(canonical_id)} if canonical_id else set()
         shapes.update(
             _identity_shape(
                 f"{_catalog_publisher(alias.get('provider'))}/"
                 f"{str(alias.get('alias') or '').strip().lower()}"
             )
-            for alias in entry.get("aliases") or []
-            if isinstance(alias, Mapping)
+            for alias in aliases
         )
         if wanted in shapes:
             found.append(entry)
@@ -703,9 +722,9 @@ def _gateway_additions(
     operations: list[dict[str, Any]] = []
     identity_exclusions: list[dict[str, Any]] = []
     for rate in extraction.rates:
-        matches = _exact_models(document, rate.model_key)
+        matches = _exact_models(document, rate.model_key, observed_on)
         if not matches:
-            near = _near_models(document, rate.model_key)
+            near = _near_models(document, rate.model_key, observed_on)
             if near:
                 identity_exclusions.append(
                     {

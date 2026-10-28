@@ -326,6 +326,41 @@ effective_from)` on a model the catalog already has:
   start on a later UTC date than the row it replaces, for the same reason.
 - `close_price` sets `effective_to` on the open row without a replacement.
 
+Catalog operations change which models exist and what calls they match:
+
+- `add_model` appends one complete model entry.
+- `add_alias` appends one alias to an existing model. A spelling another
+  model already holds is a conflict only while both aliases are in effect.
+- `close_alias` sets `effective_to` on an open alias, named by
+  `(canonical_id, provider, alias, channel)`; `expect` is the exact current
+  alias. An alias with dates must cite its source, so a close carries
+  `source_url` when the alias has none and must not when it has one.
+
+A `close_alias`, `close_price`, `add_alias` and `add_price` together move a
+spelling from a duplicate entry to the model it duplicates from a date. Calls
+before that date keep the old model and price, calls from it resolve to the
+surviving model, and the old entry stays for history with nothing in effect:
+
+```yaml
+  - op: close_alias
+    key: {canonical_id: example-host/model-a-instruct, provider: openrouter,
+          alias: example-host/model-a-instruct, channel: openrouter-api}
+    expect: {provider: openrouter, alias: example-host/model-a-instruct, channel: openrouter-api}
+    effective_to: "2026-10-20"
+    source_url: "https://..."
+  - op: close_price      # the duplicate's open openrouter-api row
+  - op: add_alias
+    key: {canonical_id: example/model-a, provider: openrouter,
+          alias: example-host/model-a-instruct, channel: openrouter-api}
+    expect: null
+    alias: {provider: openrouter, alias: example-host/model-a-instruct,
+            channel: openrouter-api, effective_from: "2026-10-20", source_url: "https://..."}
+  - op: add_price        # the same rate on example/model-a from 2026-10-20
+```
+
+Gateway discovery matches a spelling only through aliases in effect on the
+observation date, so it follows a moved spelling to its new model.
+
 A price id ends with the UTC date of its row's start. If two rows for one
 model, channel and region would still share an id (possible in a hand-edited
 catalog), each that does not start at UTC midnight also names its UTC start

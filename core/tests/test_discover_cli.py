@@ -589,3 +589,23 @@ def test_an_unwritable_report_path_exits_one_without_a_report(paths, capsys):
 def test_an_unloadable_adapter_is_an_error(paths, capsys):
     assert discover_prices.main(paths["base"] + ["--content-dir", str(paths["content"]), "--llm-adapter", "no_such_module:propose"]) == 1
     assert "cannot load adapter" in capsys.readouterr().err
+
+
+def test_a_close_alias_operation_round_trips_through_the_report_form():
+    alias = {
+        "provider": "openrouter",
+        "alias": "example-host/model-a-instruct",
+        "channel": "openrouter-api",
+    }
+    operation = {
+        "op": "close_alias",
+        "key": dict(alias, canonical_id="example-host/model-a-instruct"),
+        "expect": alias,
+        "effective_to": "2026-10-20",
+        "source_url": "https://example.com/review",
+    }
+    delta = discover_prices._delta([operation], ["observation"], [])
+
+    assert discover_prices._operation_json(
+        discover_prices.parse_catalog_delta(delta).operations[0]
+    ) == operation

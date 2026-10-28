@@ -3,6 +3,7 @@ document."""
 
 import copy
 from datetime import datetime, timezone
+from decimal import Decimal
 
 import pytest
 
@@ -902,3 +903,195 @@ def test_a_replacement_with_an_offset_after_the_row_applies():
     rows = _rows(result, channel="openai-api", region="global")
     assert rows[1]["effective_to"] == "2026-10-20"
     assert rows[2]["effective_from"] == "2026-10-20"
+
+
+# --- Moving an alias between models ------------------------------------------
+
+GATEWAY_ALIAS = {
+    "provider": "openrouter",
+    "alias": "example-host/model-a-instruct",
+    "channel": "openrouter-api",
+}
+GATEWAY_ROW = {
+    "channel": "openrouter-api",
+    "region": "global",
+    "effective_from": "2026-01-01",
+    "input_per_mtok": 0.5,
+    "output_per_mtok": 2.0,
+    "source_url": "https://example.com/gateway/models",
+}
+MOVE_SOURCE = "https://example.com/catalog-review"
+
+
+def _with_duplicate():
+    """model-a plus a duplicate entry a gateway spelling created for it."""
+    document = _document()
+    document["models"].append(
+        {
+            "canonical_id": "example-host/model-a-instruct",
+            "publisher": "example-host",
+            "aliases": [dict(GATEWAY_ALIAS)],
+            "prices": [dict(GATEWAY_ROW)],
+        }
+    )
+    return document
+
+
+def _close_alias(**overrides):
+    operation = {
+        "op": "close_alias",
+        "key": dict(GATEWAY_ALIAS, canonical_id="example-host/model-a-instruct"),
+        "expect": dict(GATEWAY_ALIAS),
+        "effective_to": "2026-10-20",
+        "source_url": MOVE_SOURCE,
+    }
+    operation.update(overrides)
+    return operation
+
+
+def _move_operations():
+    """The reviewed delta that folds the duplicate into model-a on 2026-10-20."""
+    return [
+        _close_alias(),
+        _close(
+            key=_key(
+                canonical_id="example-host/model-a-instruct",
+                channel="openrouter-api",
+            ),
+            expect=dict(GATEWAY_ROW),
+        ),
+        _add_alias(
+            alias=dict(
+                GATEWAY_ALIAS,
+                effective_from="2026-10-20",
+                source_url=MOVE_SOURCE,
+            )
+        ),
+        _add(
+            key=_key(channel="openrouter-api", effective_from="2026-10-20"),
+            price=_new_price(
+                channel="openrouter-api",
+                input_per_mtok="0.5",
+                output_per_mtok="2",
+                source_url="https://example.com/gateway/models",
+            ),
+        ),
+    ]
+
+
+def _resolved(document, at):
+    result = load_catalog_document(document).snapshot.cost(
+        provider="openrouter",
+        model="example-host/model-a-instruct",
+        at=at,
+        input_tokens=1_000_000,
+        output_tokens=0,
+    )
+    return result.canonical_model, result.cost_usd
+
+
+def test_a_gateway_spelling_moves_to_another_model_from_a_date():
+    document = _with_duplicate()
+    before = copy.deepcopy(document)
+    moved = apply_catalog_delta(document, _delta(*_move_operations()))
+    assert document == before
+
+    duplicate = moved["models"][1]
+    assert duplicate["aliases"] == [
+        dict(GATEWAY_ALIAS, effective_to="2026-10-20", source_url=MOVE_SOURCE)
+    ]
+    assert duplicate["prices"] == [dict(GATEWAY_ROW, effective_to="2026-10-20")]
+    # Calls before the move keep the model and price they were billed under;
+    # calls from the move resolve to the surviving model.
+    assert _resolved(moved, datetime(2026, 10, 19, tzinfo=timezone.utc)) == (
+        "example-host/model-a-instruct",
+        Decimal("0.5"),
+    )
+    assert _resolved(moved, datetime(2026, 10, 21, tzinfo=timezone.utc)) == (
+        "example/model-a",
+        Decimal("0.5"),
+    )
+
+
+def test_a_spelling_another_model_holds_stays_a_conflict_without_a_close():
+    operations = _move_operations()
+    assert _conflicts(_with_duplicate(), _delta(*operations[2:])) == [
+        (0, "alias_conflict")
+    ]
+
+
+def test_a_spelling_whose_alias_already_ended_can_be_added_from_that_date():
+    document = _with_duplicate()
+    document["models"][1]["aliases"] = [
+        dict(GATEWAY_ALIAS, effective_to="2026-10-20", source_url=MOVE_SOURCE)
+    ]
+    added = apply_catalog_delta(
+        document, _delta(_move_operations()[2])
+    )
+    assert added["models"][0]["aliases"][-1]["effective_from"] == "2026-10-20"
+    # Starting before the old alias ends would give one spelling two models.
+    early = _add_alias(
+        alias=dict(
+            GATEWAY_ALIAS, effective_from="2026-10-19", source_url=MOVE_SOURCE
+        )
+    )
+    assert _conflicts(document, _delta(early)) == [(0, "alias_conflict")]
+
+
+def test_close_alias_sets_only_the_end_and_a_missing_source():
+    cited = _with_duplicate()
+    cited["models"][1]["aliases"] = [dict(GATEWAY_ALIAS, source_url=MOVE_SOURCE)]
+    operation = _close_alias(expect=dict(GATEWAY_ALIAS, source_url=MOVE_SOURCE))
+    del operation["source_url"]
+    closed = apply_catalog_delta(cited, _delta(operation))
+    assert closed["models"][1]["aliases"] == [
+        dict(GATEWAY_ALIAS, source_url=MOVE_SOURCE, effective_to="2026-10-20")
+    ]
+
+
+@pytest.mark.parametrize(
+    ("document_alias", "overrides", "reason"),
+    [
+        (GATEWAY_ALIAS, {"key": dict(GATEWAY_ALIAS, canonical_id="example/missing")}, "unknown_model"),
+        (GATEWAY_ALIAS, {"key": dict(GATEWAY_ALIAS, canonical_id="example-host/model-a-instruct", alias="example-host/other")}, "alias_missing"),
+        (GATEWAY_ALIAS, {"expect": dict(GATEWAY_ALIAS, channel="vercel-ai-gateway")}, "expect_mismatch"),
+        (
+            dict(GATEWAY_ALIAS, effective_to="2026-09-01", source_url=MOVE_SOURCE),
+            {"expect": dict(GATEWAY_ALIAS, effective_to="2026-09-01", source_url=MOVE_SOURCE), "source_url": None},
+            "alias_not_open",
+        ),
+        (
+            dict(GATEWAY_ALIAS, effective_from="2026-11-01", source_url=MOVE_SOURCE),
+            {"expect": dict(GATEWAY_ALIAS, effective_from="2026-11-01", source_url=MOVE_SOURCE), "source_url": None},
+            "not_after_start",
+        ),
+        (GATEWAY_ALIAS, {"source_url": None}, "source_url_needed"),
+        (
+            dict(GATEWAY_ALIAS, source_url=MOVE_SOURCE),
+            {"expect": dict(GATEWAY_ALIAS, source_url=MOVE_SOURCE), "source_url": "https://example.com/other"},
+            "source_url_exists",
+        ),
+    ],
+)
+def test_close_alias_preconditions(document_alias, overrides, reason):
+    document = _with_duplicate()
+    document["models"][1]["aliases"] = [dict(document_alias)]
+    operation = _close_alias(**overrides)
+    if operation.get("source_url") is None:
+        operation.pop("source_url")
+    assert _conflicts(document, _delta(operation)) == [(0, reason)]
+
+
+@pytest.mark.parametrize(
+    ("overrides", "message"),
+    [
+        ({"expect": None}, "expect must be the full current row"),
+        ({"effective_to": "soon"}, "invalid effective_to"),
+        ({"source_url": "  "}, "invalid source_url"),
+        ({"price": _new_price()}, "close_alias takes only effective_to and source_url"),
+        ({"key": dict(GATEWAY_ALIAS, canonical_id="example/model-a", region="global")}, "close_alias key has unknown fields"),
+    ],
+)
+def test_close_alias_schema(overrides, message):
+    with pytest.raises(CatalogDeltaError, match=message):
+        parse_catalog_delta(_delta(_close_alias(**overrides)))

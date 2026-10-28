@@ -109,7 +109,7 @@ def _operation_json(operation: DeltaOperation) -> dict[str, Any]:
     and no fields beyond the schema's."""
     if operation.op == "add_model":
         key = {"canonical_id": operation.key.canonical_id}
-    elif operation.op == "add_alias":
+    elif operation.op in ("add_alias", "close_alias"):
         key = {
             "canonical_id": operation.key.canonical_id,
             "provider": operation.key.provider,
@@ -136,6 +136,8 @@ def _operation_json(operation: DeltaOperation) -> dict[str, Any]:
         data["model"] = _canonical_value(operation.model)
     if operation.alias is not None:
         data["alias"] = _canonical_value(operation.alias)
+    if operation.source_url is not None:
+        data["source_url"] = operation.source_url
     return data
 
 
