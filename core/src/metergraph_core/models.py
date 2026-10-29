@@ -19,13 +19,14 @@ EXECUTION_PROFILES = frozenset({"default", "bedrock"})
 # "moonshotai", the name its catalog aliases carry ("moonshot" is only an
 # input alias the catalog normalizes).
 ROUTE_PROVIDERS = frozenset(
-    {"anthropic", "bedrock", "fireworks", "moonshotai", "openai", "vercel"}
+    {"anthropic", "bedrock", "fireworks", "mistral", "moonshotai", "openai", "vercel"}
 )
 ROUTE_PROVIDER_CHANNELS = MappingProxyType(
     {
         "anthropic": "anthropic-api",
         "bedrock": "aws-bedrock",
         "fireworks": "fireworks-api",
+        "mistral": "mistral-api",
         "moonshotai": "moonshot-api",
         "openai": "openai-api",
         "vercel": "vercel-ai-gateway",
@@ -38,6 +39,7 @@ OFFER_GROUP_PROFILES = MappingProxyType(
         "openai-direct": "default",
         "anthropic-direct": "default",
         "moonshot-direct": "default",
+        "mistral-direct": "default",
         "bedrock": "bedrock",
     }
 )
@@ -48,6 +50,7 @@ OFFER_GROUP_CREDENTIALS = MappingProxyType(
         "openai-direct": "OPENAI_API_KEY",
         "anthropic-direct": "ANTHROPIC_API_KEY",
         "moonshot-direct": "MOONSHOT_API_KEY",
+        "mistral-direct": "MISTRAL_API_KEY",
         "bedrock": None,
     }
 )
@@ -58,6 +61,7 @@ OFFER_GROUP_PROVIDERS = MappingProxyType(
         "openai-direct": "openai",
         "anthropic-direct": "anthropic",
         "moonshot-direct": "moonshotai",
+        "mistral-direct": "mistral",
         "bedrock": "bedrock",
     }
 )

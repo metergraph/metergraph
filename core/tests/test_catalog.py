@@ -61,8 +61,8 @@ def test_current_catalog_prices_more_than_one_thousand_provider_model_pairs():
     }
 
     # Includes claude-3-5-haiku-20241022 at its last known price.
-    assert len(pairs) == 1169
-    assert sum(provider == "vercel" for provider, _ in pairs) == 189
+    assert len(pairs) == 1170
+    assert sum(provider == "vercel" for provider, _ in pairs) == 190
     assert sum(provider == "openrouter" for provider, _ in pairs) == 212
 
 
@@ -496,6 +496,20 @@ def test_minimax_m3_1_flash_promotion_prices_cache_reads_at_zero():
 
     assert result.status == "priced"
     assert result.cost_usd == Decimal("0")
+
+
+def test_minimax_m3_1_flash_captured_on_vercel_prices_on_the_gateway():
+    result = SNAPSHOT.cost(
+        provider="vercel",
+        model="minimax/minimax-m3.1-flash",
+        at=_at("2026-10-27"),
+        input_tokens=1_000_000,
+        output_tokens=1_000_000,
+    )
+
+    assert result.status == "priced"
+    assert result.canonical_model == "minimax/minimax-m3.1-flash"
+    assert result.cost_usd == Decimal("0.75")
 
 
 def test_deepseek_v4_1_flash_1017_fast_has_fixed_gateway_pricing():

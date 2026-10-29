@@ -1,4 +1,4 @@
-version: '2026-10-27'
+version: '2026-10-29'
 models:
 - canonical_id: openai/gpt-5.6-sol
   display_name: GPT-5.6 Sol
@@ -888,6 +888,30 @@ models:
     execution_profiles:
     - default
     display_name: Kimi K3.1 Pro Highspeed (direct)
+- canonical_id: minimax/minimax-m3.1-flash
+  display_name: MiniMax M3.1 Flash
+  publisher: minimax
+  released: '2026-10-19'  # https://www.minimax.io/blog/minimax-m31f
+  routes:
+  - key: default:minimax/minimax-m3.1-flash
+    id: minimax/minimax-m3.1-flash
+    provider: vercel
+    model_id: minimax/minimax-m3.1-flash
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: mistral/mistral-small-4
+  display_name: Mistral Small 4
+  publisher: mistral
+  released: '2026-03-16'  # https://docs.mistral.ai/models/mistral-small-4-0-26-03
+  routes:
+  - key: default:mistral:mistral-small-2603
+    id: mistral:mistral-small-2603
+    provider: mistral
+    model_id: mistral-small-2603
+    pricing_channel: mistral-api
+    execution_profiles:
+    - default
 execution_profiles:
 - id: default
   routes:
@@ -963,6 +987,8 @@ execution_profiles:
   - default:openai:gpt-6.1-terra
   - default:moonshotai:kimi-k3.1-pro
   - default:moonshotai:kimi-k3.1-pro-highspeed
+  - default:minimax/minimax-m3.1-flash
+  - default:mistral:mistral-small-2603
 - id: bedrock
   routes:
   - bedrock:anthropic/claude-sonnet-5
@@ -1029,6 +1055,7 @@ offer_groups:
   - default:deepseek/deepseek-v4.1-flash-1017
   - default:deepseek/deepseek-v4.1-flash-1017-fast
   - default:inception/mercury-3
+  - default:minimax/minimax-m3.1-flash
 - id: fireworks
   credential: FIREWORKS_API_KEY
   routes:
@@ -1059,6 +1086,10 @@ offer_groups:
   routes:
   - default:moonshotai:kimi-k3.1-pro
   - default:moonshotai:kimi-k3.1-pro-highspeed
+- id: mistral-direct
+  credential: MISTRAL_API_KEY
+  routes:
+  - default:mistral:mistral-small-2603
 - id: bedrock
   credential: null
   routes:
