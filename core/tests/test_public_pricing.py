@@ -2128,7 +2128,6 @@ def test_installed_catalog_starts_mistrals_moving_aliases_at_their_release(
     [
         ("mistral-large-latest", "0.05000000"),
         ("ministral-14b-latest", "0.02000000"),
-        ("mistral-small-latest", "0.01500000"),
         ("mistral-medium-latest", "0.15000000"),
     ],
 )
@@ -2146,6 +2145,27 @@ def test_installed_catalog_prices_mistrals_current_prompt_cache(model, cache_cos
 
     assert result.status == "priced"
     assert result.cost_usd == Decimal(cache_cost)
+
+
+@pytest.mark.parametrize("model", ["mistral-small-2603", "mistral-small-latest"])
+def test_installed_catalog_bills_mistral_small_4_cached_prompt_tokens_once(model):
+    """Mistral's prompt_tokens includes cached_tokens, so only the uncached
+    remainder takes the input rate: 5 x $0.15 + 1008 x $0.015 + 30 x $0.60
+    per MTok."""
+    catalog = load_catalog()
+
+    result = catalog.snapshot.cost(
+        provider="mistral",
+        model=model,
+        at=datetime(2026, 10, 27, tzinfo=timezone.utc),
+        input_tokens=1013,
+        output_tokens=30,
+        cache_read_tokens=1008,
+    )
+
+    assert result.status == "priced"
+    assert result.canonical_model == "mistral/mistral-small-4"
+    assert result.cost_usd == Decimal("0.00003387")
 
 
 @pytest.mark.parametrize("alias", ["deepseek-chat", "deepseek-reasoner"])

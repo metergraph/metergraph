@@ -224,7 +224,7 @@ def test_registry_document_shape_is_required(mutation):
 
 def test_bundled_registry_preserves_current_execution_and_product_fields():
     registry = load_model_registry()
-    assert registry.version == "2026-10-27"
+    assert registry.version == "2026-10-29"
     assert [route.id for route in registry.candidates("gateway")] == [
         "anthropic/claude-sonnet-5",
         "anthropic/claude-opus-5",
@@ -278,6 +278,7 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "deepseek/deepseek-v4.1-flash-1017",
         "deepseek/deepseek-v4.1-flash-1017-fast",
         "inception/mercury-3",
+        "minimax/minimax-m3.1-flash",
     ]
     gateway_ids = {route.id for route in registry.candidates("gateway")}
     assert "liquid/lfm2.5-24b-a2b" not in gateway_ids
@@ -285,7 +286,6 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
     assert "reflection/beam-free" not in gateway_ids
     assert "nvidia/nemotron-3.5-lightning-free" not in gateway_ids
     assert "elorian/glimpse" not in gateway_ids
-    assert "minimax/minimax-m3.1-flash" not in gateway_ids
     assert [route.id for route in registry.candidates("fireworks")] == [
         "fireworks:accounts/fireworks/models/glm-5p2",
         "fireworks:accounts/fireworks/models/qwen3p7-plus",
@@ -322,7 +322,7 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "deepseek/deepseek-v3.2",
         "deepseek/deepseek-v3.1",
     ]
-    assert len(registry.routes_for_execution_profile("default")) == 72
+    assert len(registry.routes_for_execution_profile("default")) == 74
     assert len(registry.routes_for_execution_profile("bedrock")) == 8
 
 
@@ -602,6 +602,27 @@ def test_october_19_gateway_routes_are_priced_candidates(
     assert resolved.price.output_per_mtok == Decimal(output_rate)
 
 
+def test_minimax_m3_1_flash_is_a_gateway_candidate_after_its_promotion():
+    registry = load_model_registry()
+    route = registry.route("default:minimax/minimax-m3.1-flash")
+
+    assert route in registry.reachable_candidates({"AI_GATEWAY_API_KEY"})
+    assert (route.provider, route.model_id, route.pricing_channel) == (
+        "vercel",
+        "minimax/minimax-m3.1-flash",
+        "vercel-ai-gateway",
+    )
+    resolved = load_catalog().snapshot.resolve_price(
+        model=route.model_id,
+        channel=route.pricing_channel,
+        at=datetime(2026, 10, 27, tzinfo=timezone.utc),
+    )
+    assert resolved is not None
+    assert resolved.canonical_model == "minimax/minimax-m3.1-flash"
+    assert resolved.price.input_per_mtok == Decimal("0.15")
+    assert resolved.price.output_per_mtok == Decimal("0.60")
+
+
 @pytest.mark.parametrize(
     ("offer_group", "route_key", "model_id"),
     [
@@ -675,6 +696,12 @@ def test_new_benchmark_candidates_are_priced_gateway_candidates(model, display_n
             "kimi-k3.1-pro-highspeed", "moonshot-api",
             datetime(2026, 10, 24, tzinfo=timezone.utc), "4.00", "20.00",
         ),
+        (
+            "mistral-direct", "MISTRAL_API_KEY",
+            "default:mistral:mistral-small-2603", "mistral/mistral-small-4",
+            "mistral", "mistral-small-2603", "mistral-api",
+            datetime(2026, 10, 27, tzinfo=timezone.utc), "0.15", "0.60",
+        ),
     ],
 )
 def test_direct_only_routes_need_their_provider_credential(
@@ -695,7 +722,7 @@ def test_direct_only_routes_need_their_provider_credential(
     # the other direct credentials never reach them.
     assert [r.key for r in registry.model(canonical_id).routes] == [route_key]
     others = {"AI_GATEWAY_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
-              "FIREWORKS_API_KEY", "MOONSHOT_API_KEY"} - {credential}
+              "FIREWORKS_API_KEY", "MOONSHOT_API_KEY", "MISTRAL_API_KEY"} - {credential}
     assert route not in registry.reachable_candidates(others)
 
     resolved = load_catalog().snapshot.resolve_price(
@@ -801,6 +828,75 @@ def test_moonshot_route_validates_against_its_direct_catalog_price():
     value["version"] = "2026-10-23"
     with pytest.raises(ModelRegistryError, match="no price for pricing channel"):
         validate_model_registry(parse_model_registry(value), load_catalog())
+
+
+def mistral_document():
+    value = document()
+    route_key = "mistral-direct:mistral:mistral-small-2603"
+    value["models"].append(
+        {
+            "canonical_id": "mistral/mistral-small-4",
+            "display_name": "Mistral Small 4",
+            "publisher": "mistral",
+            "routes": [
+                {
+                    "key": route_key,
+                    "id": "mistral:mistral-small-2603",
+                    "provider": "mistral",
+                    "model_id": "mistral-small-2603",
+                    "pricing_channel": "mistral-api",
+                    "execution_profiles": ["default"],
+                }
+            ],
+        }
+    )
+    value["execution_profiles"][0]["routes"].append(route_key)
+    value["offer_groups"].append(
+        {
+            "id": "mistral-direct",
+            "credential": "MISTRAL_API_KEY",
+            "routes": [route_key],
+        }
+    )
+    return value
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        ("gateway_channel", "cannot use pricing channel"),
+        ("wrong_credential", "requires credential 'MISTRAL_API_KEY'"),
+        ("foreign_route", "requires provider 'mistral'"),
+    ],
+)
+def test_mistral_direct_route_contract_fails_closed(mutation, message):
+    value = mistral_document()
+    parse_model_registry(value)
+    if mutation == "gateway_channel":
+        value["models"][1]["routes"][0]["pricing_channel"] = "vercel-ai-gateway"
+    elif mutation == "wrong_credential":
+        value["offer_groups"][-1]["credential"] = "AI_GATEWAY_API_KEY"
+    else:
+        value["offer_groups"][-1]["routes"] = ["openai-direct:openai:gpt-5.6"]
+    with pytest.raises(ModelRegistryError, match=message):
+        parse_model_registry(value)
+
+
+@pytest.mark.parametrize(
+    ("route_key", "display_name", "released"),
+    [
+        ("default:minimax/minimax-m3.1-flash", "MiniMax M3.1 Flash", date(2026, 10, 19)),
+        ("default:mistral:mistral-small-2603", "Mistral Small 4", date(2026, 3, 16)),
+    ],
+)
+def test_new_routes_record_release_and_name_the_model_not_the_transport(
+    route_key, display_name, released,
+):
+    registry = load_model_registry()
+    route = registry.route(route_key)
+
+    assert route.display_name == display_name
+    assert registry.model(route.canonical_id).released == released
 
 
 def test_validation_rejects_canonical_drift():
