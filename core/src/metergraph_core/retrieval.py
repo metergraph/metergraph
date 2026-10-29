@@ -52,6 +52,7 @@ class RetrievalCostResult:
     cost_usd: Decimal | None
     status: str
     reasons: tuple[str, ...] = ()
+    source_url: str | None = None
 
 
 # The retrieval operation a counted search or fetch is billed as on each
@@ -231,4 +232,4 @@ class RetrievalCatalog:
         cost = (Decimal(count) * price.per_1k_usd / _THOUSAND).quantize(
             _COST_QUANTUM, rounding=ROUND_HALF_UP
         )
-        return RetrievalCostResult(price.id, cost, "priced", ())
+        return RetrievalCostResult(price.id, cost, "priced", (), price.source_url)

@@ -168,7 +168,7 @@ def _disputed(
 
 
 def resolve_billing(
-    catalog_result: CostResult,
+    catalog_result: "CostResult | CallCostResult",
     evidence: GatewayBillingEvidence,
     *,
     disputes: Iterable[Dispute] = (),
@@ -231,3 +231,8 @@ def resolve_billing(
         catalog_price_id=catalog_result.price_id,
         catalog_reasons=reasons,
     )
+
+# Imported only for type checking to keep the response adapter independent.
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .calls import CallCostResult

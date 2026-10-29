@@ -573,3 +573,48 @@ lifecycles.
 The model registry version is an ISO date. When more than one registry ships on
 the same date, append a positive revision such as `2026-09-25.2` so consumers
 can distinguish the policies while pricing validation still uses that date.
+
+
+## Complete call costs with counted retrieval
+
+`price_call_from_response` adds verified first-party Anthropic web-search and
+web-fetch fees from the same effective-dated catalog as token pricing. Existing
+`cost_from_response` remains token-only.
+
+```python
+from metergraph_core import price_call_from_response
+
+result = price_call_from_response(
+    "anthropic",
+    {"type": "message", "model": "claude-sonnet-5-5", "usage": {
+        "input_tokens": 1000, "output_tokens": 100,
+        "server_tool_use": {"web_search_requests": 2},
+    }},
+    at="2026-10-20T00:00:00Z",
+)
+assert str(result.cost_usd) == "0.02300000"
+```
+
+A complete result is `priced`. An unresolved required fee makes it `partial`,
+with `cost_usd=None` and explicit missing dimensions. An unknown model remains
+`unpriced` even when a search fee is known. `known_subtotal_usd` contains only
+exact catalog components; partial legacy token fallback amounts have
+`token_basis="fallback_estimate"` and are kept separately. `estimated_total_usd`
+is supplied only when all retrieval fees are known and a token fallback exists.
+These amounts are list-price calculations, not reconciled invoices.
+
+`price_call` accepts normalized `ModelUsage` and a sequence of
+`RetrievalUsage(operation, units)`. `compose_call_cost` accepts an existing token
+result and validates its selected price against the supplied catalog before
+composition. Aggregate duplicate operations before calling it. Operation counts
+must be nonnegative integers; booleans, fractions, strings, and missing counts
+are unresolved. No search is inferred from citations or text. An ordinary
+Anthropic response without optional server-tool usage has no observed retrieval;
+explicit tool evidence with missing counters remains unresolved.
+
+Only the `anthropic-api`/Anthropic `web_search` and `web_fetch` scopes are newly
+supported. Observed operations on other channels remain unresolved, including
+Claude on Vertex; they do not inherit Gemini grounding rates. Existing independent
+retrieval pricing remains available. Use one catalog snapshot and effective time
+for a call. `resolve_billing` accepts the aggregate result and retains a qualified
+gateway total without adding the catalog retrieval amount again.
