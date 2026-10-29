@@ -2293,6 +2293,14 @@ models:
     publisher: deepseek
     aliases:
       - {provider: bedrock, alias: deepseek.v3-v1:0, channel: aws-bedrock}
+      - provider: vercel
+        alias: deepseek/deepseek-v3.1
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        effective_from: "2026-11-02"
+        source_url: https://vercel.com/ai-gateway/models/deepseek-v3.1
     prices:
       - channel: aws-bedrock
         region: us-west-2
@@ -2300,6 +2308,15 @@ models:
         input_per_mtok: 0.58
         output_per_mtok: 1.68
         source_url: https://aws.amazon.com/bedrock/pricing/
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.25
+        output_per_mtok: 0.95
+        cache_read_per_mtok: 0.13
+        rules:
+          varies_by_provider: true
+        source_url: https://ai-gateway.vercel.sh/v1/models
 
   - canonical_id: deepseek/v4-flash
     publisher: deepseek
@@ -5716,6 +5733,14 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: qwen/qwen3-coder-30b-a3b-instruct
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        effective_from: "2026-11-02"
+        source_url: https://openrouter.ai/qwen/qwen3-coder-30b-a3b-instruct
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -5723,6 +5748,14 @@ models:
         input_per_mtok: 0.15
         output_per_mtok: 0.6
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.07
+        output_per_mtok: 0.28
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: alibaba/qwen3-coder-next
     publisher: alibaba
@@ -6297,6 +6330,14 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: bytedance-seed/seed-2-1-turbo
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        effective_from: "2026-11-02"
+        source_url: https://openrouter.ai/bytedance-seed/seed-2-1-turbo
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -6305,6 +6346,14 @@ models:
         output_per_mtok: 2.5
         cache_read_per_mtok: 0.1
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.5
+        output_per_mtok: 2.5
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: callstack/apex
     publisher: callstack
@@ -6383,10 +6432,13 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+        effective_to: "2026-11-02"
+        source_url: https://vercel.com/ai-gateway/models/deepseek-v3.1
     prices:
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-11-02"
         input_per_mtok: 0.25
         output_per_mtok: 0.95
         cache_read_per_mtok: 0.13
@@ -6836,6 +6888,14 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: meta-llama/llama-3.1-70b-instruct
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        effective_from: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-3.1-70b-instruct
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -6843,6 +6903,14 @@ models:
         input_per_mtok: 0.72
         output_per_mtok: 0.72
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.4
+        output_per_mtok: 0.4
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: meta/llama-3.1-8b
     publisher: meta
@@ -6853,6 +6921,14 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: meta-llama/llama-3.1-8b-instruct
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        effective_from: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-3.1-8b-instruct
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -6862,6 +6938,15 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.05
+        output_per_mtok: 0.08
+        cache_read_per_mtok: 0.025
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: meta/llama-3.3-70b
     publisher: meta
@@ -6872,6 +6957,14 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: meta-llama/llama-3.3-70b-instruct
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        effective_from: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-3.3-70b-instruct
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -6879,6 +6972,14 @@ models:
         input_per_mtok: 0.72
         output_per_mtok: 0.72
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.1
+        output_per_mtok: 0.32
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: meta/llama-4-maverick
     publisher: meta
@@ -6889,6 +6990,14 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: meta-llama/llama-4-maverick
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        effective_from: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-4-maverick
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -6896,6 +7005,15 @@ models:
         input_per_mtok: 0.24
         output_per_mtok: 0.97
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.1875
+        output_per_mtok: 0.6525
+        cache_read_per_mtok: 0.05
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: meta/llama-4-scout
     publisher: meta
@@ -6906,6 +7024,14 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: meta-llama/llama-4-scout
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        effective_from: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-4-scout
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -6915,6 +7041,14 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.1
+        output_per_mtok: 0.3
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: meta/muse-spark-1.2-contributor
     publisher: meta
@@ -8865,10 +8999,13 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+        effective_to: "2026-11-02"
+        source_url: https://openrouter.ai/bytedance-seed/seed-2-1-turbo
     prices:
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-11-02"
         input_per_mtok: 0.5
         output_per_mtok: 2.5
         rules:
@@ -9293,10 +9430,13 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+        effective_to: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-3.1-70b-instruct
     prices:
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-11-02"
         input_per_mtok: 0.4
         output_per_mtok: 0.4
         rules:
@@ -9312,10 +9452,13 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+        effective_to: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-3.1-8b-instruct
     prices:
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-11-02"
         input_per_mtok: 0.05
         output_per_mtok: 0.08
         cache_read_per_mtok: 0.025
@@ -9370,10 +9513,13 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+        effective_to: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-3.3-70b-instruct
     prices:
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-11-02"
         input_per_mtok: 0.1
         output_per_mtok: 0.32
         rules:
@@ -9389,10 +9535,13 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+        effective_to: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-4-maverick
     prices:
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-11-02"
         input_per_mtok: 0.1875
         output_per_mtok: 0.6525
         cache_read_per_mtok: 0.05
@@ -9409,10 +9558,13 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+        effective_to: "2026-11-02"
+        source_url: https://openrouter.ai/meta-llama/llama-4-scout
     prices:
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-11-02"
         input_per_mtok: 0.1
         output_per_mtok: 0.3
         rules:
@@ -10380,10 +10532,13 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+        effective_to: "2026-11-02"
+        source_url: https://openrouter.ai/qwen/qwen3-coder-30b-a3b-instruct
     prices:
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-11-02"
         input_per_mtok: 0.07
         output_per_mtok: 0.28
         rules:
