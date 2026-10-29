@@ -6,7 +6,7 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-10-28"
+version: "2026-10-29"
 currency: USD
 pricing_verified_at: "2026-10-27"
 models:
@@ -23,6 +23,18 @@ models:
       - {provider: bedrock, alias: global.openai.gpt-6-sol, channel: aws-bedrock, price_region: global}
       - {provider: bedrock, alias: us.openai.gpt-6-sol, channel: aws-bedrock-geo, price_region: global}
       - {provider: bedrock, alias: openai.gpt-6-sol, channel: aws-bedrock, price_region: us-east-1}
+      - provider: openrouter
+        alias: openai/gpt-6-sol
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-6-sol-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -79,6 +91,17 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-sol.html
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.2
+        cache_write_5m_per_mtok: 2.5
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-6-luna
     publisher: openai
@@ -93,6 +116,18 @@ models:
       - {provider: bedrock, alias: global.openai.gpt-6-luna, channel: aws-bedrock, price_region: global}
       - {provider: bedrock, alias: us.openai.gpt-6-luna, channel: aws-bedrock-geo, price_region: global}
       - {provider: bedrock, alias: openai.gpt-6-luna, channel: aws-bedrock, price_region: us-east-1}
+      - provider: openrouter
+        alias: openai/gpt-6-luna
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-6-luna-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -149,6 +184,17 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-luna.html
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.1
+        output_per_mtok: 0.5
+        cache_read_per_mtok: 0.01
+        cache_write_5m_per_mtok: 0.125
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-6-astra
     publisher: openai
@@ -163,6 +209,18 @@ models:
       - {provider: bedrock, alias: global.openai.gpt-6-astra, channel: aws-bedrock, price_region: global}
       - {provider: bedrock, alias: us.openai.gpt-6-astra, channel: aws-bedrock-geo, price_region: global}
       - {provider: bedrock, alias: openai.gpt-6-astra, channel: aws-bedrock, price_region: [us-east-1, us-west-2]}
+      - provider: openrouter
+        alias: openai/gpt-6-astra
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-6-astra-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -229,6 +287,17 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-6-astra.html
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 10
+        output_per_mtok: 50
+        cache_read_per_mtok: 1
+        cache_write_5m_per_mtok: 12.5
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-6.1-sol
     publisher: openai
@@ -245,6 +314,18 @@ models:
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
         effective_from: "2026-10-02"
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - provider: openrouter
+        alias: openai/gpt-6.1-sol
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-6.1-sol-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -289,6 +370,17 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.1
+        cache_write_5m_per_mtok: 2.5
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-6.1-terra
     publisher: openai
@@ -296,6 +388,24 @@ models:
       - {provider: openai, alias: gpt-6.1-terra, channel: openai-api}
       - {provider: litellm, alias: gpt-6.1-terra, channel: openai-api}
       - {provider: unknown, alias: gpt-6.1-terra, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-6.1-terra
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-6.1-terra-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: vercel
+        alias: openai/gpt-6.1-terra
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -313,6 +423,27 @@ models:
           input_includes_cache_write: true
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://developers.openai.com/api/docs/models/gpt-6.1-terra
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1
+        output_per_mtok: 5
+        cache_read_per_mtok: 0.05
+        cache_write_5m_per_mtok: 1.25
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1
+        output_per_mtok: 5
+        cache_read_per_mtok: 0.05
+        cache_write_5m_per_mtok: 1.25
+        rules:
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://ai-gateway.vercel.sh/v1/models
 
   - canonical_id: openai/gpt-5.6-sol
     publisher: openai
@@ -329,6 +460,18 @@ models:
         channel: vercel-ai-gateway
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
       - {provider: bedrock, alias: us.openai.gpt-5.6-sol, channel: aws-bedrock}
+      - provider: openrouter
+        alias: openai/gpt-5.6-sol
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5.6-sol-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -403,6 +546,17 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-56-sol.html
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 4
+        output_per_mtok: 20
+        cache_read_per_mtok: 0.4
+        cache_write_5m_per_mtok: 5
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-5.6-terra
     publisher: openai
@@ -415,6 +569,18 @@ models:
         channel: vercel-ai-gateway
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
       - {provider: bedrock, alias: us.openai.gpt-5.6-terra, channel: aws-bedrock}
+      - provider: openrouter
+        alias: openai/gpt-5.6-terra
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5.6-terra-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -463,6 +629,17 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-56-terra.html
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 12
+        cache_read_per_mtok: 0.2
+        cache_write_5m_per_mtok: 2.5
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-5.6-luna
     publisher: openai
@@ -475,6 +652,18 @@ models:
         channel: vercel-ai-gateway
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
       - {provider: bedrock, alias: us.openai.gpt-5.6-luna, channel: aws-bedrock}
+      - provider: openrouter
+        alias: openai/gpt-5.6-luna
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5.6-luna-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -534,6 +723,17 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.2
+        output_per_mtok: 1.2
+        cache_read_per_mtok: 0.02
+        cache_write_5m_per_mtok: 0.25
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-5.4-mini
     publisher: openai
@@ -549,6 +749,12 @@ models:
         alias: openai/gpt-5.4-mini
         channel: vercel-ai-gateway
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+      - provider: openrouter
+        alias: openai/gpt-5.4-mini
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -568,6 +774,15 @@ models:
         output_per_mtok: 4.50
         cache_read_per_mtok: 0.075
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.75
+        output_per_mtok: 4.5
+        cache_read_per_mtok: 0.075
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-5.4
     publisher: openai
@@ -578,6 +793,12 @@ models:
       - {provider: vercel, alias: openai/gpt-5.4, channel: vercel-ai-gateway}
       - {provider: litellm, alias: gpt-5.4, channel: openai-api}
       - {provider: unknown, alias: gpt-5.4, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-5.4
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -609,6 +830,16 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2.5
+        output_per_mtok: 15
+        cache_read_per_mtok: 0.25
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.4-nano
     publisher: openai
     aliases:
@@ -623,6 +854,12 @@ models:
         alias: openai/gpt-5.4-nano
         channel: vercel-ai-gateway
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+      - provider: openrouter
+        alias: openai/gpt-5.4-nano
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -642,6 +879,15 @@ models:
         output_per_mtok: 1.25
         cache_read_per_mtok: 0.02
         source_url: https://vercel.com/ai-gateway/models/gpt-5.4-nano/providers
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.2
+        output_per_mtok: 1.25
+        cache_read_per_mtok: 0.02
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-4o-mini
     publisher: openai
@@ -759,6 +1005,12 @@ models:
       - {provider: vercel, alias: openai/gpt-4.1, channel: vercel-ai-gateway}
       - {provider: litellm, alias: gpt-4.1, channel: openai-api}
       - {provider: unknown, alias: gpt-4.1, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-4.1
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -779,6 +1031,15 @@ models:
         output_per_mtok: 8.0
         cache_read_per_mtok: 0.5
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 8
+        cache_read_per_mtok: 0.5
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-4.1-mini
     publisher: openai
     aliases:
@@ -786,6 +1047,12 @@ models:
       - {provider: openai, alias: gpt-4.1-mini-2025-04-14, channel: openai-api}
       - {provider: openai, alias: openai/gpt-4.1-mini, channel: openai-api}
       - {provider: vercel, alias: openai/gpt-4.1-mini, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true}, effective_from: "2026-10-02", source_url: https://ai-gateway.vercel.sh/v1/models}
+      - provider: openrouter
+        alias: openai/gpt-4.1-mini
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -805,6 +1072,15 @@ models:
         output_per_mtok: 1.60
         cache_read_per_mtok: 0.10
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.4
+        output_per_mtok: 1.6
+        cache_read_per_mtok: 0.1
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-4.1-nano
     publisher: openai
@@ -813,6 +1089,12 @@ models:
       - {provider: openai, alias: gpt-4.1-nano-2025-04-14, channel: openai-api}
       - {provider: openai, alias: openai/gpt-4.1-nano, channel: openai-api}
       - {provider: vercel, alias: openai/gpt-4.1-nano, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true}, effective_from: "2026-10-02", source_url: https://ai-gateway.vercel.sh/v1/models}
+      - provider: openrouter
+        alias: openai/gpt-4.1-nano
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -834,6 +1116,15 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.1
+        output_per_mtok: 0.4
+        cache_read_per_mtok: 0.03
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-5.2
     publisher: openai
@@ -842,6 +1133,12 @@ models:
       - {provider: openai, alias: gpt-5.2-2025-12-11, channel: openai-api}
       - {provider: openai, alias: openai/gpt-5.2, channel: openai-api}
       - {provider: vercel, alias: openai/gpt-5.2, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true}, effective_from: "2026-10-02", source_url: https://ai-gateway.vercel.sh/v1/models}
+      - provider: openrouter
+        alias: openai/gpt-5.2
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -863,6 +1160,15 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.75
+        output_per_mtok: 14
+        cache_read_per_mtok: 0.175
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-5.2-pro
     publisher: openai
@@ -872,6 +1178,18 @@ models:
       - {provider: openai, alias: openai/gpt-5.2-pro, channel: openai-api}
       - {provider: litellm, alias: gpt-5.2-pro, channel: openai-api}
       - {provider: unknown, alias: gpt-5.2-pro, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-5.2-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: vercel
+        alias: openai/gpt-5.2-pro
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -879,6 +1197,20 @@ models:
         input_per_mtok: 21.00
         output_per_mtok: 168.00
         source_url: https://developers.openai.com/api/docs/models/gpt-5.2-pro
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 21
+        output_per_mtok: 168
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 21
+        output_per_mtok: 168
+        source_url: https://ai-gateway.vercel.sh/v1/models
 
   - canonical_id: anthropic/claude-fable-5.1
     publisher: anthropic
@@ -2508,6 +2840,12 @@ models:
       - {provider: unknown, alias: grok-4.3-latest, channel: xai-api}
       - {provider: x-ai, alias: xai/grok-4.3, channel: xai-api}
       - {provider: x-ai, alias: xai/grok-4.3-latest, channel: xai-api}
+      - provider: openrouter
+        alias: x-ai/grok-4.3
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: xai-api
         region: global
@@ -2542,6 +2880,16 @@ models:
         rules:
           long_context: {threshold: 200000, input_multiplier: 2.0, output_multiplier: 2.0}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 2.5
+        cache_read_per_mtok: 0.2
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: perplexity/sonar
     publisher: perplexity
     aliases:
@@ -2551,6 +2899,12 @@ models:
       - {provider: perplexity-ai, alias: perplexity/sonar, channel: perplexity-api}
       - {provider: unknown, alias: sonar, channel: perplexity-api}
       - {provider: vercel, alias: perplexity/sonar, channel: vercel-ai-gateway}
+      - provider: openrouter
+        alias: perplexity/sonar
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: perplexity-api
         region: global
@@ -2579,6 +2933,15 @@ models:
         rules:
           uncaptured_fees: true
         source_url: https://vercel.com/ai-gateway/models/sonar
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1
+        output_per_mtok: 1
+        rules:
+          varies_by_provider: true
+          uncaptured_fees: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: openai/gpt-5-mini
     publisher: openai
@@ -2591,6 +2954,12 @@ models:
         alias: openai/gpt-5-mini
         channel: vercel-ai-gateway
         rules: {input_includes_cache_read: true}
+      - provider: openrouter
+        alias: openai/gpt-5-mini
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -2609,6 +2978,15 @@ models:
         output_per_mtok: 2.00
         cache_read_per_mtok: 0.025
         source_url: https://vercel.com/ai-gateway/models/gpt-5-mini/providers
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.25
+        output_per_mtok: 2
+        cache_read_per_mtok: 0.025
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: anthropic/claude-3-haiku
     publisher: anthropic
@@ -3584,6 +3962,12 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: vercel
+        alias: openai/gpt-oss-120b
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: fireworks-api
         region: global
@@ -3602,6 +3986,15 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.1
+        output_per_mtok: 0.5
+        cache_read_per_mtok: 0.1
+        rules:
+          varies_by_provider: true
+        source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: nvidia/nemotron-3-ultra-nvfp4
     publisher: nvidia
     aliases:
@@ -3717,6 +4110,12 @@ models:
       - {provider: litellm, alias: grok-4.6-latest, channel: xai-api, effective_from: "2026-08-12", source_url: https://docs.x.ai/developers/release-notes}
       - {provider: x-ai, alias: xai/grok-4.6, channel: xai-api}
       - {provider: x-ai, alias: xai/grok-4.6-latest, channel: xai-api, effective_from: "2026-08-12", source_url: https://docs.x.ai/developers/release-notes}
+      - provider: openrouter
+        alias: x-ai/grok-4.6
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -3768,6 +4167,16 @@ models:
         rules:
           long_context: {threshold: 200000, input_multiplier: 2.0, output_multiplier: 2.0}
         source_url: https://docs.x.ai/developers/advanced-api-usage/regions
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 6
+        cache_read_per_mtok: 0.5
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: xai/grok-4.7
     publisher: xai
     aliases:
@@ -3794,6 +4203,12 @@ models:
         rules: {input_includes_cache_read: true}
         effective_from: "2026-10-02"
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - provider: openrouter
+        alias: x-ai/grok-4.7
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -3836,6 +4251,16 @@ models:
         output_per_mtok: 6.0
         cache_read_per_mtok: 0.5
         source_url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-xai-grok-4-7.html
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 6
+        cache_read_per_mtok: 0.5
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: google/gemini-3-flash-preview
     publisher: google
     aliases:
@@ -4207,6 +4632,12 @@ models:
       - {provider: alibaba, alias: alibaba/qwen3.7-plus, channel: vercel-ai-gateway, rules: {"input_includes_cache_read": true, "input_includes_cache_write": true}}
       - {provider: litellm, alias: qwen3.7-plus, channel: alibaba-api}
       - {provider: unknown, alias: qwen3.7-plus, channel: alibaba-api}
+      - provider: openrouter
+        alias: qwen/qwen3.7-plus
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: alibaba-api
         region: global
@@ -4237,6 +4668,17 @@ models:
         rules:
           long_context: {threshold: 256000, input_multiplier: 3.0, output_multiplier: 3.0}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.32
+        output_per_mtok: 1.28
+        cache_read_per_mtok: 0.064
+        cache_write_5m_per_mtok: 0.4
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 256000, input_multiplier: 3, output_multiplier: 3}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: alibaba/qwen3.8-max
     publisher: alibaba
     aliases:
@@ -4993,6 +5435,12 @@ models:
       - {provider: vercel, alias: openai/gpt-5, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true}, effective_from: "2026-10-02", source_url: https://ai-gateway.vercel.sh/v1/models}
       - {provider: openai, alias: gpt-5, channel: openai-api, rules: {"input_includes_cache_read": true}}
       - {provider: unknown, alias: gpt-5, channel: openai-api, rules: {"input_includes_cache_read": true}}
+      - provider: openrouter
+        alias: openai/gpt-5
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -5012,6 +5460,15 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.125
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.3-codex
     publisher: openai
     aliases:
@@ -5020,6 +5477,12 @@ models:
       - {provider: vercel, alias: openai/gpt-5.3-codex, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true}, effective_from: "2026-10-02", source_url: https://ai-gateway.vercel.sh/v1/models}
       - {provider: openai, alias: gpt-5.3-codex, channel: openai-api}
       - {provider: unknown, alias: gpt-5.3-codex, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-5.3-codex
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -5035,6 +5498,15 @@ models:
         output_per_mtok: 14.0
         cache_read_per_mtok: 0.175
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.75
+        output_per_mtok: 14
+        cache_read_per_mtok: 0.175
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.4-pro
     publisher: openai
     aliases:
@@ -5047,6 +5519,12 @@ models:
       - {provider: openai, alias: gpt-5.4-pro-2026-03-05, channel: openai-api}
       - {provider: unknown, alias: gpt-5.4-pro, channel: openai-api}
       - {provider: unknown, alias: gpt-5.4-pro-2026-03-05, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-5.4-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -5066,6 +5544,15 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 30
+        output_per_mtok: 180
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.5
     publisher: openai
     aliases:
@@ -5078,6 +5565,12 @@ models:
       - {provider: openai, alias: gpt-5.5-2026-04-23, channel: openai-api}
       - {provider: unknown, alias: gpt-5.5, channel: openai-api}
       - {provider: unknown, alias: gpt-5.5-2026-04-23, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-5.5
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: openai-api
         region: global
@@ -5108,6 +5601,16 @@ models:
           varies_by_provider: true
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 5
+        output_per_mtok: 30
+        cache_read_per_mtok: 0.5
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.5-pro
     publisher: openai
     aliases:
@@ -5120,6 +5623,12 @@ models:
       - {provider: openai, alias: gpt-5.5-pro-2026-04-23, channel: openai-api}
       - {provider: unknown, alias: gpt-5.5-pro, channel: openai-api}
       - {provider: unknown, alias: gpt-5.5-pro-2026-04-23, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-5.5-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       # OpenAI lists no long-context batch rate, so batch stays flat.
       - channel: openai-api
@@ -5147,6 +5656,15 @@ models:
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 30
+        output_per_mtok: 180
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.6-cyber
     publisher: openai
     aliases:
@@ -5211,6 +5729,7 @@ models:
       - {provider: unknown, alias: grok-4.20-non-reasoning, channel: xai-api}
       - {provider: x-ai, alias: grok-4.20-0309-non-reasoning, channel: xai-api}
       - {provider: x-ai, alias: grok-4.20-non-reasoning, channel: xai-api}
+      - {provider: vercel, alias: spacexai/grok-4.20-non-reasoning-beta, channel: vercel-ai-gateway}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -5242,6 +5761,13 @@ models:
       - {provider: unknown, alias: grok-4.20-reasoning, channel: xai-api}
       - {provider: x-ai, alias: grok-4.20-0309-reasoning, channel: xai-api}
       - {provider: x-ai, alias: grok-4.20-reasoning, channel: xai-api}
+      - provider: openrouter
+        alias: x-ai/grok-4.20
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - {provider: vercel, alias: spacexai/grok-4.20-reasoning-beta, channel: vercel-ai-gateway}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -5261,6 +5787,16 @@ models:
         rules:
           long_context: {threshold: 200000, input_multiplier: 2.0, output_multiplier: 2.0}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 2.5
+        cache_read_per_mtok: 0.2
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: xai/grok-4.5
     publisher: xai
     aliases:
@@ -5278,6 +5814,12 @@ models:
         rules: {input_includes_cache_read: true}
         effective_from: "2026-10-02"
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - provider: openrouter
+        alias: x-ai/grok-4.5
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -5297,6 +5839,16 @@ models:
         rules:
           long_context: {threshold: 200000, input_multiplier: 2.0, output_multiplier: 2.0}
         source_url: https://docs.x.ai/developers/release-notes
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 6
+        cache_read_per_mtok: 0.3
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
   - canonical_id: zai/glm-5.1
     publisher: zai
     aliases:
@@ -5628,6 +6180,12 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: qwen/qwen3-14b
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -5635,6 +6193,14 @@ models:
         input_per_mtok: 0.12
         output_per_mtok: 0.24
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.12
+        output_per_mtok: 0.24
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: alibaba/qwen-3-235b
     publisher: alibaba
@@ -5681,6 +6247,12 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - provider: openrouter
+        alias: qwen/qwen3-32b
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -5690,6 +6262,14 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.08
+        output_per_mtok: 0.28
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
 
   - canonical_id: alibaba/qwen3-coder
     publisher: alibaba
@@ -7560,6 +8140,11 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: openai, alias: gpt-3.5-turbo, channel: openai-api}
+      - {provider: openai, alias: gpt-3.5-turbo-0125, channel: openai-api}
+      - {provider: litellm, alias: gpt-3.5-turbo, channel: openai-api}
+      - {provider: unknown, alias: gpt-3.5-turbo, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-3.5-turbo, channel: openai-api}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -7576,6 +8161,14 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.50
+        output_per_mtok: 1.50
+        batch_input_per_mtok: 0.25
+        batch_output_per_mtok: 0.75
+        source_url: https://developers.openai.com/api/docs/pricing
   - canonical_id: openai/gpt-4-turbo
     publisher: openai
     aliases:
@@ -7591,6 +8184,11 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: openai, alias: gpt-4-turbo, channel: openai-api}
+      - {provider: openai, alias: gpt-4-turbo-2024-04-09, channel: openai-api}
+      - {provider: litellm, alias: gpt-4-turbo, channel: openai-api}
+      - {provider: unknown, alias: gpt-4-turbo, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-4-turbo, channel: openai-api}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -7607,6 +8205,14 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 10
+        output_per_mtok: 30
+        batch_input_per_mtok: 5
+        batch_output_per_mtok: 15
+        source_url: https://developers.openai.com/api/docs/pricing
   - canonical_id: openai/gpt-4.1-batch
     publisher: openai
     aliases:
@@ -7916,6 +8522,11 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: openai, alias: o1, channel: openai-api}
+      - {provider: openai, alias: o1-2024-12-17, channel: openai-api}
+      - {provider: litellm, alias: o1, channel: openai-api}
+      - {provider: unknown, alias: o1, channel: openai-api}
+      - {provider: openai, alias: openai/o1, channel: openai-api}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -7924,6 +8535,15 @@ models:
         output_per_mtok: 60
         cache_read_per_mtok: 7.5
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openai-api
+        region: global
+        effective_from: "2024-12-17"
+        input_per_mtok: 15
+        output_per_mtok: 60
+        cache_read_per_mtok: 7.50
+        batch_input_per_mtok: 7.50
+        batch_output_per_mtok: 30
+        source_url: https://developers.openai.com/api/docs/pricing
 
   - canonical_id: openai/o3-mini
     publisher: openai
@@ -7934,6 +8554,11 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: openai, alias: o3-mini, channel: openai-api}
+      - {provider: openai, alias: o3-mini-2025-01-31, channel: openai-api}
+      - {provider: litellm, alias: o3-mini, channel: openai-api}
+      - {provider: unknown, alias: o3-mini, channel: openai-api}
+      - {provider: openai, alias: openai/o3-mini, channel: openai-api}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -7942,6 +8567,15 @@ models:
         output_per_mtok: 4.4
         cache_read_per_mtok: 0.55
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openai-api
+        region: global
+        effective_from: "2025-01-31"
+        input_per_mtok: 1.10
+        output_per_mtok: 4.40
+        cache_read_per_mtok: 0.55
+        batch_input_per_mtok: 0.55
+        batch_output_per_mtok: 2.20
+        source_url: https://developers.openai.com/api/docs/pricing
 
   - canonical_id: poolside/laguna-s-2.1
     publisher: poolside
@@ -10263,6 +10897,11 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: openai, alias: gpt-4, channel: openai-api}
+      - {provider: openai, alias: gpt-4-0613, channel: openai-api}
+      - {provider: litellm, alias: gpt-4, channel: openai-api}
+      - {provider: unknown, alias: gpt-4, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-4, channel: openai-api}
     prices:
       - channel: openrouter-api
         region: global
@@ -10272,6 +10911,14 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 30
+        output_per_mtok: 60
+        batch_input_per_mtok: 15
+        batch_output_per_mtok: 30
+        source_url: https://developers.openai.com/api/docs/pricing
 
   - canonical_id: openai/gpt-4o-2024-05-13
     publisher: openai
@@ -10282,6 +10929,10 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: openai, alias: gpt-4o-2024-05-13, channel: openai-api}
+      - {provider: litellm, alias: gpt-4o-2024-05-13, channel: openai-api}
+      - {provider: unknown, alias: gpt-4o-2024-05-13, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-4o-2024-05-13, channel: openai-api}
     prices:
       - channel: openrouter-api
         region: global
@@ -10291,6 +10942,14 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
+      - channel: openai-api
+        region: global
+        effective_from: "2024-05-13"
+        input_per_mtok: 5
+        output_per_mtok: 15
+        batch_input_per_mtok: 2.50
+        batch_output_per_mtok: 7.50
+        source_url: https://developers.openai.com/api/docs/pricing
 
   - canonical_id: perceptron/perceptron-mk1
     publisher: perceptron
@@ -11283,6 +11942,926 @@ models:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
 
+  - canonical_id: openai/gpt-5.1
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-5.1, channel: openai-api}
+      - {provider: openai, alias: gpt-5.1-2025-11-13, channel: openai-api}
+      - {provider: litellm, alias: gpt-5.1, channel: openai-api}
+      - {provider: unknown, alias: gpt-5.1, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-5.1, channel: openai-api}
+      - provider: vercel
+        alias: openai/gpt-5.1-thinking
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5.1
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: openai-api
+        region: global
+        effective_from: "2025-11-13"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.125
+        batch_input_per_mtok: 0.625
+        batch_output_per_mtok: 5
+        batch_cache_read_per_mtok: 0.0625
+        source_url: https://developers.openai.com/api/docs/models/gpt-5.1
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.125
+        rules:
+          varies_by_provider: true
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.125
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/gpt-5-nano
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-5-nano, channel: openai-api}
+      - {provider: openai, alias: gpt-5-nano-2025-08-07, channel: openai-api}
+      - {provider: litellm, alias: gpt-5-nano, channel: openai-api}
+      - {provider: unknown, alias: gpt-5-nano, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-5-nano, channel: openai-api}
+      - provider: vercel
+        alias: openai/gpt-5-nano
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5-nano
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: openai-api
+        region: global
+        effective_from: "2025-08-07"
+        input_per_mtok: 0.05
+        output_per_mtok: 0.40
+        cache_read_per_mtok: 0.005
+        batch_input_per_mtok: 0.025
+        batch_output_per_mtok: 0.20
+        batch_cache_read_per_mtok: 0.0025
+        source_url: https://developers.openai.com/api/docs/models/gpt-5-nano
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.05
+        output_per_mtok: 0.4
+        cache_read_per_mtok: 0.005
+        rules:
+          varies_by_provider: true
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.05
+        output_per_mtok: 0.4
+        cache_read_per_mtok: 0.005
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/gpt-5-pro
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-5-pro, channel: openai-api}
+      - {provider: openai, alias: gpt-5-pro-2025-10-06, channel: openai-api}
+      - {provider: litellm, alias: gpt-5-pro, channel: openai-api}
+      - {provider: unknown, alias: gpt-5-pro, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-5-pro, channel: openai-api}
+      - provider: vercel
+        alias: openai/gpt-5-pro
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: openai-api
+        region: global
+        effective_from: "2025-10-06"
+        input_per_mtok: 15
+        output_per_mtok: 120
+        batch_input_per_mtok: 7.50
+        batch_output_per_mtok: 60
+        source_url: https://developers.openai.com/api/docs/models/gpt-5-pro
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 15
+        output_per_mtok: 120
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 15
+        output_per_mtok: 120
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/o3
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: o3, channel: openai-api}
+      - {provider: openai, alias: o3-2025-04-16, channel: openai-api}
+      - {provider: litellm, alias: o3, channel: openai-api}
+      - {provider: unknown, alias: o3, channel: openai-api}
+      - {provider: openai, alias: openai/o3, channel: openai-api}
+      - provider: vercel
+        alias: openai/o3
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/o3
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # The direct row starts at the June 2025 price cut; earlier o3 calls stay unpriced.
+      - channel: openai-api
+        region: global
+        effective_from: "2025-06-10"
+        input_per_mtok: 2
+        output_per_mtok: 8
+        cache_read_per_mtok: 0.50
+        batch_input_per_mtok: 1
+        batch_output_per_mtok: 4
+        source_url: https://developers.openai.com/api/docs/models/o3
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 8
+        cache_read_per_mtok: 0.5
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 8
+        cache_read_per_mtok: 0.5
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/o3-pro
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: o3-pro, channel: openai-api}
+      - {provider: openai, alias: o3-pro-2025-06-10, channel: openai-api}
+      - {provider: litellm, alias: o3-pro, channel: openai-api}
+      - {provider: unknown, alias: o3-pro, channel: openai-api}
+      - {provider: openai, alias: openai/o3-pro, channel: openai-api}
+      - provider: vercel
+        alias: openai/o3-pro
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/o3-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: openai-api
+        region: global
+        effective_from: "2025-06-10"
+        input_per_mtok: 20
+        output_per_mtok: 80
+        batch_input_per_mtok: 10
+        batch_output_per_mtok: 40
+        source_url: https://developers.openai.com/api/docs/models/o3-pro
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 20
+        output_per_mtok: 80
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 20
+        output_per_mtok: 80
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/o1-pro
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: o1-pro, channel: openai-api}
+      - {provider: openai, alias: o1-pro-2025-03-19, channel: openai-api}
+      - {provider: litellm, alias: o1-pro, channel: openai-api}
+      - {provider: unknown, alias: o1-pro, channel: openai-api}
+      - {provider: openai, alias: openai/o1-pro, channel: openai-api}
+    prices:
+      - channel: openai-api
+        region: global
+        effective_from: "2025-03-19"
+        input_per_mtok: 150
+        output_per_mtok: 600
+        batch_input_per_mtok: 75
+        batch_output_per_mtok: 300
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  - canonical_id: openai/gpt-5.5-cyber
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-5.5-cyber, channel: openai-api}
+      - {provider: litellm, alias: gpt-5.5-cyber, channel: openai-api}
+      - {provider: unknown, alias: gpt-5.5-cyber, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-5.5-cyber, channel: openai-api}
+    prices:
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 12.50
+        output_per_mtok: 75
+        cache_read_per_mtok: 1.25
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  - canonical_id: openai/gpt-rosalind-research
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-rosalind-research, channel: openai-api}
+      - {provider: litellm, alias: gpt-rosalind-research, channel: openai-api}
+      - {provider: unknown, alias: gpt-rosalind-research, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-rosalind-research, channel: openai-api}
+    prices:
+      # OpenAI bills this model from 2026-10-05.
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-05"
+        input_per_mtok: 5
+        output_per_mtok: 25
+        cache_read_per_mtok: 0.50
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  - canonical_id: openai/gpt-rosalind-discovery
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-rosalind-discovery, channel: openai-api}
+      - {provider: litellm, alias: gpt-rosalind-discovery, channel: openai-api}
+      - {provider: unknown, alias: gpt-rosalind-discovery, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-rosalind-discovery, channel: openai-api}
+    prices:
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 5
+        output_per_mtok: 25
+        cache_read_per_mtok: 0.50
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  - canonical_id: openai/chat-latest
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: chat-latest, channel: openai-api}
+      - {provider: litellm, alias: chat-latest, channel: openai-api}
+      - {provider: unknown, alias: chat-latest, channel: openai-api}
+      - {provider: openai, alias: openai/chat-latest, channel: openai-api}
+      - provider: openrouter
+        alias: openai/gpt-chat-latest
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # A moving alias for the newest ChatGPT Instant model, at one price.
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 5
+        output_per_mtok: 30
+        cache_read_per_mtok: 0.50
+        source_url: https://developers.openai.com/api/docs/pricing
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 5
+        output_per_mtok: 30
+        cache_read_per_mtok: 0.5
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/gpt-5-search-api
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-5-search-api, channel: openai-api}
+      - {provider: litellm, alias: gpt-5-search-api, channel: openai-api}
+      - {provider: unknown, alias: gpt-5-search-api, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-5-search-api, channel: openai-api}
+    prices:
+      # Web search calls are billed per call on top of tokens.
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.125
+        rules:
+          uncaptured_fees: true
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  - canonical_id: openai/gpt-5-codex
+    publisher: openai
+    aliases:
+      - provider: vercel
+        alias: openai/gpt-5-codex
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # OpenAI has shut this model down on its own API; gateways still sell it.
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.13
+        source_url: https://ai-gateway.vercel.sh/v1/models
+
+  - canonical_id: openai/gpt-5.1-codex
+    publisher: openai
+    aliases:
+      - provider: vercel
+        alias: openai/gpt-5.1-codex
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5.1-codex
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # OpenAI has shut this model down on its own API; gateways still sell it.
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.13
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.13
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/gpt-5.1-codex-max
+    publisher: openai
+    aliases:
+      - provider: vercel
+        alias: openai/gpt-5.1-codex-max
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5.1-codex-max
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # OpenAI has shut this model down on its own API; gateways still sell it.
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.125
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 10
+        cache_read_per_mtok: 0.125
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/gpt-5.1-codex-mini
+    publisher: openai
+    aliases:
+      - provider: vercel
+        alias: openai/gpt-5.1-codex-mini
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5.1-codex-mini
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # OpenAI has shut this model down on its own API; gateways still sell it.
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.25
+        output_per_mtok: 2
+        cache_read_per_mtok: 0.03
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.25
+        output_per_mtok: 2
+        cache_read_per_mtok: 0.03
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/gpt-5.2-codex
+    publisher: openai
+    aliases:
+      - provider: vercel
+        alias: openai/gpt-5.2-codex
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: openai/gpt-5.2-codex
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # OpenAI has shut this model down on its own API; gateways still sell it.
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.75
+        output_per_mtok: 14
+        cache_read_per_mtok: 0.175
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.75
+        output_per_mtok: 14
+        cache_read_per_mtok: 0.175
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: openai/gpt-5.2-chat-latest
+    publisher: openai
+    aliases:
+      - provider: openrouter
+        alias: openai/gpt-5.2-chat
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # OpenAI has shut this model down on its own API; gateways still sell it.
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.75
+        output_per_mtok: 14
+        cache_read_per_mtok: 0.175
+        rules:
+          varies_by_provider: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: xai/grok-4.20-multi-agent
+    publisher: xai
+    aliases:
+      - {provider: x-ai, alias: grok-4.20-multi-agent, channel: xai-api}
+      - {provider: x-ai, alias: grok-4.20-multi-agent-0309, channel: xai-api}
+      - {provider: litellm, alias: grok-4.20-multi-agent, channel: xai-api}
+      - {provider: unknown, alias: grok-4.20-multi-agent, channel: xai-api}
+      - {provider: x-ai, alias: xai/grok-4.20-multi-agent, channel: xai-api}
+      - provider: vercel
+        alias: spacexai/grok-4.20-multi-agent
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: vercel
+        alias: spacexai/grok-4.20-multi-agent-beta
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: x-ai/grok-4.20-multi-agent
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: xai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 2.50
+        cache_read_per_mtok: 0.20
+        rules:
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://docs.x.ai/developers/models
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 2.5
+        cache_read_per_mtok: 0.2
+        rules:
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 2.5
+        cache_read_per_mtok: 0.2
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: xai/grok-build-0.1
+    publisher: xai
+    aliases:
+      - {provider: x-ai, alias: grok-build-0.1, channel: xai-api}
+      - {provider: litellm, alias: grok-build-0.1, channel: xai-api}
+      - {provider: unknown, alias: grok-build-0.1, channel: xai-api}
+      - {provider: x-ai, alias: xai/grok-build-0.1, channel: xai-api}
+      - provider: vercel
+        alias: spacexai/grok-build-0.1
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: x-ai/grok-build-0.1
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: xai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1
+        output_per_mtok: 2
+        cache_read_per_mtok: 0.20
+        rules:
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://docs.x.ai/developers/models
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1
+        output_per_mtok: 2
+        cache_read_per_mtok: 0.2
+        rules:
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1
+        output_per_mtok: 2
+        cache_read_per_mtok: 0.2
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: alibaba/qwen3.5-plus
+    publisher: alibaba
+    aliases:
+      - {provider: alibaba, alias: qwen3.5-plus, channel: alibaba-api}
+      - {provider: alibaba, alias: qwen3.5-plus-2026-02-15, channel: alibaba-api}
+      - {provider: alibaba, alias: qwen3.5-plus-2026-04-20, channel: alibaba-api}
+      - {provider: litellm, alias: qwen3.5-plus, channel: alibaba-api}
+      - {provider: unknown, alias: qwen3.5-plus, channel: alibaba-api}
+      - provider: vercel
+        alias: alibaba/qwen3.5-plus
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: qwen/qwen3.5-plus-02-15
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: alibaba-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.4
+        output_per_mtok: 2.4
+        rules:
+          long_context: {threshold: 256000, input_multiplier: 1.25, output_multiplier: 1.25}
+        source_url: https://www.alibabacloud.com/help/en/model-studio/model-pricing
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.4
+        output_per_mtok: 2.4
+        cache_read_per_mtok: 0.04
+        cache_write_5m_per_mtok: 0.5
+        rules:
+          long_context: {threshold: 256000, input_multiplier: 1.25, output_multiplier: 1.25}
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.26
+        output_per_mtok: 1.56
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 256000, input_multiplier: 1.25, output_multiplier: 1.25}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: alibaba/qwen3.5-plus-2026-04-20
+    publisher: alibaba
+    aliases:
+      - provider: openrouter
+        alias: qwen/qwen3.5-plus-20260420
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # OpenRouter prices this snapshot apart from qwen3.5-plus; Alibaba prices both alike.
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.3
+        output_per_mtok: 1.8
+        cache_write_5m_per_mtok: 0.375
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 256000, input_multiplier: 1.25, output_multiplier: 1.25}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: alibaba/qwen3.6-plus
+    publisher: alibaba
+    aliases:
+      - {provider: alibaba, alias: qwen3.6-plus, channel: alibaba-api}
+      - {provider: alibaba, alias: qwen3.6-plus-2026-04-02, channel: alibaba-api}
+      - {provider: litellm, alias: qwen3.6-plus, channel: alibaba-api}
+      - {provider: unknown, alias: qwen3.6-plus, channel: alibaba-api}
+      - provider: vercel
+        alias: alibaba/qwen3.6-plus
+        channel: vercel-ai-gateway
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+      - provider: openrouter
+        alias: qwen/qwen3.6-plus
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: alibaba-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.5
+        output_per_mtok: 3
+        rules:
+          long_context: {threshold: 256000, input_multiplier: 4, output_multiplier: 2}
+        source_url: https://www.alibabacloud.com/help/en/model-studio/model-pricing
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.5
+        output_per_mtok: 3
+        cache_read_per_mtok: 0.05
+        cache_write_5m_per_mtok: 0.625
+        rules:
+          long_context: {threshold: 256000, input_multiplier: 4, output_multiplier: 2}
+        source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.325
+        output_per_mtok: 1.95
+        cache_write_5m_per_mtok: 0.40625
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 256000, input_multiplier: 4, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: bytedance/seed-1.6
+    publisher: bytedance
+    aliases:
+      - provider: openrouter
+        alias: bytedance-seed/seed-1.6
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # Vercel keeps cache reads flat above 128K, which a row cannot express.
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.25
+        output_per_mtok: 2
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 128000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: bytedance/seed-2.0-code
+    publisher: bytedance
+    aliases:
+      - provider: openrouter
+        alias: bytedance-seed/seed-2.0-code
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.5
+        output_per_mtok: 3
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 128000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: bytedance/seed-2.0-lite
+    publisher: bytedance
+    aliases:
+      - provider: openrouter
+        alias: bytedance-seed/seed-2.0-lite
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.25
+        output_per_mtok: 2
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 128000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: bytedance/seed-2.0-mini
+    publisher: bytedance
+    aliases:
+      - provider: openrouter
+        alias: bytedance-seed/seed-2.0-mini
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.1
+        output_per_mtok: 0.4
+        rules:
+          varies_by_provider: true
+          long_context: {threshold: 128000, input_multiplier: 2, output_multiplier: 2}
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: perplexity/sonar-pro
+    publisher: perplexity
+    aliases:
+      - provider: openrouter
+        alias: perplexity/sonar-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # Perplexity bills searches per request on top of tokens.
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 3
+        output_per_mtok: 15
+        rules:
+          varies_by_provider: true
+          uncaptured_fees: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: perplexity/sonar-reasoning-pro
+    publisher: perplexity
+    aliases:
+      - provider: openrouter
+        alias: perplexity/sonar-reasoning-pro
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # Perplexity bills searches per request on top of tokens.
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 8
+        rules:
+          varies_by_provider: true
+          uncaptured_fees: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: perplexity/sonar-deep-research
+    publisher: perplexity
+    aliases:
+      - provider: openrouter
+        alias: perplexity/sonar-deep-research
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # Perplexity bills searches per request on top of tokens.
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 8
+        rules:
+          varies_by_provider: true
+          uncaptured_fees: true
+        source_url: https://openrouter.ai/api/v1/models
+
+  - canonical_id: perplexity/sonar-pro-search
+    publisher: perplexity
+    aliases:
+      - provider: openrouter
+        alias: perplexity/sonar-pro-search
+        channel: openrouter-api
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+    prices:
+      # Perplexity bills searches per request on top of tokens.
+      - channel: openrouter-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 3
+        output_per_mtok: 15
+        rules:
+          varies_by_provider: true
+          uncaptured_fees: true
+        source_url: https://openrouter.ai/api/v1/models
+
 retrieval:
   - channel: anthropic-api
     operation: web_search
@@ -11359,3 +12938,4 @@ disputes:
     since: "2026-09-10"
     note: Portkey prices DeepSeek from a table that predates DeepSeek's 2026-09-10 price change, at a quarter to a half of the list price.
     source_url: https://api-docs.deepseek.com/updates/
+
