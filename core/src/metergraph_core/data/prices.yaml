@@ -2936,17 +2936,9 @@ models:
         rules:
           uncaptured_fees: true
         source_url: https://docs.perplexity.ai/docs/getting-started/pricing
-      # No published fee for Sonar's built-in search; the Search API and
-      # web_search tool fees price other endpoints.
-      - channel: perplexity-api
-        region: global
-        effective_from: "2026-10-29"
-        input_per_mtok: 0.25
-        output_per_mtok: 2.50
-        cache_read_per_mtok: 0.0625
-        rules:
-          uncaptured_fees: true
-        source_url: https://docs.perplexity.ai/docs/agent-api/models
+      # The Agent API's model list is a separate product: its Sonar rates,
+      # including its cache read rate, do not price this channel, so the
+      # direct token rates above stay the last known ones.
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-11"
