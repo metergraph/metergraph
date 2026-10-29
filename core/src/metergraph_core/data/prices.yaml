@@ -6,7 +6,7 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-10-28"
+version: "2026-10-29"
 currency: USD
 pricing_verified_at: "2026-10-27"
 models:

@@ -36,7 +36,7 @@ CORE_DIR = Path(__file__).resolve().parents[2]  # core/
 DIST_DIR = CORE_DIR / "dist"
 
 EXPECTED_NAME = "metergraph-core"
-EXPECTED_VERSION = "0.8.3"
+EXPECTED_VERSION = "0.8.4"
 EXPECTED_REQUIRES_PYTHON = ">=3.10"
 EXPECTED_SUMMARY = (
     "Open, effective-dated LLM pricing catalog and deterministic cost calculator "
@@ -74,7 +74,7 @@ GOLDEN_PRICE_ID = "openai/gpt-5.4-mini:openai-api:global:2026-03-17"
 GOLDEN_PINNED_PRICE_ID = "openai/gpt-6.1-sol:aws-bedrock:us-east-1:2026-09-29"
 GOLDEN_RETRIEVAL_COST = "14.00000000"
 GOLDEN_RETRIEVAL_PRICE_ID = "google-api:google_search_grounding:global:2026-08-26"
-CATALOG_VERSION = "2026-10-28"
+CATALOG_VERSION = "2026-10-29"
 
 REQUIRED_MODULES = (
     "__init__.py",
