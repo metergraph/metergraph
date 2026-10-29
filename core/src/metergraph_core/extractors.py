@@ -215,7 +215,7 @@ def parse_google(html_text: str, *, duplicates: list[str] | None = None) -> Tabl
     the one in effect; per-image output is not a token rate. A label may name
     the media it covers, as in "Input price (text, image, video)"."""
     parts = page_text(html_text).split("Try it in Google AI Studio")
-    tier = r"(?:Free of charge \| |Not available \| )?([^|]*\$[^|]*)"
+    tier = r"(?:Free of charge \| |Not available \| )?([^|]*\$[^|]*(?:\| \$[^|]*)*)"
     table: Table = {}
     for before, block in zip(parts, parts[1:]):
         ids = _google_ids([c.strip() for c in before.split("|") if c.strip()])
@@ -226,7 +226,12 @@ def parse_google(html_text: str, *, duplicates: list[str] | None = None) -> Tabl
         if not (inp and out):
             continue
         cache = re.search(r"Context caching price[^|]*\| " + tier, block)
-        output = None if "per image" in out.group(1) else dollars(out.group(1))
+        # A scalar output rate cannot express separate text/video/audio prices.
+        # Leave it missing so refresh escalates rather than selecting the first
+        # modality and overwriting a manually verified catalog rate.
+        output_cell = out.group(1)
+        modalities = set(re.findall(r"\((text|video|audio)\)", output_cell, re.I))
+        output = None if "per image" in output_cell or len(modalities) > 1 else dollars(output_cell)
         rates = {"input": dollars(inp.group(1)), "output": output, "cache_read": dollars(cache.group(1)) if cache else None}
         for model_id in ids:
             _keep_first(table, model_id, {k: v for k, v in rates.items() if v is not None}, duplicates)

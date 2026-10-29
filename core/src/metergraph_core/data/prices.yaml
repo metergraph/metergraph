@@ -2455,13 +2455,16 @@ models:
         batch_input_per_mtok: 0.68
         batch_output_per_mtok: 2.09
         source_url: https://docs.mistral.ai/models/mistral-large
-      # Mistral publishes no batch rate for this model.
+      # Batch input/output use the documented 50% discount on all models:
+      # https://docs.mistral.ai/studio/batch-processing
       - channel: mistral-api
         region: global
         effective_from: "2026-10-29"
         input_per_mtok: 0.70
         output_per_mtok: 2.10
         cache_read_per_mtok: 0.07
+        batch_input_per_mtok: 0.35
+        batch_output_per_mtok: 1.05
         source_url: https://docs.mistral.ai/models/mistral-large
       - channel: vercel-ai-gateway
         region: global
@@ -3690,7 +3693,8 @@ models:
         output_per_mtok: 15.0
         cache_read_per_mtok: 0.3
         source_url: https://platform.kimi.ai/docs/pricing/chat
-      # The 5m field stores Moonshot's unsplit cache-write rate.
+      # The platform's cache-write figure is stored for the default 5m TTL;
+      # the separately billed 1h tier remains unknown.
       - channel: moonshot-api
         region: global
         effective_from: "2026-10-29"
@@ -3698,6 +3702,7 @@ models:
         output_per_mtok: 15.0
         cache_read_per_mtok: 0.3
         cache_write_5m_per_mtok: 3.0
+        rules: {input_includes_cache_read: true, input_includes_cache_write: true}
         source_url: https://platform.kimi.ai/
       - channel: fireworks-api
         region: global
@@ -4616,6 +4621,8 @@ models:
         region: global
         effective_from: "2026-10-28"
         effective_to: "2026-10-29"
+        # Reconcile the already-published live interval; this was an automated
+        # text-rate misclassification, corrected by the successor below.
         input_per_mtok: 1.5
         output_per_mtok: 9
         source_url: https://ai.google.dev/gemini-api/docs/pricing

@@ -3095,3 +3095,61 @@ def test_the_last_known_price_is_the_one_that_applied_most_recently(tmp_path):
     assert found.reasons == ("price_ended",)
     assert found.price.region == "global"
     assert found.price.input_per_mtok == Decimal("0.8")
+
+
+@pytest.mark.parametrize("provider", ["moonshotai", "unknown", "litellm"])
+@pytest.mark.parametrize("fresh_tokens, expected", [(0, "0.165"), (20_000, "0.225")])
+def test_kimi_k3_cache_tokens_are_not_charged_as_fresh_input(provider, fresh_tokens, expected):
+    result = load_catalog().calculate_cost(
+        model="kimi-k3", provider=provider, channel="moonshot-api",
+        at=datetime(2026, 10, 29, tzinfo=timezone.utc),
+        usage=ModelUsage(
+            input_tokens=100_000 + fresh_tokens, output_tokens=0,
+            cache_read_tokens=50_000, cache_write_5m_tokens=50_000,
+        ),
+    )
+    assert result.status == "priced"
+    assert result.cost_usd == Decimal(expected)
+    assert result.components.input == Decimal(fresh_tokens) * Decimal("0.000003")
+
+
+def test_mistral_large_4_preserves_batch_discount_at_corrected_rates():
+    result = load_catalog().price(
+        model="mistral-large-4", channel="mistral-api",
+        at=datetime(2026, 10, 29, tzinfo=timezone.utc),
+        input_tokens=1_000_000, output_tokens=1_000_000, batch=True,
+    )
+    assert result.status == "priced"
+    assert result.cost_usd == Decimal("1.40")
+
+
+def test_kimi_k3_preserves_history_and_leaves_one_hour_writes_partial():
+    catalog = load_catalog()
+    before = catalog.price(
+        model="kimi-k3", channel="moonshot-api",
+        at=datetime(2026, 10, 28, tzinfo=timezone.utc),
+        input_tokens=100_000, output_tokens=0,
+        cache_read_tokens=50_000, cache_write_5m_tokens=50_000,
+    )
+    assert before.status == "partial"
+    # Preserve the previously published cache-read double charge in this interval.
+    assert before.cost_usd == Decimal("0.315")
+    assert "cache_write_5m_rate_unavailable" in before.reasons
+    one_hour = catalog.price(
+        model="kimi-k3", channel="moonshot-api",
+        at=datetime(2026, 10, 29, tzinfo=timezone.utc),
+        input_tokens=100_000, output_tokens=0, cache_write_1h_tokens=50_000,
+    )
+    assert one_hour.status == "partial"
+    assert "cache_write_1h_rate_unavailable" in one_hour.reasons
+
+
+@pytest.mark.parametrize("day, expected", [(28, "10.50"), (29, "19.00")])
+def test_gemini_video_reconciles_applied_history_then_corrects_output_rate(day, expected):
+    result = load_catalog().price(
+        model="gemini-omni-1.1-flash", channel="google-api",
+        at=datetime(2026, 10, day, tzinfo=timezone.utc),
+        input_tokens=1_000_000, output_tokens=1_000_000,
+    )
+    assert result.status == "priced"
+    assert result.cost_usd == Decimal(expected)
