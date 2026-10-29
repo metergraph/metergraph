@@ -89,16 +89,25 @@ class LoadedCatalog:
     # Gateways whose amount billing declines per publisher; see Dispute.
     disputes: tuple[Dispute, ...] = ()
 
-    def canonical_model_id(self, provider: str, model_id: str) -> str:
-        """Resolve a captured provider-native model id to its canonical id,
-        using the known source ``provider`` to disambiguate names shared across
-        providers. An unknown provider, unknown id, or non-string input is left
-        unchanged so none is ever misattributed."""
+    def canonical_model_id(self, provider: str, model_id: str, *, at: Any = None) -> str:
+        """Resolve a provider's model name, using ``at`` (default now) for migrations.
+
+        Unknown or ambiguous names are returned unchanged.
+        """
         if not isinstance(model_id, str) or not isinstance(provider, str):
             return model_id
-        return self.canonical_ids.get(
-            (normalize_provider(provider), model_id), model_id
-        )
+        provider = normalize_provider(provider)
+        canonical = self.canonical_ids.get((provider, model_id))
+        if canonical is not None:
+            return canonical
+        when = _coerce_datetime(at) if at is not None else datetime.now(timezone.utc)
+        matches = {
+            alias.canonical_id
+            for alias in self.snapshot._aliases.get((provider, model_id.lower()), ())
+            if (alias.effective_from is None or alias.effective_from <= when)
+            and (alias.effective_to is None or when < alias.effective_to)
+        }
+        return next(iter(matches)) if len(matches) == 1 else model_id
 
     def infer_direct_channel(self, model: Any) -> str | None:
         """Infer a direct pricing channel only when the catalog is unambiguous."""
