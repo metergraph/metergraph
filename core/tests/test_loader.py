@@ -40,7 +40,7 @@ def test_parse_retrieval_accepts_a_well_formed_entry():
 
 def test_bundled_catalog_has_identity_and_prices_a_call():
     loaded = load_catalog()
-    assert loaded.version == "2026-10-29"
+    assert loaded.version == "2026-10-29.2"
     assert len(loaded.content_hash) == 64
     result = loaded.snapshot.cost(
         provider="openai",

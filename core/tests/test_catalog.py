@@ -27,7 +27,7 @@ def test_prices_yaml_parses():
     assert VERSION
     assert DOC["models"]
     assert LOADED.currency == "USD"
-    assert LOADED.pricing_verified_at.isoformat() == "2026-10-27"
+    assert LOADED.pricing_verified_at.isoformat() == "2026-10-29"
 
 
 def test_openrouter_cache_reads_are_not_charged_as_fresh_input():
