@@ -6,7 +6,7 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-10-29.2"
+version: "2026-10-29.3"
 currency: USD
 pricing_verified_at: "2026-10-29"
 models:
@@ -6463,6 +6463,14 @@ models:
           input_includes_cache_write: true
         effective_from: "2026-11-02"
         source_url: https://openrouter.ai/qwen/qwen3-coder-30b-a3b-instruct
+      - provider: openrouter
+        alias: alibaba/qwen3-coder-30b-a3b-instruct
+        channel: openrouter-api
+        effective_from: "2026-11-02"
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+        source_url: https://openrouter.ai/qwen/qwen3-coder-30b-a3b-instruct
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -12253,11 +12261,22 @@ models:
       - channel: openai-api
         region: global
         effective_from: "2025-06-10"
+        effective_to: "2026-10-29"
         input_per_mtok: 2
         output_per_mtok: 8
         cache_read_per_mtok: 0.50
         batch_input_per_mtok: 1
         batch_output_per_mtok: 4
+        source_url: https://developers.openai.com/api/docs/models/o3
+      - channel: openai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2
+        output_per_mtok: 8
+        cache_read_per_mtok: 0.50
+        batch_input_per_mtok: 1
+        batch_output_per_mtok: 4
+        batch_cache_read_per_mtok: 0.25
         source_url: https://developers.openai.com/api/docs/models/o3
       - channel: vercel-ai-gateway
         region: global

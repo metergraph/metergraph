@@ -479,7 +479,7 @@ def validate_model_registry(
                 f"{route.id}: model {route.model_id!r} has no pricing channel "
                 f"{route.pricing_channel!r}"
             )
-        canonical = catalog.canonical_model_id(route.provider, route.model_id)
+        canonical = catalog.canonical_model_id(route.provider, route.model_id, at=validation_time)
         if canonical == route.model_id:
             resolved = catalog.snapshot.resolve_price(
                 model=route.model_id,

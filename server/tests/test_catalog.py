@@ -29,7 +29,7 @@ def test_server_catalog_reexports_core_types():
 
 def test_server_loader_uses_core_bundled_catalog():
     version, document, snapshot = prices.load()
-    assert version == "2026-10-29.2"
+    assert version == "2026-10-29.3"
     assert document["models"]
     assert isinstance(snapshot, CoreCatalogSnapshot)
 

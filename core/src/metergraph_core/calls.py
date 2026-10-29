@@ -7,7 +7,7 @@ from typing import Any, Mapping, Sequence
 
 from .catalog import CostResult, ModelUsage, direct_channel_for_provider, normalize_provider
 from .loader import LoadedCatalog
-from .responses import _as_mapping, _bundled_catalog, cost_from_response, response_format
+from .responses import _as_mapping, _bundled_catalog, _first, cost_from_response, response_format
 
 _ZERO = Decimal('0')
 
@@ -138,7 +138,7 @@ def response_retrieval_usage(response: Any, *, format: str | None = None) -> tup
         usage = data.get('usage')
         usage = usage if isinstance(usage, Mapping) else {}
         server = usage.get('server_tool_use')
-        if 'server_tool_use' in usage and not isinstance(server, Mapping):
+        if server is not None and not isinstance(server, Mapping):
             return (RetrievalUsage('web_search', None),)
         server = server or {}
         found = [RetrievalUsage(op, server[key]) for key, op in (
@@ -157,8 +157,12 @@ def response_retrieval_usage(response: Any, *, format: str | None = None) -> tup
         candidates = data.get('candidates')
         if isinstance(candidates, list):
             for item in candidates:
-                metadata = item.get('groundingMetadata') if isinstance(item, Mapping) else None
-                if isinstance(metadata, Mapping) and ('webSearchQueries' in metadata or 'groundingChunks' in metadata):
+                metadata = _first(item, 'groundingMetadata', 'grounding_metadata') if isinstance(item, Mapping) else None
+                if isinstance(metadata, Mapping) and any(
+                    _first(metadata, camel, snake) is not None
+                    for camel, snake in (("webSearchQueries", "web_search_queries"),
+                                         ("groundingChunks", "grounding_chunks"))
+                ):
                     # Grounding evidence does not establish billable query count.
                     return (RetrievalUsage('google_search_grounding', None),)
     if detected == 'openai.responses':
