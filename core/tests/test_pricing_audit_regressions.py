@@ -1,8 +1,13 @@
+import copy
+from datetime import datetime, timezone
 from decimal import Decimal
 
 import pytest
 
 from metergraph_core import load_catalog, price_call_from_response
+import metergraph_core.loader as loader
+from metergraph_core.loader import load_catalog_document
+from metergraph_core.models import ModelRegistryError, parse_model_registry, validate_model_registry
 
 AT = "2026-10-29T12:00:00Z"
 
@@ -67,3 +72,66 @@ def test_qwen_canonicalization_without_a_date_returns_a_registered_identity():
     catalog = load_catalog()
     result = catalog.canonical_model_id("openrouter", "qwen/qwen3-coder-30b-a3b-instruct")
     assert result in {model["canonical_id"] for model in catalog.document["models"]}
+
+
+@pytest.mark.parametrize("metadata", [None, {}, {"web_search_queries": None, "grounding_chunks": None}])
+def test_empty_gemini_sdk_grounding_does_not_imply_search(metadata):
+    response = {"model_version": "gemini-3.8-flash", "usage_metadata": {
+        "prompt_token_count": 1000, "candidates_token_count": 100,
+    }, "candidates": [{"grounding_metadata": metadata}]}
+    result = price_call_from_response("google", response, at=AT)
+    assert result.status == "priced"
+    assert result.retrieval == ()
+
+
+def test_anthropic_sdk_null_server_tool_usage_does_not_imply_search():
+    response = {"type": "message", "model": "claude-sonnet-5-5", "content": [],
+                "usage": {"input_tokens": 1000, "output_tokens": 100, "server_tool_use": None}}
+    result = price_call_from_response("anthropic", response, at=AT)
+    assert result.status == "priced"
+    assert result.retrieval == ()
+
+
+@pytest.mark.parametrize("version,canonical,valid", [
+    ("2026-10-29", "alibaba/qwen3-coder-30b-a3b-instruct", True),
+    ("2026-11-03", "alibaba/qwen3-coder-30b-a3b", True),
+    ("2026-11-03", "alibaba/qwen3-coder-30b-a3b-instruct", False),
+])
+def test_registry_validation_uses_registry_date_after_alias_migration(monkeypatch, version, canonical, valid):
+
+    class FutureDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return datetime(2026, 11, 3, tzinfo=timezone.utc)
+
+    registry = parse_model_registry({
+        "version": version, "models": [{
+            "canonical_id": canonical,
+            "display_name": "Qwen", "publisher": "alibaba", "routes": [{
+                "key": "vercel:qwen", "id": "vercel:qwen", "provider": "vercel",
+                "model_id": "qwen/qwen3-coder-30b-a3b-instruct",
+                "pricing_channel": "vercel-ai-gateway", "execution_profiles": ["default"],
+            }],
+        }], "execution_profiles": [{"id": "default", "routes": ["vercel:qwen"]}],
+        "offer_groups": [{"id": "gateway", "credential": "AI_GATEWAY_API_KEY", "routes": ["vercel:qwen"]}],
+    })
+    document = copy.deepcopy(load_catalog().document)
+    document["models"] = [m for m in document["models"] if m["canonical_id"] in {
+        "alibaba/qwen3-coder-30b-a3b-instruct", "alibaba/qwen3-coder-30b-a3b"}]
+    for model in document["models"]:
+        model["aliases"] = [a for a in model.get("aliases", []) if a.get("provider") != "vercel"]
+        model["prices"] = [p for p in model.get("prices", []) if p["channel"] != "vercel-ai-gateway"]
+        for price in model["prices"]:
+            if price["channel"] == "openrouter-api":
+                price["channel"] = "vercel-ai-gateway"
+        for alias in model.get("aliases", []):
+            if alias.get("provider") == "openrouter":
+                alias["provider"] = "vercel"
+                alias["channel"] = "vercel-ai-gateway"
+    catalog = load_catalog_document(document)
+    monkeypatch.setattr(loader, "datetime", FutureDatetime)
+    if valid:
+        validate_model_registry(registry, catalog)
+    else:
+        with pytest.raises(ModelRegistryError, match="pricing resolves canonical model"):
+            validate_model_registry(registry, catalog)
