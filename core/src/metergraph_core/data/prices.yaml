@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-10-29"
+version: "2026-10-29.2"
 currency: USD
-pricing_verified_at: "2026-10-27"
+pricing_verified_at: "2026-10-29"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -1579,6 +1579,7 @@ models:
       - channel: anthropic-api
         region: global
         effective_from: "2026-10-07"
+        effective_to: "2026-10-29"
         input_per_mtok: 2.00
         output_per_mtok: 10.00
         cache_read_per_mtok: 0.10
@@ -1587,6 +1588,17 @@ models:
         batch_input_per_mtok: 1.00
         batch_output_per_mtok: 5.00
         source_url: https://www.anthropic.com/claude-haiku-5-5
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 2.00
+        output_per_mtok: 10.00
+        cache_read_per_mtok: 0.10
+        cache_write_5m_per_mtok: 2.50
+        cache_write_1h_per_mtok: 4.00
+        batch_input_per_mtok: 1.00
+        batch_output_per_mtok: 5.00
+        source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-07"
@@ -2436,11 +2448,23 @@ models:
       - channel: mistral-api
         region: global
         effective_from: "2026-10-20"
+        effective_to: "2026-10-29"
         input_per_mtok: 1.36
         output_per_mtok: 4.18
         cache_read_per_mtok: 0.14
         batch_input_per_mtok: 0.68
         batch_output_per_mtok: 2.09
+        source_url: https://docs.mistral.ai/models/mistral-large
+      # Batch input/output use the documented 50% discount on all models:
+      # https://docs.mistral.ai/studio/batch-processing
+      - channel: mistral-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 0.70
+        output_per_mtok: 2.10
+        cache_read_per_mtok: 0.07
+        batch_input_per_mtok: 0.35
+        batch_output_per_mtok: 1.05
         source_url: https://docs.mistral.ai/models/mistral-large
       - channel: vercel-ai-gateway
         region: global
@@ -2915,6 +2939,9 @@ models:
         rules:
           uncaptured_fees: true
         source_url: https://docs.perplexity.ai/docs/getting-started/pricing
+      # The Agent API's model list is a separate product: its Sonar rates,
+      # including its cache read rate, do not price this channel, so the
+      # direct token rates above stay the last known ones.
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-11"
@@ -3661,10 +3688,22 @@ models:
       - channel: moonshot-api
         region: global
         effective_from: "2026-07-16"
+        effective_to: "2026-10-29"
         input_per_mtok: 3.0
         output_per_mtok: 15.0
         cache_read_per_mtok: 0.3
         source_url: https://platform.kimi.ai/docs/pricing/chat
+      # The platform's cache-write figure is stored for the default 5m TTL;
+      # the separately billed 1h tier remains unknown.
+      - channel: moonshot-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 3.0
+        output_per_mtok: 15.0
+        cache_read_per_mtok: 0.3
+        cache_write_5m_per_mtok: 3.0
+        rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+        source_url: https://platform.kimi.ai/
       - channel: fireworks-api
         region: global
         effective_from: "2026-07-19"
@@ -4574,6 +4613,22 @@ models:
       - channel: google-api
         region: global
         effective_from: "2026-08-27"
+        effective_to: "2026-10-28"
+        input_per_mtok: 1.50
+        output_per_mtok: 17.50
+        source_url: https://ai.google.dev/gemini-api/docs/pricing
+      - channel: google-api
+        region: global
+        effective_from: "2026-10-28"
+        effective_to: "2026-10-29"
+        # Reconcile the already-published live interval; this was an automated
+        # text-rate misclassification, corrected by the successor below.
+        input_per_mtok: 1.5
+        output_per_mtok: 9
+        source_url: https://ai.google.dev/gemini-api/docs/pricing
+      - channel: google-api
+        region: global
+        effective_from: "2026-10-29"
         input_per_mtok: 1.50
         output_per_mtok: 17.50
         source_url: https://ai.google.dev/gemini-api/docs/pricing
@@ -5085,6 +5140,7 @@ models:
       - channel: anthropic-api
         region: global
         effective_from: "2026-06-09"
+        effective_to: "2026-10-29"
         input_per_mtok: 10
         output_per_mtok: 50
         cache_read_per_mtok: 1
@@ -5093,6 +5149,17 @@ models:
         batch_input_per_mtok: 5
         batch_output_per_mtok: 25
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 10
+        output_per_mtok: 50
+        cache_read_per_mtok: 1
+        cache_write_5m_per_mtok: 12.5
+        cache_write_1h_per_mtok: 20
+        batch_input_per_mtok: 5
+        batch_output_per_mtok: 25
+        source_url: https://platform.claude.com/docs/en/about-claude/pricing
   - canonical_id: anthropic/claude-opus-4
     publisher: anthropic
     aliases:
@@ -5113,6 +5180,7 @@ models:
       - channel: anthropic-api
         region: global
         effective_from: "2025-05-14"
+        effective_to: "2026-10-29"
         input_per_mtok: 15
         output_per_mtok: 75
         cache_read_per_mtok: 1.5
@@ -5121,6 +5189,17 @@ models:
         batch_input_per_mtok: 7.5
         batch_output_per_mtok: 37.5
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 15
+        output_per_mtok: 75
+        cache_read_per_mtok: 1.5
+        cache_write_5m_per_mtok: 18.75
+        cache_write_1h_per_mtok: 30
+        batch_input_per_mtok: 7.5
+        batch_output_per_mtok: 37.5
+        source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-02"
@@ -5148,6 +5227,7 @@ models:
       - channel: anthropic-api
         region: global
         effective_from: "2025-08-05"
+        effective_to: "2026-10-29"
         input_per_mtok: 15
         output_per_mtok: 75
         cache_read_per_mtok: 1.5
@@ -5156,6 +5236,17 @@ models:
         batch_input_per_mtok: 7.5
         batch_output_per_mtok: 37.5
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 15
+        output_per_mtok: 75
+        cache_read_per_mtok: 1.5
+        cache_write_5m_per_mtok: 18.75
+        cache_write_1h_per_mtok: 30
+        batch_input_per_mtok: 7.5
+        batch_output_per_mtok: 37.5
+        source_url: https://platform.claude.com/docs/en/about-claude/pricing
   - canonical_id: anthropic/claude-opus-4.5
     publisher: anthropic
     aliases:
@@ -5166,6 +5257,7 @@ models:
       - channel: anthropic-api
         region: global
         effective_from: "2025-11-01"
+        effective_to: "2026-10-29"
         input_per_mtok: 5
         output_per_mtok: 25
         cache_read_per_mtok: 0.5
@@ -5174,6 +5266,17 @@ models:
         batch_input_per_mtok: 2.5
         batch_output_per_mtok: 12.5
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 5
+        output_per_mtok: 25
+        cache_read_per_mtok: 0.5
+        cache_write_5m_per_mtok: 6.25
+        cache_write_1h_per_mtok: 10
+        batch_input_per_mtok: 2.5
+        batch_output_per_mtok: 12.5
+        source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2025-11-01"
@@ -5236,6 +5339,7 @@ models:
       - channel: anthropic-api
         region: global
         effective_from: "2025-05-14"
+        effective_to: "2026-10-29"
         input_per_mtok: 3
         output_per_mtok: 15
         cache_read_per_mtok: 0.3
@@ -5244,6 +5348,17 @@ models:
         batch_input_per_mtok: 1.5
         batch_output_per_mtok: 7.5
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 3
+        output_per_mtok: 15
+        cache_read_per_mtok: 0.3
+        cache_write_5m_per_mtok: 3.75
+        cache_write_1h_per_mtok: 6
+        batch_input_per_mtok: 1.5
+        batch_output_per_mtok: 7.5
+        source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2025-05-14"
@@ -5743,12 +5858,22 @@ models:
       - channel: xai-api
         region: global
         effective_from: "2026-03-10"
+        effective_to: "2026-10-29"
         input_per_mtok: 1.25
         output_per_mtok: 2.5
         cache_read_per_mtok: 0.2
         rules:
           long_context: {threshold: 200000, input_multiplier: 2.0, output_multiplier: 2.0}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: xai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 2.5
+        cache_read_per_mtok: 0.2
+        rules:
+          long_context: {threshold: 200000, input_multiplier: 2.0, output_multiplier: 2.0}
+        source_url: https://docs.x.ai/developers/models
   - canonical_id: xai/grok-4.20-reasoning
     publisher: xai
     aliases:
@@ -5781,12 +5906,22 @@ models:
       - channel: xai-api
         region: global
         effective_from: "2026-03-10"
+        effective_to: "2026-10-29"
         input_per_mtok: 1.25
         output_per_mtok: 2.5
         cache_read_per_mtok: 0.2
         rules:
           long_context: {threshold: 200000, input_multiplier: 2.0, output_multiplier: 2.0}
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: xai-api
+        region: global
+        effective_from: "2026-10-29"
+        input_per_mtok: 1.25
+        output_per_mtok: 2.5
+        cache_read_per_mtok: 0.2
+        rules:
+          long_context: {threshold: 200000, input_multiplier: 2.0, output_multiplier: 2.0}
+        source_url: https://docs.x.ai/developers/models
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-29"

@@ -632,3 +632,15 @@ def test_an_unrecognised_page_extracts_nothing_and_changes_the_fingerprint():
     extraction = extract("openai", page)
     assert extraction.rates == ()
     assert extraction.fingerprint != structural_fingerprint("openai", _fixture("openai-api-pricing"))
+
+
+@pytest.mark.parametrize("prices", [
+    "$9.00 (text), $17.50 (video)",
+    "$17.50 (video), $9.00 (text)",
+    "$9.00 (text)<br>$17.50 (video)",
+])
+def test_google_does_not_flatten_output_modality_rates(prices):
+    page = _google_block("<p>gemini-example-video</p>").replace("$2</td>", f"{prices}</td>")
+    assert _rates(extract("google", page)) == {
+        ("gemini-example-video", "global"): {"input_per_mtok": D("1")},
+    }

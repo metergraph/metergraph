@@ -1817,3 +1817,29 @@ def test_gateway_discovery_follows_a_moved_spelling_another_gateway_keeps():
         ("replace_price", "meta/llama-x")
     ]
     assert evidence["identity_exclusions"] == []
+
+
+def test_google_multimodal_output_escalates_instead_of_reverting_verified_rate():
+    page = (
+        "<h2>Example video</h2><p>gemini-example-video</p>"
+        "<a>Try it in Google AI Studio</a><table>"
+        "<tr><td>Input price</td><td>Not available</td><td>$1.50 (text / video)</td></tr>"
+        "<tr><td>Output price</td><td>Not available</td>"
+        "<td>$9.00 (text)<br>$17.50 (video)</td></tr></table>"
+    )
+    dimensions = ["input_per_mtok", "output_per_mtok"]
+    source = _source(
+        "google-api-pricing", "google", "google-api", "google",
+        dimensions=dimensions, fingerprint=structural_fingerprint("google", page),
+    )
+    row = {
+        "channel": "google-api", "region": "global", "effective_from": "2026-10-29",
+        "input_per_mtok": 1.5, "output_per_mtok": 17.5,
+        "source_url": "https://example.com/google-pricing",
+    }
+    document = _document(_model(
+        "example/video", "gemini-example-video", row, channel="google-api", provider="google",
+    ))
+    result = _plan(document, _registry(source), {"google-api-pricing": page}, date(2026, 10, 30))
+    assert result.delta["operations"] == []
+    assert [(e.reason, e.dimension) for e in result.escalations] == [("missing_rate", "output_per_mtok")]
