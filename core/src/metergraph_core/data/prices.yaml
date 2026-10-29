@@ -12700,12 +12700,6 @@ models:
   - canonical_id: bytedance/seed-1.6
     publisher: bytedance
     aliases:
-      - provider: vercel
-        alias: bytedance/seed-1.6
-        channel: vercel-ai-gateway
-        rules:
-          input_includes_cache_read: true
-          input_includes_cache_write: true
       - provider: openrouter
         alias: bytedance-seed/seed-1.6
         channel: openrouter-api
@@ -12713,15 +12707,7 @@ models:
           input_includes_cache_read: true
           input_includes_cache_write: true
     prices:
-      - channel: vercel-ai-gateway
-        region: global
-        effective_from: "2026-10-29"
-        input_per_mtok: 0.25
-        output_per_mtok: 2
-        cache_read_per_mtok: 0.05
-        rules:
-          long_context: {threshold: 128000, input_multiplier: 2, output_multiplier: 2}
-        source_url: https://ai-gateway.vercel.sh/v1/models
+      # Vercel keeps cache reads flat above 128K, which a row cannot express.
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-29"
@@ -12731,26 +12717,6 @@ models:
           varies_by_provider: true
           long_context: {threshold: 128000, input_multiplier: 2, output_multiplier: 2}
         source_url: https://openrouter.ai/api/v1/models
-
-  - canonical_id: bytedance/seed-1.8
-    publisher: bytedance
-    aliases:
-      - provider: vercel
-        alias: bytedance/seed-1.8
-        channel: vercel-ai-gateway
-        rules:
-          input_includes_cache_read: true
-          input_includes_cache_write: true
-    prices:
-      - channel: vercel-ai-gateway
-        region: global
-        effective_from: "2026-10-29"
-        input_per_mtok: 0.25
-        output_per_mtok: 2
-        cache_read_per_mtok: 0.05
-        rules:
-          long_context: {threshold: 128000, input_multiplier: 2, output_multiplier: 2}
-        source_url: https://ai-gateway.vercel.sh/v1/models
 
   - canonical_id: bytedance/seed-2.0-code
     publisher: bytedance
