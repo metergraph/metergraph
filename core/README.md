@@ -573,3 +573,33 @@ lifecycles.
 The model registry version is an ISO date. When more than one registry ships on
 the same date, append a positive revision such as `2026-09-25.2` so consumers
 can distinguish the policies while pricing validation still uses that date.
+
+
+## Complete call pricing
+
+`price_call_from_response` combines token costs with supported retrieval fees.
+`cost_from_response` remains token-only. Retrieval pricing supports Anthropic
+`web_search` and `web_fetch` on `anthropic-api`; other observed scopes are unresolved.
+
+```python
+from metergraph_core import price_call_from_response
+
+result = price_call_from_response(
+    "anthropic",
+    {"type": "message", "model": "claude-sonnet-5-5", "usage": {
+        "input_tokens": 1000, "output_tokens": 100,
+        "server_tool_use": {"web_search_requests": 2},
+    }},
+    at="2026-10-20T00:00:00Z",
+)
+assert str(result.cost_usd) == "0.02300000"
+```
+
+`cost_usd` is set only when the call is fully priced. `known_subtotal_usd`
+contains exact components; `estimated_total_usd` separates token fallback
+estimates when all retrieval fees are known. Missing charges are reported in
+`missing_dimensions`. Counts must be nonnegative integers.
+
+For normalized usage, use `price_call` with `ModelUsage` and `RetrievalUsage`.
+To compose an existing token result from the same catalog, use `compose_call_cost`.
+`resolve_billing` accepts complete-call results for gateway reconciliation.

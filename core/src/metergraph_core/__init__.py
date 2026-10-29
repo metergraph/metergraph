@@ -155,3 +155,9 @@ __all__ = [
     "search_operation_for_channel",
     "validate_model_registry",
 ]
+
+from .calls import (CallCostResult, RetrievalComponent, RetrievalUsage, compose_call_cost,
+                    price_call, price_call_from_response, response_retrieval_usage)
+
+__all__ += ["CallCostResult", "RetrievalComponent", "RetrievalUsage", "compose_call_cost",
+            "price_call", "price_call_from_response", "response_retrieval_usage"]
