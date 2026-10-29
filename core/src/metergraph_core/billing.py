@@ -232,7 +232,6 @@ def resolve_billing(
         catalog_reasons=reasons,
     )
 
-# Imported only for type checking to keep the response adapter independent.
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .calls import CallCostResult

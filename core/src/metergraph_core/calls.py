@@ -1,9 +1,4 @@
-"""Compose token and counted retrieval prices from one catalog snapshot.
-
-The complete-call API is additive: legacy token pricing and its fallback
-semantics are unchanged. Only verified first-party Anthropic retrieval scope
-is enabled here; other observed retrieval operations stay unresolved.
-"""
+"""Compose token and counted retrieval costs from one catalog snapshot."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -66,11 +61,9 @@ def compose_call_cost(
     retrieval: Sequence[RetrievalUsage] = (), provider: str | None = None,
     channel: str | None = None, region: str = 'global',
 ) -> CallCostResult:
-    """Compose an already resolved token result from ``catalog``.
+    """Combine retrieval with a token result from the same catalog and time.
 
-    Both paths must use the same catalog and token result effective time.
-    Partial legacy token results are estimates, never exact subtotals.
-    Gateway-reported billing remains a caller responsibility, not a fee here.
+    Partial token results remain estimates, excluded from the known subtotal.
     """
     if token_cost.effective_at is None:
         raise ValueError('token_cost must carry its effective_at')
@@ -135,11 +128,9 @@ def price_call(
 
 
 def response_retrieval_usage(response: Any, *, format: str | None = None) -> tuple[RetrievalUsage, ...]:
-    """Read billable-operation metadata, never prompt or response text.
+    """Read operation metadata without reading prompt or response text.
 
-    Absent optional Anthropic server usage on an ordinary complete response
-    means no observed retrieval. Present malformed counters stay unknown.
-    Explicit tool evidence without counters also stays unknown.
+    Tool evidence without a valid usage counter remains unresolved.
     """
     data = _as_mapping(response)
     detected = format or response_format(data)
@@ -168,8 +159,7 @@ def response_retrieval_usage(response: Any, *, format: str | None = None) -> tup
             for item in candidates:
                 metadata = item.get('groundingMetadata') if isinstance(item, Mapping) else None
                 if isinstance(metadata, Mapping) and ('webSearchQueries' in metadata or 'groundingChunks' in metadata):
-                    # Search queries/chunks are evidence, not a universal
-                    # billable query counter across Gemini model families.
+                    # Grounding evidence does not establish billable query count.
                     return (RetrievalUsage('google_search_grounding', None),)
     if detected == 'openai.responses':
         output = data.get('output')

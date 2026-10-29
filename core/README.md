@@ -575,11 +575,11 @@ the same date, append a positive revision such as `2026-09-25.2` so consumers
 can distinguish the policies while pricing validation still uses that date.
 
 
-## Complete call costs with counted retrieval
+## Complete call pricing
 
-`price_call_from_response` adds verified first-party Anthropic web-search and
-web-fetch fees from the same effective-dated catalog as token pricing. Existing
-`cost_from_response` remains token-only.
+`price_call_from_response` combines token costs with supported retrieval fees.
+`cost_from_response` remains token-only. Retrieval pricing supports Anthropic
+`web_search` and `web_fetch` on `anthropic-api`; other observed scopes are unresolved.
 
 ```python
 from metergraph_core import price_call_from_response
@@ -595,26 +595,11 @@ result = price_call_from_response(
 assert str(result.cost_usd) == "0.02300000"
 ```
 
-A complete result is `priced`. An unresolved required fee makes it `partial`,
-with `cost_usd=None` and explicit missing dimensions. An unknown model remains
-`unpriced` even when a search fee is known. `known_subtotal_usd` contains only
-exact catalog components; partial legacy token fallback amounts have
-`token_basis="fallback_estimate"` and are kept separately. `estimated_total_usd`
-is supplied only when all retrieval fees are known and a token fallback exists.
-These amounts are list-price calculations, not reconciled invoices.
+`cost_usd` is set only when the call is fully priced. `known_subtotal_usd`
+contains exact components; `estimated_total_usd` separates token fallback
+estimates when all retrieval fees are known. Missing charges are reported in
+`missing_dimensions`. Counts must be nonnegative integers.
 
-`price_call` accepts normalized `ModelUsage` and a sequence of
-`RetrievalUsage(operation, units)`. `compose_call_cost` accepts an existing token
-result and validates its selected price against the supplied catalog before
-composition. Aggregate duplicate operations before calling it. Operation counts
-must be nonnegative integers; booleans, fractions, strings, and missing counts
-are unresolved. No search is inferred from citations or text. An ordinary
-Anthropic response without optional server-tool usage has no observed retrieval;
-explicit tool evidence with missing counters remains unresolved.
-
-Only the `anthropic-api`/Anthropic `web_search` and `web_fetch` scopes are newly
-supported. Observed operations on other channels remain unresolved, including
-Claude on Vertex; they do not inherit Gemini grounding rates. Existing independent
-retrieval pricing remains available. Use one catalog snapshot and effective time
-for a call. `resolve_billing` accepts the aggregate result and retains a qualified
-gateway total without adding the catalog retrieval amount again.
+For normalized usage, use `price_call` with `ModelUsage` and `RetrievalUsage`.
+To compose an existing token result from the same catalog, use `compose_call_cost`.
+`resolve_billing` accepts complete-call results for gateway reconciliation.
