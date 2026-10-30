@@ -3164,7 +3164,9 @@ def test_kimi_k3_preserves_history_and_leaves_one_hour_writes_partial():
     assert "cache_write_1h_rate_unavailable" in one_hour.reasons
 
 
-@pytest.mark.parametrize("day, expected", [(28, "10.50"), (29, "19.00")])
+@pytest.mark.parametrize(
+    "day, expected", [(28, "10.50"), (29, "19.00"), (30, "10.50"), (31, "19.00")]
+)
 def test_gemini_video_reconciles_applied_history_then_corrects_output_rate(day, expected):
     result = load_catalog().price(
         model="gemini-omni-1.1-flash", channel="google-api",
