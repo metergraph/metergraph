@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-10-29.3"
+version: "2026-10-30.1"
 currency: USD
-pricing_verified_at: "2026-10-29"
+pricing_verified_at: "2026-10-30"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -1623,6 +1623,7 @@ models:
       - channel: anthropic-api
         region: global
         effective_from: "2026-10-07"
+        effective_to: "2026-10-30"
         input_per_mtok: 0.10
         output_per_mtok: 0.50
         cache_read_per_mtok: 0.01
@@ -1633,6 +1634,19 @@ models:
         rules:
           long_context: {threshold: 100000, input_multiplier: 5, output_multiplier: 5, threshold_counts_cached_tokens: true}
         source_url: https://www.anthropic.com/claude-haiku-5-5
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-10-30"
+        input_per_mtok: 0.10
+        output_per_mtok: 0.50
+        cache_read_per_mtok: 0.01
+        cache_write_5m_per_mtok: 0.125
+        cache_write_1h_per_mtok: 0.20
+        batch_input_per_mtok: 0.05
+        batch_output_per_mtok: 0.25
+        rules:
+          long_context: {threshold: 100000, input_multiplier: 5, output_multiplier: 5, threshold_counts_cached_tokens: true}
+        source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-10-07"
@@ -3620,10 +3634,24 @@ models:
       - channel: moonshot-api
         region: global
         effective_from: "2026-10-24"
+        effective_to: "2026-10-30"
         input_per_mtok: 2.00
         output_per_mtok: 10.00
         cache_read_per_mtok: 0.20
         cache_write_5m_per_mtok: 2.00
+        rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+        source_url: https://platform.kimi.ai/
+      # Batch input/output are 60% of the standard price, the rule the platform
+      # states for this model: https://platform.kimi.ai/docs/pricing/batch
+      - channel: moonshot-api
+        region: global
+        effective_from: "2026-10-30"
+        input_per_mtok: 2.00
+        output_per_mtok: 10.00
+        cache_read_per_mtok: 0.20
+        cache_write_5m_per_mtok: 2.00
+        batch_input_per_mtok: 1.20
+        batch_output_per_mtok: 6.00
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
         source_url: https://platform.kimi.ai/
 
@@ -3698,10 +3726,24 @@ models:
       - channel: moonshot-api
         region: global
         effective_from: "2026-10-29"
+        effective_to: "2026-10-30"
         input_per_mtok: 3.0
         output_per_mtok: 15.0
         cache_read_per_mtok: 0.3
         cache_write_5m_per_mtok: 3.0
+        rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+        source_url: https://platform.kimi.ai/
+      # Batch input/output are 60% of the standard price, the rule the platform
+      # states for this model: https://platform.kimi.ai/docs/pricing/batch
+      - channel: moonshot-api
+        region: global
+        effective_from: "2026-10-30"
+        input_per_mtok: 3.0
+        output_per_mtok: 15.0
+        cache_read_per_mtok: 0.3
+        cache_write_5m_per_mtok: 3.0
+        batch_input_per_mtok: 1.80
+        batch_output_per_mtok: 9.00
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
         source_url: https://platform.kimi.ai/
       - channel: fireworks-api
@@ -4574,10 +4616,6 @@ models:
         cache_read_per_mtok: 0.16
         source_url: https://fireworks.ai/models/fireworks/kimi-k2p6
 
-  # Google prices this model's output by modality: $9.00 text, $17.50 video.
-  # The catalog carries one output rate per price row, so this records the text
-  # rate. A video-heavy caller is therefore under-costed here, which is the
-  # known limitation to revisit if that traffic ever becomes material.
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
@@ -4609,7 +4647,9 @@ models:
       - {provider: google, alias: gemini-omni-1.1-flash, channel: google-api}
       - {provider: google, alias: models/gemini-omni-1.1-flash, channel: google-api}
     prices:
-      # Uses the video output rate: video is this model's only output modality.
+      # Google lists $9.00 text and $17.50 video output here; $17.50 is the
+      # billed rate, the one its stated 5,792 tokens per second of 720p video
+      # at about $0.10 per second resolves to.
       - channel: google-api
         region: global
         effective_from: "2026-08-27"
@@ -4629,6 +4669,20 @@ models:
       - channel: google-api
         region: global
         effective_from: "2026-10-29"
+        effective_to: "2026-10-30"
+        input_per_mtok: 1.50
+        output_per_mtok: 17.50
+        source_url: https://ai.google.dev/gemini-api/docs/pricing
+      - channel: google-api
+        region: global
+        effective_from: "2026-10-30"
+        effective_to: "2026-10-31"
+        input_per_mtok: 1.5
+        output_per_mtok: 9
+        source_url: https://ai.google.dev/gemini-api/docs/pricing
+      - channel: google-api
+        region: global
+        effective_from: "2026-10-31"
         input_per_mtok: 1.50
         output_per_mtok: 17.50
         source_url: https://ai.google.dev/gemini-api/docs/pricing

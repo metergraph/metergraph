@@ -74,7 +74,7 @@ GOLDEN_PRICE_ID = "openai/gpt-5.4-mini:openai-api:global:2026-03-17"
 GOLDEN_PINNED_PRICE_ID = "openai/gpt-6.1-sol:aws-bedrock:us-east-1:2026-09-29"
 GOLDEN_RETRIEVAL_COST = "14.00000000"
 GOLDEN_RETRIEVAL_PRICE_ID = "google-api:google_search_grounding:global:2026-08-26"
-CATALOG_VERSION = "2026-10-29.3"
+CATALOG_VERSION = "2026-10-30.1"
 
 REQUIRED_MODULES = (
     "__init__.py",
@@ -309,7 +309,7 @@ def _verify_isolated_install(wheel: Path) -> None:
         loaded = load_catalog()
         assert loaded.version == {CATALOG_VERSION!r}, loaded.version
         assert loaded.currency == "USD", loaded.currency
-        assert loaded.pricing_verified_at.isoformat() == "2026-10-29"
+        assert loaded.pricing_verified_at.isoformat() == "2026-10-30"
         assert len(loaded.content_hash) == 64, loaded.content_hash
         registry = load_model_registry()
         assert registry.version == "2026-10-29", registry.version
