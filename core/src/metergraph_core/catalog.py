@@ -32,6 +32,7 @@ _DIRECT_CHANNEL_BY_PROVIDER = {
     "google": "google-api",
     "vercel": "vercel-ai-gateway",
     "openrouter": "openrouter-api",
+    "tencent": "tencent-tokenhub-api",
     "vertex-ai": "google-vertex-ai",
     "fireworks": "fireworks-api",
     "bedrock": "aws-bedrock",
