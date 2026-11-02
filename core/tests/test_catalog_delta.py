@@ -407,6 +407,21 @@ def test_a_new_price_keeps_its_batch_cache_rate():
     assert str(_resolved_after(result).price.batch_cache_read_per_mtok) == "0.05"
 
 
+def test_a_new_price_keeps_its_batch_one_hour_cache_write_rate():
+    price = _new_price(batch_cache_write_1h_per_mtok="2.40")
+    result = apply_catalog_delta(_document(), _delta(_replace(price=price)))
+    assert _rows(result, effective_from="2026-10-20") == [price]
+    assert str(_resolved_after(result).price.batch_cache_write_1h_per_mtok) == "2.40"
+
+
+@pytest.mark.parametrize("value", ["-0.05", 0.05, "NaN", None])
+def test_batch_one_hour_cache_write_rate_requires_non_negative_decimal(value):
+    with pytest.raises(CatalogDeltaError, match="batch_cache_write_1h_per_mtok"):
+        parse_catalog_delta(
+            _delta(_replace(price=_new_price(batch_cache_write_1h_per_mtok=value)))
+        )
+
+
 def test_a_zero_batch_cache_rate_is_a_rate():
     price = _new_price(batch_cache_read_per_mtok="0")
     result = apply_catalog_delta(_document(), _delta(_replace(price=price)))

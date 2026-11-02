@@ -428,6 +428,17 @@ def parse_catalog(
                     f"{canonical}: invalid batch_cache_write_5m_per_mtok "
                     f"{batch_cache_write!r}"
                 )
+            batch_cache_write_1h = price.get("batch_cache_write_1h_per_mtok")
+            batch_cache_write_1h_per_mtok = _decimal(batch_cache_write_1h)
+            if batch_cache_write_1h is not None and (
+                batch_cache_write_1h_per_mtok is None
+                or not batch_cache_write_1h_per_mtok.is_finite()
+                or batch_cache_write_1h_per_mtok < 0
+            ):
+                raise CatalogError(
+                    f"{canonical}: invalid batch_cache_write_1h_per_mtok "
+                    f"{batch_cache_write_1h!r}"
+                )
             prices.append(
                 Price(
                     id=f"{canonical}:{channel}:{region}:{_id_date(effective_from)}",
@@ -454,6 +465,7 @@ def parse_catalog(
                     currency=currency,
                     batch_cache_read_per_mtok=batch_cache_read_per_mtok,
                     batch_cache_write_5m_per_mtok=batch_cache_write_5m_per_mtok,
+                    batch_cache_write_1h_per_mtok=batch_cache_write_1h_per_mtok,
                 )
             )
     return version, {key: tuple(value) for key, value in aliases.items()}, _unique_ids(prices)
