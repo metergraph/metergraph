@@ -3008,6 +3008,43 @@ def test_installed_catalog_prices_kimi_batch_cache(
 
 
 @pytest.mark.parametrize(
+    ("model", "batch_write", "standard_write"),
+    [
+        ("kimi-k3.1-pro", "2.40", "4.00"),
+        ("kimi-k3", "3.60", "6.00"),
+    ],
+)
+def test_installed_catalog_prices_kimi_one_hour_cache_writes(
+    model, batch_write, standard_write
+):
+    usage = dict(
+        input_tokens=1_000_000,
+        output_tokens=0,
+        cache_write_1h_tokens=1_000_000,
+    )
+    historical = load_catalog().price(
+        model=model, channel="moonshot-api",
+        at=datetime(2026, 10, 31, tzinfo=timezone.utc),
+        batch=True, **usage,
+    )
+    assert historical.status == "partial"
+    assert "cache_write_1h_rate_unavailable" in historical.reasons
+    batch = load_catalog().price(
+        model=model, channel="moonshot-api",
+        at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+        batch=True, **usage,
+    )
+    standard = load_catalog().price(
+        model=model, channel="moonshot-api",
+        at=datetime(2026, 11, 2, tzinfo=timezone.utc),
+        batch=False, **usage,
+    )
+    assert batch.status == standard.status == "priced"
+    assert batch.components.cache_write == Decimal(batch_write)
+    assert standard.components.cache_write == Decimal(standard_write)
+
+
+@pytest.mark.parametrize(
     ("at", "cost", "reasons"),
     [
         (datetime(2026, 10, 22, tzinfo=timezone.utc), "2.00000000", ("uncaptured_fees",)),

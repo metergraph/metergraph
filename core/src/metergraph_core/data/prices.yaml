@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-10-30.1"
+version: "2026-11-02.1"
 currency: USD
-pricing_verified_at: "2026-10-30"
+pricing_verified_at: "2026-11-02"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -3646,6 +3646,7 @@ models:
       - channel: moonshot-api
         region: global
         effective_from: "2026-10-30"
+        effective_to: "2026-11-02"
         input_per_mtok: 2.00
         output_per_mtok: 10.00
         cache_read_per_mtok: 0.20
@@ -3656,6 +3657,23 @@ models:
         batch_cache_write_5m_per_mtok: 1.20
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
         source_url: https://platform.kimi.ai/
+      # Current 1h rates: https://platform.kimi.ai/docs/pricing/chat
+      # Batch 1h rates: https://platform.kimi.ai/docs/pricing/batch
+      - channel: moonshot-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 2.00
+        output_per_mtok: 10.00
+        cache_read_per_mtok: 0.20
+        cache_write_5m_per_mtok: 2.00
+        cache_write_1h_per_mtok: 4.00
+        batch_input_per_mtok: 1.20
+        batch_output_per_mtok: 6.00
+        batch_cache_read_per_mtok: 0.12
+        batch_cache_write_5m_per_mtok: 1.20
+        batch_cache_write_1h_per_mtok: 2.40
+        rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+        source_url: https://platform.kimi.ai/docs/pricing/batch
 
   - canonical_id: moonshotai/kimi-k3.1-pro-highspeed
     publisher: moonshotai
@@ -3740,6 +3758,7 @@ models:
       - channel: moonshot-api
         region: global
         effective_from: "2026-10-30"
+        effective_to: "2026-11-02"
         input_per_mtok: 3.0
         output_per_mtok: 15.0
         cache_read_per_mtok: 0.3
@@ -3750,6 +3769,23 @@ models:
         batch_cache_write_5m_per_mtok: 1.80
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
         source_url: https://platform.kimi.ai/
+      # Current 1h rates: https://platform.kimi.ai/docs/pricing/chat
+      # Batch 1h rates: https://platform.kimi.ai/docs/pricing/batch
+      - channel: moonshot-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 3.0
+        output_per_mtok: 15.0
+        cache_read_per_mtok: 0.3
+        cache_write_5m_per_mtok: 3.0
+        cache_write_1h_per_mtok: 6.0
+        batch_input_per_mtok: 1.80
+        batch_output_per_mtok: 9.00
+        batch_cache_read_per_mtok: 0.18
+        batch_cache_write_5m_per_mtok: 1.80
+        batch_cache_write_1h_per_mtok: 3.60
+        rules: {input_includes_cache_read: true, input_includes_cache_write: true}
+        source_url: https://platform.kimi.ai/docs/pricing/batch
       - channel: fireworks-api
         region: global
         effective_from: "2026-07-19"

@@ -256,6 +256,40 @@ def test_replacing_a_price_rejects_an_unusable_batch_cache_rate(value):
         replace(_direct_price(), batch_cache_read_per_mtok=value)
 
 
+@pytest.mark.parametrize("value", _INVALID_DIRECT_RATES)
+def test_replacing_a_price_rejects_an_unusable_batch_one_hour_write_rate(value):
+    with pytest.raises(ValueError, match="batch_cache_write_1h_per_mtok"):
+        replace(_direct_price(), batch_cache_write_1h_per_mtok=value)
+
+
+@pytest.mark.parametrize(
+    ("standard_rate", "batch_rate", "batch_status", "standard_status", "batch_cost", "standard_cost"),
+    [
+        (Decimal("4"), None, "priced", "priced", Decimal("4"), Decimal("4")),
+        (None, Decimal("2.4"), "priced", "partial", Decimal("2.4"), Decimal("0")),
+        (Decimal("4"), Decimal("2.4"), "priced", "priced", Decimal("2.4"), Decimal("4")),
+        (Decimal("4"), Decimal("0"), "priced", "priced", Decimal("0"), Decimal("4")),
+    ],
+)
+def test_batch_one_hour_write_uses_explicit_rate_or_existing_fallback(
+    standard_rate, batch_rate, batch_status, standard_status, batch_cost, standard_cost
+):
+    price = replace(
+        _direct_price(),
+        cache_write_1h_per_mtok=standard_rate,
+        batch_cache_write_1h_per_mtok=batch_rate,
+    )
+    alias = Alias("anthropic/direct", "anthropic/direct", "anthropic-api", {})
+    snapshot = CatalogSnapshot({("anthropic", "direct"): alias}, [price], region="global")
+    usage = dict(input_tokens=0, output_tokens=0, cache_write_1h_tokens=1_000_000)
+    batch = snapshot.cost(provider="anthropic", model="direct", at=_JULY, batch=True, **usage)
+    standard = snapshot.cost(provider="anthropic", model="direct", at=_JULY, batch=False, **usage)
+    assert batch.status == batch_status
+    assert standard.status == standard_status
+    assert batch.components.cache_write == batch_cost
+    assert standard.components.cache_write == standard_cost
+
+
 def test_direct_constructor_accepts_a_zero_batch_cache_rate():
     price = _direct_price(batch_cache_read_per_mtok=Decimal("0"))
     alias = Alias("anthropic/direct", "anthropic/direct", "anthropic-api", {})

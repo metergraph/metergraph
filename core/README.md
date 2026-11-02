@@ -156,8 +156,9 @@ standard `cache_read_per_mtok`, as before. A standard call always uses the
 standard cache-read rate. A row with only a batch cache rate fully prices a
 cached batch call, while a cached standard call on it is `partial` with
 `cache_read_rate_unavailable`.
-Batch cache writes use `Price.batch_cache_write_5m_per_mtok` when stated;
-otherwise they retain the row's standard cache-write rate.
+Batch cache writes use `Price.batch_cache_write_5m_per_mtok` or
+`Price.batch_cache_write_1h_per_mtok` for the matching TTL when stated;
+otherwise each retains the row's standard cache-write rate.
 
 A `ModelUsage` count left `None` is unknown, not zero. A missing input or
 output count keeps the subtotal that is known, marks the result `partial`, and
