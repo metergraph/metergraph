@@ -162,6 +162,16 @@ sources:
     fingerprint: null
     low_risk: {eligible: false, dimensions: []}
 
+  - id: tencent-tokenhub-kimi-k28-pricing
+    provider: tencent
+    channel: tencent-tokenhub-api
+    catalog_channel: true
+    url: https://intl.cloud.tencent.com/document/product/1300/78937
+    parser: html-tables
+    dimensions: [input_per_mtok, output_per_mtok, cache_read_per_mtok]
+    fingerprint: null
+    low_risk: {eligible: false, dimensions: []}
+
   # Gemini and partner models on Vertex AI. Prices vary by model, context
   # length, tier and processing mode; reviewed discovery only. The URL is the
   # current destination of Google's Vertex AI generative pricing page

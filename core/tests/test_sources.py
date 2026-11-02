@@ -273,6 +273,7 @@ def test_bundled_registry_covers_every_seeded_provider():
         "vercel",
         "openrouter",
         "moonshotai",
+        "tencent",
     }
 
 

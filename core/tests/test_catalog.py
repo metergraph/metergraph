@@ -550,6 +550,45 @@ def test_beam_is_recognized_but_unpriced_on_the_mixed_provider_gateway():
     assert "no_effective_price" in result.reasons
 
 
+def test_kimi_k28_prices_tencent_tokenhub_without_pricing_kimi_code_membership():
+    assert (
+        LOADED.canonical_model_id("moonshotai", "kimi-for-coding", at=_at("2026-11-02"))
+        == "moonshotai/kimi-k2.8-preview"
+    )
+    subscription = SNAPSHOT.cost(
+        provider="moonshotai",
+        model="kimi-for-coding",
+        at=_at("2026-11-02"),
+        input_tokens=1_000_000,
+        output_tokens=1_000_000,
+    )
+    assert subscription.status == "unpriced"
+    assert subscription.cost_usd is None
+
+    metered = SNAPSHOT.cost(
+        provider="tencent",
+        model="kimi-k2.8-preview",
+        at=_at("2026-11-02"),
+        input_tokens=1_000_000,
+        output_tokens=1_000_000,
+        cache_read_tokens=250_000,
+    )
+    assert metered.status == "priced"
+    assert metered.canonical_model == "moonshotai/kimi-k2.8-preview"
+    assert metered.cost_usd == Decimal("4.81250000")
+
+    cache_write = SNAPSHOT.cost(
+        provider="tencent",
+        model="kimi-k2.8-preview",
+        at=_at("2026-11-02"),
+        input_tokens=1_000_000,
+        output_tokens=0,
+        cache_write_tokens=100_000,
+    )
+    assert cache_write.status == "partial"
+    assert "cache_write_5m_rate_unavailable" in cache_write.reasons
+
+
 def test_sonnet_5_5_cache_read_cut_preserves_history():
     before = SNAPSHOT.resolve_price(
         model="claude-sonnet-5-5", channel="anthropic-api", at=_at("2026-10-06")

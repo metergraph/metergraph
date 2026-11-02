@@ -6,7 +6,7 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-02.1"
+version: "2026-11-02.2"
 currency: USD
 pricing_verified_at: "2026-11-02"
 models:
@@ -3843,6 +3843,32 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
+  - canonical_id: moonshotai/kimi-k2.8-preview
+    publisher: moonshotai
+    aliases:
+      # This subscription ID follows Kimi Code's backing model; end the alias
+      # when Kimi switches it to another model.
+      - provider: moonshotai
+        alias: kimi-for-coding
+        channel: kimi-code-subscription
+        effective_from: "2026-09-11"
+        source_url: https://www.kimi.com/code/docs/en/kimi-code/whats-new.html
+      - provider: tencent
+        alias: kimi-k2.8-preview
+        channel: tencent-tokenhub-api
+        effective_from: "2026-11-02"
+        source_url: https://intl.cloud.tencent.com/document/product/1300/80635
+    prices:
+      # First verified TokenHub rate, not its launch date. Add a separate
+      # earlier row if historical rates are later verified.
+      - channel: tencent-tokenhub-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 1.00
+        output_per_mtok: 4.00
+        cache_read_per_mtok: 0.25
+        rules: {input_includes_cache_read: true}
+        source_url: https://intl.cloud.tencent.com/document/product/1300/78937
   - canonical_id: moonshotai/kimi-k3-fast
     publisher: moonshotai
     aliases:

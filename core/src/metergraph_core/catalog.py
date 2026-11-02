@@ -32,6 +32,9 @@ _DIRECT_CHANNEL_BY_PROVIDER = {
     "google": "google-api",
     "vercel": "vercel-ai-gateway",
     "openrouter": "openrouter-api",
+    # Captured Tencent API traffic is assumed to use TokenHub; review this
+    # mapping before adding TokenHub rates for Tencent's own models.
+    "tencent": "tencent-tokenhub-api",
     "vertex-ai": "google-vertex-ai",
     "fireworks": "fireworks-api",
     "bedrock": "aws-bedrock",
