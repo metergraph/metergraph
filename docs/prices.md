@@ -46,6 +46,13 @@ be fully priced while a cached standard call is `partial`. A row without it keep
 batch cache reads at `cache_read_per_mtok`, unchanged; that fallback is not a claim that
 the provider bills batch cache reads at the standard rate.
 
+The optional `batch_cache_write_5m_per_mtok` and
+`batch_cache_write_1h_per_mtok` fields similarly replace the matching standard
+cache-write rate on batch calls only. Record a batch rate when the provider
+publishes it; do not derive one from a discount on another rate. An absent
+batch rate keeps the existing standard-rate fallback, while an absent standard
+rate still leaves standard calls with that cache write `partial`.
+
 `rules` options:
 - `input_includes_cache_read` — whether the provider reports cached tokens inside
   `input_tokens`, in which case cache reads are deducted from billable input. Assumed for
