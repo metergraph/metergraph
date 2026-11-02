@@ -3846,6 +3846,8 @@ models:
   - canonical_id: moonshotai/kimi-k2.8-preview
     publisher: moonshotai
     aliases:
+      # This subscription ID follows Kimi Code's backing model; end the alias
+      # when Kimi switches it to another model.
       - provider: moonshotai
         alias: kimi-for-coding
         channel: kimi-code-subscription
@@ -3857,6 +3859,8 @@ models:
         effective_from: "2026-11-02"
         source_url: https://intl.cloud.tencent.com/document/product/1300/80635
     prices:
+      # First verified TokenHub rate, not its launch date. Add a separate
+      # earlier row if historical rates are later verified.
       - channel: tencent-tokenhub-api
         region: global
         effective_from: "2026-11-02"
