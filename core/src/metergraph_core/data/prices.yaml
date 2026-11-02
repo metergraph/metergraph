@@ -3652,6 +3652,8 @@ models:
         cache_write_5m_per_mtok: 2.00
         batch_input_per_mtok: 1.20
         batch_output_per_mtok: 6.00
+        batch_cache_read_per_mtok: 0.12
+        batch_cache_write_5m_per_mtok: 1.20
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
         source_url: https://platform.kimi.ai/
 
@@ -3744,6 +3746,8 @@ models:
         cache_write_5m_per_mtok: 3.0
         batch_input_per_mtok: 1.80
         batch_output_per_mtok: 9.00
+        batch_cache_read_per_mtok: 0.18
+        batch_cache_write_5m_per_mtok: 1.80
         rules: {input_includes_cache_read: true, input_includes_cache_write: true}
         source_url: https://platform.kimi.ai/
       - channel: fireworks-api

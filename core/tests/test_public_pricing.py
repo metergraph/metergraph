@@ -2983,6 +2983,31 @@ def test_installed_catalog_prices_gemini_4_argon_batch_cache_reads(
 
 
 @pytest.mark.parametrize(
+    ("model", "batch_read", "batch_write"),
+    [
+        ("kimi-k3.1-pro", "0.12", "1.20"),
+        ("kimi-k3", "0.18", "1.80"),
+    ],
+)
+def test_installed_catalog_prices_kimi_batch_cache(
+    model, batch_read, batch_write
+):
+    resolved = load_catalog().price(
+        model=model,
+        channel="moonshot-api",
+        at=datetime(2026, 10, 31, tzinfo=timezone.utc),
+        batch=True,
+        input_tokens=2_000_000,
+        output_tokens=0,
+        cache_read_tokens=1_000_000,
+        cache_write_5m_tokens=1_000_000,
+    )
+    assert resolved.status == "priced"
+    assert resolved.components.cache_read == Decimal(batch_read)
+    assert resolved.components.cache_write == Decimal(batch_write)
+
+
+@pytest.mark.parametrize(
     ("at", "cost", "reasons"),
     [
         (datetime(2026, 10, 22, tzinfo=timezone.utc), "2.00000000", ("uncaptured_fees",)),
