@@ -3835,8 +3835,9 @@ models:
         output_per_mtok: 4.00
         cache_read_per_mtok: 0.19
         source_url: https://platform.kimi.ai/docs/pricing/chat
-      # Batch input/output are 60% of the standard price, the rule the platform
-      # states for this model, which supports no cache writes.
+      # Batch input/output use Kimi's 60% rule. K2.7 Code has no cache-write
+      # rate because it does not support cache writes. No batch cache-read rate
+      # is verified, so the catalog uses the standard $0.19/MTok fallback for hits.
       - channel: moonshot-api
         region: global
         effective_from: "2026-11-03"
