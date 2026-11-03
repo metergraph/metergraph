@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-02.2"
+version: "2026-11-03"
 currency: USD
-pricing_verified_at: "2026-11-02"
+pricing_verified_at: "2026-11-03"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -3830,10 +3830,23 @@ models:
       - channel: moonshot-api
         region: global
         effective_from: "2026-10-07"
+        effective_to: "2026-11-03"
         input_per_mtok: 0.95
         output_per_mtok: 4.00
         cache_read_per_mtok: 0.19
         source_url: https://platform.kimi.ai/docs/pricing/chat
+      # Batch input/output are 60% of the standard price, the rule the platform
+      # states for this model, which supports no cache writes.
+      - channel: moonshot-api
+        region: global
+        effective_from: "2026-11-03"
+        input_per_mtok: 0.95
+        output_per_mtok: 4.00
+        cache_read_per_mtok: 0.19
+        batch_input_per_mtok: 0.57
+        batch_output_per_mtok: 2.40
+        rules: {input_includes_cache_read: true}
+        source_url: https://platform.kimi.ai/docs/pricing/batch
       - channel: openrouter-api
         region: global
         effective_from: "2026-10-20"
