@@ -66,17 +66,19 @@ sources:
       eligible: true
       dimensions: [input_per_mtok, output_per_mtok, cache_write_5m_per_mtok, cache_read_per_mtok]
 
+  # The current destination of the Gemini API pricing page
+  # (ai.google.dev/gemini-api/docs/pricing redirects here), so the allowlisted
+  # fetch needs no redirect. Reviewed discovery only until the google parser's
+  # reading of this page and a fingerprint are reviewed.
   - id: google-api-pricing
     provider: google
     channel: google-api
     catalog_channel: true
-    url: https://ai.google.dev/gemini-api/docs/pricing
+    url: https://aistudio.google.com/docs/pricing
     parser: google
     dimensions: [input_per_mtok, output_per_mtok, cache_read_per_mtok]
-    fingerprint: sha256:ce07b6f065f5dfd21a9f14a005c30de1f5802e3ba118dc1dbe088a124c84adbd
-    low_risk:
-      eligible: true
-      dimensions: [input_per_mtok, output_per_mtok, cache_read_per_mtok]
+    fingerprint: null
+    low_risk: {eligible: false, dimensions: []}
 
   - id: deepseek-api-pricing
     provider: deepseek

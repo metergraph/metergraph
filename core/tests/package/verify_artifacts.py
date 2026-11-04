@@ -36,7 +36,7 @@ CORE_DIR = Path(__file__).resolve().parents[2]  # core/
 DIST_DIR = CORE_DIR / "dist"
 
 EXPECTED_NAME = "metergraph-core"
-EXPECTED_VERSION = "0.8.8"
+EXPECTED_VERSION = "0.8.9"
 EXPECTED_REQUIRES_PYTHON = ">=3.10"
 EXPECTED_SUMMARY = (
     "Open, effective-dated LLM pricing catalog and deterministic cost calculator "
@@ -74,7 +74,7 @@ GOLDEN_PRICE_ID = "openai/gpt-5.4-mini:openai-api:global:2026-03-17"
 GOLDEN_PINNED_PRICE_ID = "openai/gpt-6.1-sol:aws-bedrock:us-east-1:2026-09-29"
 GOLDEN_RETRIEVAL_COST = "14.00000000"
 GOLDEN_RETRIEVAL_PRICE_ID = "google-api:google_search_grounding:global:2026-08-26"
-CATALOG_VERSION = "2026-11-03"
+CATALOG_VERSION = "2026-11-04"
 
 REQUIRED_MODULES = (
     "__init__.py",
@@ -309,7 +309,7 @@ def _verify_isolated_install(wheel: Path) -> None:
         loaded = load_catalog()
         assert loaded.version == {CATALOG_VERSION!r}, loaded.version
         assert loaded.currency == "USD", loaded.currency
-        assert loaded.pricing_verified_at.isoformat() == "2026-11-03"
+        assert loaded.pricing_verified_at.isoformat() == "2026-11-04"
         assert len(loaded.content_hash) == 64, loaded.content_hash
         registry = load_model_registry()
         assert registry.version == "2026-10-29", registry.version
@@ -422,11 +422,11 @@ def _verify_isolated_install(wheel: Path) -> None:
         low_risk = sorted(source.id for source in sources.low_risk())
         assert low_risk == [
             "anthropic-api-pricing",
-            "google-api-pricing",
             "xai-api-pricing",
         ], low_risk
         assert len(sources.sources) == 18, len(sources.sources)
         assert sources.get("google-vertex-ai-pricing").low_risk.eligible is False
+        assert sources.get("google-api-pricing").low_risk.eligible is False
         [model] = [
             entry for entry in loaded.document["models"]
             if entry["canonical_id"] == "openai/gpt-5.4-mini"
