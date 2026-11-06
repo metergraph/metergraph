@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-03"
+version: "2026-11-04"
 currency: USD
-pricing_verified_at: "2026-11-03"
+pricing_verified_at: "2026-11-04"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -12538,6 +12538,46 @@ models:
         input_per_mtok: 5
         output_per_mtok: 25
         cache_read_per_mtok: 0.50
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  - canonical_id: openai/gpt-6-rosalind
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-6-rosalind, channel: openai-api}
+      - {provider: litellm, alias: gpt-6-rosalind, channel: openai-api}
+      - {provider: unknown, alias: gpt-6-rosalind, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-6-rosalind, channel: openai-api}
+    prices:
+      # First verified rate, not a launch date.
+      # The 5m field holds OpenAI's 30-minute cache write; its 12-hour tier
+      # has no field.
+      - channel: openai-api
+        region: global
+        effective_from: "2026-11-04"
+        input_per_mtok: 15.00
+        output_per_mtok: 75.00
+        cache_read_per_mtok: 1.50
+        cache_write_5m_per_mtok: 18.75
+        rules:
+          input_includes_cache_read: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  - canonical_id: openai/gpt-6-astra-law
+    publisher: openai
+    aliases:
+      - {provider: openai, alias: gpt-6-astra-law, channel: openai-api}
+      - {provider: litellm, alias: gpt-6-astra-law, channel: openai-api}
+      - {provider: unknown, alias: gpt-6-astra-law, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-6-astra-law, channel: openai-api}
+    prices:
+      # First verified rate, not a launch date.
+      - channel: openai-api
+        region: global
+        effective_from: "2026-11-04"
+        input_per_mtok: 10.00
+        output_per_mtok: 50.00
+        cache_read_per_mtok: 1.00
         source_url: https://developers.openai.com/api/docs/pricing
 
   - canonical_id: openai/chat-latest

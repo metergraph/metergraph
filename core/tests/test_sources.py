@@ -244,12 +244,12 @@ def test_validate_rejects_a_registry_only_channel_the_catalog_prices():
 FIXTURES = Path(__file__).parent / "fixtures" / "sources"
 LOW_RISK_IDS = {
     "anthropic-api-pricing",
-    "google-api-pricing",
     "xai-api-pricing",
 }
-# Demoted to reviewed discovery while keeping the official parser, so its
-# rows remain discovery evidence; its synthetic fixture still covers that parser.
-DEMOTED_OFFICIAL_PARSER_IDS = {"openai-api-pricing"}
+# Demoted to reviewed discovery while keeping the official parser, so their
+# rows remain discovery evidence; their synthetic fixtures still cover those
+# parsers.
+DEMOTED_OFFICIAL_PARSER_IDS = {"openai-api-pricing", "google-api-pricing"}
 
 
 def test_bundled_registry_validates_against_the_bundled_catalog():
@@ -308,15 +308,27 @@ def test_gateway_model_feeds_are_registered_for_reviewed_discovery():
         assert source.low_risk.eligible is False
 
 
-def test_only_the_three_reviewed_official_parsers_start_low_risk():
+def test_only_the_reviewed_official_parsers_start_low_risk():
     low_risk = load_source_registry().low_risk()
     assert {source.id for source in low_risk} == LOW_RISK_IDS
-    assert {source.parser for source in low_risk} == {"anthropic", "google", "xai"}
+    assert {source.parser for source in low_risk} == {"anthropic", "xai"}
 
 
 def test_openai_is_reviewed_discovery_with_its_official_parser():
     source = load_source_registry().get("openai-api-pricing")
     assert source.parser == "openai"
+    assert source.low_risk.eligible is False
+    assert source.low_risk.dimensions == ()
+    assert source.fingerprint is None
+    assert source.catalog_channel is True
+
+
+def test_google_registers_the_gemini_api_pricing_page_without_low_risk_status():
+    source = load_source_registry().get("google-api-pricing")
+    assert source.parser == "google"
+    # The current destination of the Gemini API pricing page; registering it
+    # keeps the allowlisted fetch free of redirects.
+    assert source.url == "https://aistudio.google.com/docs/pricing"
     assert source.low_risk.eligible is False
     assert source.low_risk.dimensions == ()
     assert source.fingerprint is None

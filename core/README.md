@@ -406,13 +406,18 @@ for source in load_source_registry().sources:
 
 Seeding a source does not make it low-risk. Low-risk means a proven official
 parser whose live structural fingerprint has been reviewed and recorded.
-Anthropic, Google (Gemini API) and xAI start low-risk; each may change
-existing rates, in its allowed dimensions, on existing rows.
+Anthropic and xAI start low-risk; each may change existing rates, in its
+allowed dimensions, on existing rows.
 
 OpenAI is reviewed discovery only. Its official parser still reads the live
 rows, but the live pricing data no longer exposes the rendered column header
 needed to verify the parser's positional columns, so its rows are evidence for
 review, never automated changes.
+
+Google (Gemini API) is reviewed discovery only. The registry points at the
+pricing page's current home, so the allowlisted fetch needs no redirect, and
+its official parser's reading of that page and a fingerprint need review
+before it can propose changes again.
 
 Every other source is reviewed discovery only. It is read with a generic
 parser, `html-tables` for any page's tables or `gpu-license-prose` for GPU or
@@ -484,8 +489,9 @@ price on one canonical entry instead of a conflicting second `add_model`.
 
 The fetch-capable scripts read `<source-id>.*` files from `--content-dir` instead
 of fetching. The
-tests use one synthetic fixture per low-risk source, plus OpenAI's, in
-`tests/fixtures/sources/`, reproducing only the structure its parser reads;
+tests use one synthetic fixture per low-risk source, plus OpenAI's and
+Google's, in `tests/fixtures/sources/`, reproducing only the structure its
+parser reads;
 the generic discovery parsers are tested on small inline synthetic pages.
 
 ## Provider review and contributions

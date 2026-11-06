@@ -248,5 +248,5 @@ def test_healthz_reports_catalog_identity(client):
     response = client.get("/healthz")
     assert response.status_code == 200
     assert response.json()["ok"] is True
-    assert response.json()["catalog_version"] == "2026-11-03"
+    assert response.json()["catalog_version"] == "2026-11-04"
     assert len(response.json()["catalog_hash"]) == 64
