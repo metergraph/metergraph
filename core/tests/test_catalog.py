@@ -2446,6 +2446,11 @@ def test_inkling_2_small_uses_tinker_serverless_rates():
     )
     assert result.status == "priced"
     assert result.cost_usd == Decimal("0.37300000")
+    assert SNAPSHOT.cost(
+        provider="tinker", model="thinkingmachines/Inkling-2-Small",
+        at=_at("2026-11-05"), input_tokens=1_000_000,
+        cache_read_tokens=100_000, output_tokens=100_000,
+    ).cost_usd == result.cost_usd
 
 
 def test_longcat_2_5_direct_is_distinct_from_gateway_preview():

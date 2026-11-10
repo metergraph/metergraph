@@ -666,6 +666,9 @@ def test_direct_channel_for_provider_maps_known_and_rejects_unknown():
     assert direct_channel_for_provider("anthropic") == "anthropic-api"
     assert direct_channel_for_provider("vercel") == "vercel-ai-gateway"
     assert direct_channel_for_provider("openrouter") == "openrouter-api"
+    assert direct_channel_for_provider("meituan") == "longcat-api"
+    assert direct_channel_for_provider("thinkingmachines") == "tinker-serverless"
+    assert direct_channel_for_provider("tinker") == "tinker-serverless"
     # A provider with no direct channel defined -- caller keeps it unpriced.
     assert direct_channel_for_provider("mystery") is None
     assert direct_channel_for_provider(None) is None
@@ -678,6 +681,9 @@ def test_catalog_infers_a_unique_direct_channel_from_model_identity():
     assert catalog.infer_direct_channel("claude-opus-5") == "anthropic-api"
     assert catalog.infer_direct_channel("openai/gpt-5.6-luna") == "openai-api"
     assert catalog.infer_direct_channel("google/gemini-3.6-flash") == "google-api"
+    assert catalog.infer_direct_channel("muse-ember-1.0") == "meta-api"
+    assert catalog.infer_direct_channel("thinkingmachines/Inkling-2-Small") == "tinker-serverless"
+    assert catalog.infer_direct_channel("LongCat-2.5") == "longcat-api"
 
 
 def test_catalog_does_not_infer_ambiguous_or_unknown_model_identity(tmp_path):
