@@ -1238,6 +1238,9 @@ models:
         cache_write_1h_per_mtok: 20.00
         batch_input_per_mtok: 5.00
         batch_output_per_mtok: 25.00
+        batch_cache_read_per_mtok: 0.125
+        batch_cache_write_5m_per_mtok: 6.25
+        batch_cache_write_1h_per_mtok: 10.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -1279,6 +1282,9 @@ models:
         cache_write_1h_per_mtok: 20.00
         batch_input_per_mtok: 5.00
         batch_output_per_mtok: 25.00
+        batch_cache_read_per_mtok: 0.50
+        batch_cache_write_5m_per_mtok: 6.25
+        batch_cache_write_1h_per_mtok: 10.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: aws-bedrock
         region: us-west-2
@@ -1329,6 +1335,9 @@ models:
         cache_write_1h_per_mtok: 8.00
         batch_input_per_mtok: 2.00
         batch_output_per_mtok: 10.00
+        batch_cache_read_per_mtok: 0.10
+        batch_cache_write_5m_per_mtok: 2.50
+        batch_cache_write_1h_per_mtok: 4.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -1385,6 +1394,9 @@ models:
         cache_write_1h_per_mtok: 10.00
         batch_input_per_mtok: 2.50
         batch_output_per_mtok: 12.50
+        batch_cache_read_per_mtok: 0.25
+        batch_cache_write_5m_per_mtok: 3.125
+        batch_cache_write_1h_per_mtok: 5.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -1440,6 +1452,9 @@ models:
         cache_write_1h_per_mtok: 10.00
         batch_input_per_mtok: 2.50
         batch_output_per_mtok: 12.50
+        batch_cache_read_per_mtok: 0.25
+        batch_cache_write_5m_per_mtok: 3.125
+        batch_cache_write_1h_per_mtok: 5.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -1484,6 +1499,9 @@ models:
         cache_write_1h_per_mtok: 10.00
         batch_input_per_mtok: 2.50
         batch_output_per_mtok: 12.50
+        batch_cache_read_per_mtok: 0.25
+        batch_cache_write_5m_per_mtok: 3.125
+        batch_cache_write_1h_per_mtok: 5.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -1522,6 +1540,9 @@ models:
         cache_write_1h_per_mtok: 10.00
         batch_input_per_mtok: 2.50
         batch_output_per_mtok: 12.50
+        batch_cache_read_per_mtok: 0.25
+        batch_cache_write_5m_per_mtok: 3.125
+        batch_cache_write_1h_per_mtok: 5.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: google-vertex-ai
         region: global
@@ -1566,6 +1587,9 @@ models:
         cache_write_1h_per_mtok: 4.00
         batch_input_per_mtok: 1.00
         batch_output_per_mtok: 5.00
+        batch_cache_read_per_mtok: 0.10
+        batch_cache_write_5m_per_mtok: 1.25
+        batch_cache_write_1h_per_mtok: 2.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -1587,6 +1611,9 @@ models:
         cache_write_1h_per_mtok: 4.00
         batch_input_per_mtok: 1.00
         batch_output_per_mtok: 5.00
+        batch_cache_read_per_mtok: 0.05
+        batch_cache_write_5m_per_mtok: 1.25
+        batch_cache_write_1h_per_mtok: 2.00
         source_url: https://www.anthropic.com/claude-haiku-5-5
       - channel: anthropic-api
         region: global
@@ -1598,6 +1625,9 @@ models:
         cache_write_1h_per_mtok: 4.00
         batch_input_per_mtok: 1.00
         batch_output_per_mtok: 5.00
+        batch_cache_read_per_mtok: 0.05
+        batch_cache_write_5m_per_mtok: 1.25
+        batch_cache_write_1h_per_mtok: 2.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -1631,6 +1661,9 @@ models:
         cache_write_1h_per_mtok: 0.20
         batch_input_per_mtok: 0.05
         batch_output_per_mtok: 0.25
+        batch_cache_read_per_mtok: 0.005
+        batch_cache_write_5m_per_mtok: 0.0625
+        batch_cache_write_1h_per_mtok: 0.10
         rules:
           long_context: {threshold: 100000, input_multiplier: 5, output_multiplier: 5, threshold_counts_cached_tokens: true}
         source_url: https://www.anthropic.com/claude-haiku-5-5
@@ -1644,6 +1677,9 @@ models:
         cache_write_1h_per_mtok: 0.20
         batch_input_per_mtok: 0.05
         batch_output_per_mtok: 0.25
+        batch_cache_read_per_mtok: 0.005
+        batch_cache_write_5m_per_mtok: 0.0625
+        batch_cache_write_1h_per_mtok: 0.10
         rules:
           long_context: {threshold: 100000, input_multiplier: 5, output_multiplier: 5, threshold_counts_cached_tokens: true}
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
@@ -1681,6 +1717,9 @@ models:
         cache_write_1h_per_mtok: 4.00
         batch_input_per_mtok: 1.00
         batch_output_per_mtok: 5.00
+        batch_cache_read_per_mtok: 0.10
+        batch_cache_write_5m_per_mtok: 1.25
+        batch_cache_write_1h_per_mtok: 2.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: aws-bedrock
         region: us-west-2
@@ -1736,6 +1775,9 @@ models:
         cache_write_1h_per_mtok: 2.00
         batch_input_per_mtok: 0.50
         batch_output_per_mtok: 2.50
+        batch_cache_read_per_mtok: 0.05
+        batch_cache_write_5m_per_mtok: 0.625
+        batch_cache_write_1h_per_mtok: 1.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -1860,6 +1902,9 @@ models:
         cache_write_1h_per_mtok: 6.00
         batch_input_per_mtok: 1.50
         batch_output_per_mtok: 7.50
+        batch_cache_read_per_mtok: 0.15
+        batch_cache_write_5m_per_mtok: 1.875
+        batch_cache_write_1h_per_mtok: 3.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
 
       - channel: vercel-ai-gateway
@@ -5231,6 +5276,9 @@ models:
         cache_write_1h_per_mtok: 1.6
         batch_input_per_mtok: 0.4
         batch_output_per_mtok: 2
+        batch_cache_read_per_mtok: 0.04
+        batch_cache_write_5m_per_mtok: 0.5
+        batch_cache_write_1h_per_mtok: 0.8
         source_url: https://docs.anthropic.com/en/docs/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -5260,6 +5308,9 @@ models:
         cache_write_1h_per_mtok: 20.00
         batch_input_per_mtok: 5.00
         batch_output_per_mtok: 25.00
+        batch_cache_read_per_mtok: 0.125
+        batch_cache_write_5m_per_mtok: 6.25
+        batch_cache_write_1h_per_mtok: 10.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
 
   - canonical_id: anthropic/claude-mythos-5
@@ -5285,6 +5336,9 @@ models:
         cache_write_1h_per_mtok: 20
         batch_input_per_mtok: 5
         batch_output_per_mtok: 25
+        batch_cache_read_per_mtok: 0.5
+        batch_cache_write_5m_per_mtok: 6.25
+        batch_cache_write_1h_per_mtok: 10
         source_url: https://ai-gateway.vercel.sh/v1/models
       - channel: anthropic-api
         region: global
@@ -5296,6 +5350,9 @@ models:
         cache_write_1h_per_mtok: 20
         batch_input_per_mtok: 5
         batch_output_per_mtok: 25
+        batch_cache_read_per_mtok: 0.5
+        batch_cache_write_5m_per_mtok: 6.25
+        batch_cache_write_1h_per_mtok: 10
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
   - canonical_id: anthropic/claude-opus-4
     publisher: anthropic
@@ -5325,6 +5382,9 @@ models:
         cache_write_1h_per_mtok: 30
         batch_input_per_mtok: 7.5
         batch_output_per_mtok: 37.5
+        batch_cache_read_per_mtok: 0.75
+        batch_cache_write_5m_per_mtok: 9.375
+        batch_cache_write_1h_per_mtok: 15
         source_url: https://ai-gateway.vercel.sh/v1/models
       - channel: anthropic-api
         region: global
@@ -5336,6 +5396,9 @@ models:
         cache_write_1h_per_mtok: 30
         batch_input_per_mtok: 7.5
         batch_output_per_mtok: 37.5
+        batch_cache_read_per_mtok: 0.75
+        batch_cache_write_5m_per_mtok: 9.375
+        batch_cache_write_1h_per_mtok: 15
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -5372,6 +5435,9 @@ models:
         cache_write_1h_per_mtok: 30
         batch_input_per_mtok: 7.5
         batch_output_per_mtok: 37.5
+        batch_cache_read_per_mtok: 0.75
+        batch_cache_write_5m_per_mtok: 9.375
+        batch_cache_write_1h_per_mtok: 15
         source_url: https://ai-gateway.vercel.sh/v1/models
       - channel: anthropic-api
         region: global
@@ -5383,6 +5449,9 @@ models:
         cache_write_1h_per_mtok: 30
         batch_input_per_mtok: 7.5
         batch_output_per_mtok: 37.5
+        batch_cache_read_per_mtok: 0.75
+        batch_cache_write_5m_per_mtok: 9.375
+        batch_cache_write_1h_per_mtok: 15
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
   - canonical_id: anthropic/claude-opus-4.5
     publisher: anthropic
@@ -5402,6 +5471,9 @@ models:
         cache_write_1h_per_mtok: 10
         batch_input_per_mtok: 2.5
         batch_output_per_mtok: 12.5
+        batch_cache_read_per_mtok: 0.25
+        batch_cache_write_5m_per_mtok: 3.125
+        batch_cache_write_1h_per_mtok: 5
         source_url: https://ai-gateway.vercel.sh/v1/models
       - channel: anthropic-api
         region: global
@@ -5413,6 +5485,9 @@ models:
         cache_write_1h_per_mtok: 10
         batch_input_per_mtok: 2.5
         batch_output_per_mtok: 12.5
+        batch_cache_read_per_mtok: 0.25
+        batch_cache_write_5m_per_mtok: 3.125
+        batch_cache_write_1h_per_mtok: 5
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -5484,6 +5559,9 @@ models:
         cache_write_1h_per_mtok: 6
         batch_input_per_mtok: 1.5
         batch_output_per_mtok: 7.5
+        batch_cache_read_per_mtok: 0.15
+        batch_cache_write_5m_per_mtok: 1.875
+        batch_cache_write_1h_per_mtok: 3
         source_url: https://ai-gateway.vercel.sh/v1/models
       - channel: anthropic-api
         region: global
@@ -5495,6 +5573,9 @@ models:
         cache_write_1h_per_mtok: 6
         batch_input_per_mtok: 1.5
         batch_output_per_mtok: 7.5
+        batch_cache_read_per_mtok: 0.15
+        batch_cache_write_5m_per_mtok: 1.875
+        batch_cache_write_1h_per_mtok: 3
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
