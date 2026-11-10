@@ -1803,6 +1803,9 @@ models:
         cache_write_1h_per_mtok: 6.00
         batch_input_per_mtok: 1.50
         batch_output_per_mtok: 7.50
+        batch_cache_read_per_mtok: 0.15
+        batch_cache_write_5m_per_mtok: 1.875
+        batch_cache_write_1h_per_mtok: 3.00
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
       - channel: vercel-ai-gateway
         region: global
