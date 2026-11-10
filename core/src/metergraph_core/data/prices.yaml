@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-09"
+version: "2026-11-10"
 currency: USD
-pricing_verified_at: "2026-11-09"
+pricing_verified_at: "2026-11-10"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -1433,6 +1433,7 @@ models:
       - channel: aws-bedrock
         region: global
         effective_from: "2026-07-24"
+        effective_to: "2026-11-10"
         input_per_mtok: 5.0
         output_per_mtok: 25.0
         cache_read_per_mtok: 0.5
@@ -1441,9 +1442,21 @@ models:
         batch_input_per_mtok: 2.5
         batch_output_per_mtok: 12.5
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: aws-bedrock
+        region: global
+        effective_from: "2026-11-10"
+        input_per_mtok: 5.0
+        output_per_mtok: 25.0
+        cache_read_per_mtok: 0.5
+        cache_write_5m_per_mtok: 6.25
+        cache_write_1h_per_mtok: 10.0
+        batch_input_per_mtok: 2.5
+        batch_output_per_mtok: 12.5
+        source_url: https://aws.amazon.com/bedrock/pricing/
       - channel: aws-bedrock-geo
         region: global
         effective_from: "2026-07-24"
+        effective_to: "2026-11-10"
         input_per_mtok: 5.5
         output_per_mtok: 27.5
         cache_read_per_mtok: 0.55
@@ -1452,6 +1465,17 @@ models:
         batch_input_per_mtok: 2.75
         batch_output_per_mtok: 13.75
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: aws-bedrock-geo
+        region: global
+        effective_from: "2026-11-10"
+        input_per_mtok: 5.5
+        output_per_mtok: 27.5
+        cache_read_per_mtok: 0.55
+        cache_write_5m_per_mtok: 6.875
+        cache_write_1h_per_mtok: 11.0
+        batch_input_per_mtok: 2.75
+        batch_output_per_mtok: 13.75
+        source_url: https://aws.amazon.com/bedrock/pricing/
   - canonical_id: anthropic/claude-opus-4.8
     publisher: anthropic
     aliases:
@@ -1884,6 +1908,7 @@ models:
       - channel: aws-bedrock
         region: global
         effective_from: "2026-02-17"
+        effective_to: "2026-11-10"
         input_per_mtok: 3.0
         output_per_mtok: 15.0
         cache_read_per_mtok: 0.3
@@ -1892,9 +1917,21 @@ models:
         batch_input_per_mtok: 1.5
         batch_output_per_mtok: 7.5
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: aws-bedrock
+        region: global
+        effective_from: "2026-11-10"
+        input_per_mtok: 3.0
+        output_per_mtok: 15.0
+        cache_read_per_mtok: 0.3
+        cache_write_5m_per_mtok: 3.75
+        cache_write_1h_per_mtok: 6.0
+        batch_input_per_mtok: 1.5
+        batch_output_per_mtok: 7.5
+        source_url: https://aws.amazon.com/bedrock/pricing/
       - channel: aws-bedrock-geo
         region: global
         effective_from: "2026-02-17"
+        effective_to: "2026-11-10"
         input_per_mtok: 3.3
         output_per_mtok: 16.5
         cache_read_per_mtok: 0.33
@@ -1903,6 +1940,17 @@ models:
         batch_input_per_mtok: 1.65
         batch_output_per_mtok: 8.25
         source_url: https://ai-gateway.vercel.sh/v1/models
+      - channel: aws-bedrock-geo
+        region: global
+        effective_from: "2026-11-10"
+        input_per_mtok: 3.3
+        output_per_mtok: 16.5
+        cache_read_per_mtok: 0.33
+        cache_write_5m_per_mtok: 4.125
+        cache_write_1h_per_mtok: 6.6
+        batch_input_per_mtok: 1.65
+        batch_output_per_mtok: 8.25
+        source_url: https://aws.amazon.com/bedrock/pricing/
   - canonical_id: anthropic/claude-sonnet-4.5
     publisher: anthropic
     aliases:
