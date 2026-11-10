@@ -607,6 +607,11 @@ def _price_tokens(
         output_multiplier = _decimal(
             long_context.get("output_multiplier")
         ) or Decimal("1")
+        if long_context.get("cache_write_rate_unavailable"):
+            # Published long-context input/cache-read rates do not establish a
+            # cache-write rate. Keep the known components and report partial.
+            cache_write_5m_rate = None
+            cache_write_1h_rate = None
     # Applies to every rate on the row, cache included, and composes with a
     # long-context tier rather than replacing it.
     off_peak = _off_peak_multiplier(rules, at)

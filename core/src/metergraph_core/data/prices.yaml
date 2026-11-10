@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-04"
+version: "2026-11-09"
 currency: USD
-pricing_verified_at: "2026-11-04"
+pricing_verified_at: "2026-11-09"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -1211,6 +1211,29 @@ models:
         input_per_mtok: 21
         output_per_mtok: 168
         source_url: https://ai-gateway.vercel.sh/v1/models
+
+  - canonical_id: anthropic/claude-fable-5.2
+    publisher: anthropic
+    aliases:
+      - {provider: anthropic, alias: claude-fable-5-2, channel: anthropic-api}
+      - {provider: anthropic, alias: anthropic/claude-fable-5-2, channel: anthropic-api}
+      - {provider: litellm, alias: claude-fable-5-2, channel: anthropic-api}
+      - {provider: unknown, alias: claude-fable-5-2, channel: anthropic-api}
+    prices:
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-11-09"
+        input_per_mtok: 8.00
+        output_per_mtok: 40.00
+        cache_read_per_mtok: 0.20
+        cache_write_5m_per_mtok: 10.00
+        cache_write_1h_per_mtok: 16.00
+        batch_input_per_mtok: 4.00
+        batch_output_per_mtok: 20.00
+        batch_cache_read_per_mtok: 0.10
+        batch_cache_write_5m_per_mtok: 5.00
+        batch_cache_write_1h_per_mtok: 8.00
+        source_url: https://platform.claude.com/docs/en/models/fable-5-2/whats-new-fable-5-2
 
   - canonical_id: anthropic/claude-fable-5.1
     publisher: anthropic
@@ -5238,6 +5261,29 @@ models:
         cache_read_per_mtok: 0.08
         cache_write_5m_per_mtok: 1
         source_url: https://vercel.com/ai-gateway/models/claude-haiku-3.5/providers
+  - canonical_id: anthropic/claude-mythos-5.2
+    publisher: anthropic
+    aliases:
+      - {provider: anthropic, alias: claude-mythos-5-2, channel: anthropic-api}
+      - {provider: anthropic, alias: anthropic/claude-mythos-5-2, channel: anthropic-api}
+      - {provider: litellm, alias: claude-mythos-5-2, channel: anthropic-api}
+      - {provider: unknown, alias: claude-mythos-5-2, channel: anthropic-api}
+    prices:
+      - channel: anthropic-api
+        region: global
+        effective_from: "2026-11-09"
+        input_per_mtok: 8.00
+        output_per_mtok: 40.00
+        cache_read_per_mtok: 0.20
+        cache_write_5m_per_mtok: 10.00
+        cache_write_1h_per_mtok: 16.00
+        batch_input_per_mtok: 4.00
+        batch_output_per_mtok: 20.00
+        batch_cache_read_per_mtok: 0.10
+        batch_cache_write_5m_per_mtok: 5.00
+        batch_cache_write_1h_per_mtok: 8.00
+        source_url: https://platform.claude.com/docs/en/models/mythos-5-2/overview
+
   - canonical_id: anthropic/claude-mythos-5.1
     publisher: anthropic
     aliases:
@@ -5917,6 +5963,26 @@ models:
           varies_by_provider: true
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://openrouter.ai/api/v1/models
+  - canonical_id: openai/gpt-6-cyber
+    publisher: openai
+    aliases:
+      - {provider: litellm, alias: gpt-6-cyber, channel: openai-api}
+      - {provider: openai, alias: openai/gpt-6-cyber, channel: openai-api}
+      - {provider: openai, alias: gpt-6-cyber, channel: openai-api}
+      - {provider: unknown, alias: gpt-6-cyber, channel: openai-api}
+    prices:
+      # Batch is unsupported. Above 272K input tokens, OpenAI lists input,
+      # cache-read, and output rates, but no long-context cache-write rate.
+      - channel: openai-api
+        region: global
+        effective_from: "2026-11-07"
+        input_per_mtok: 20.00
+        output_per_mtok: 100.00
+        cache_read_per_mtok: 2.00
+        cache_write_5m_per_mtok: 25.00
+        rules:
+          long_context: {threshold: 272000, threshold_counts_cached_tokens: true, input_multiplier: 2, output_multiplier: 1.5, cache_write_rate_unavailable: true}
+        source_url: https://developers.openai.com/api/docs/models/gpt-6-cyber
   - canonical_id: openai/gpt-5.6-cyber
     publisher: openai
     aliases:
