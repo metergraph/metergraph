@@ -13415,6 +13415,8 @@ models:
     aliases:
       - {provider: thinkingmachines, alias: thinkingmachines/Inkling-2-Small, channel: tinker-serverless, rules: {input_includes_cache_read: true}}
       - {provider: tinker, alias: thinkingmachines/Inkling-2-Small, channel: tinker-serverless, rules: {input_includes_cache_read: true}}
+      - {provider: thinkingmachines, alias: "thinkingmachines/Inkling-2-Small:peft:262144", channel: tinker-serverless, rules: {input_includes_cache_read: true}}
+      - {provider: tinker, alias: "thinkingmachines/Inkling-2-Small:peft:262144", channel: tinker-serverless, rules: {input_includes_cache_read: true}}
     prices:
       - channel: tinker-serverless
         region: global

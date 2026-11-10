@@ -2451,6 +2451,11 @@ def test_inkling_2_small_uses_tinker_serverless_rates():
         at=_at("2026-11-05"), input_tokens=1_000_000,
         cache_read_tokens=100_000, output_tokens=100_000,
     ).cost_usd == result.cost_usd
+    assert SNAPSHOT.cost(
+        provider="tinker", model="thinkingmachines/Inkling-2-Small:peft:262144",
+        at=_at("2026-11-05"), input_tokens=1_000_000,
+        cache_read_tokens=100_000, output_tokens=100_000,
+    ).cost_usd == result.cost_usd
 
 
 def test_longcat_2_5_direct_is_distinct_from_gateway_preview():

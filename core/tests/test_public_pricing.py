@@ -685,6 +685,7 @@ def test_catalog_infers_a_unique_direct_channel_from_model_identity():
     assert catalog.infer_direct_channel("google/gemini-3.6-flash") == "google-api"
     assert catalog.infer_direct_channel("muse-ember-1.0") == "meta-api"
     assert catalog.infer_direct_channel("thinkingmachines/Inkling-2-Small") == "tinker-serverless"
+    assert catalog.infer_direct_channel("thinkingmachines/Inkling-2-Small:peft:262144") == "tinker-serverless"
     assert catalog.infer_direct_channel("LongCat-2.5") == "longcat-api"
     assert catalog.infer_direct_channel("particle-1") == "particle-api"
 
