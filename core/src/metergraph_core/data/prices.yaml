@@ -13395,6 +13395,48 @@ models:
           uncaptured_fees: true
         source_url: https://openrouter.ai/api/v1/models
 
+  - canonical_id: meta/muse-ember-1.0
+    publisher: meta
+    aliases:
+      - {provider: meta, alias: muse-ember-1.0, channel: meta-api, rules: {input_includes_cache_read: true}}
+    prices:
+      - channel: meta-api
+        region: global
+        effective_from: "2026-11-09"
+        input_per_mtok: 0.10
+        output_per_mtok: 0.50
+        cache_read_per_mtok: 0.004
+        rules:
+          long_context: {threshold: 200000, threshold_counts_cached_tokens: true, input_multiplier: 3, output_multiplier: 3}
+        source_url: https://dev.meta.ai/docs/pricing-rate-limits
+
+  - canonical_id: thinkingmachines/inkling-2-small
+    publisher: thinkingmachines
+    aliases:
+      - {provider: thinkingmachines, alias: thinkingmachines/Inkling-2-Small, channel: tinker-serverless, rules: {input_includes_cache_read: true}}
+      - {provider: tinker, alias: thinkingmachines/Inkling-2-Small, channel: tinker-serverless, rules: {input_includes_cache_read: true}}
+    prices:
+      - channel: tinker-serverless
+        region: global
+        effective_from: "2026-11-05"
+        input_per_mtok: 0.30
+        output_per_mtok: 1.00
+        cache_read_per_mtok: 0.03
+        source_url: https://thinkingmachines.ai/tinker/pricing/
+
+  - canonical_id: meituan/longcat-2.5
+    publisher: meituan
+    aliases:
+      - {provider: meituan, alias: LongCat-2.5, channel: longcat-api, rules: {input_includes_cache_read: true}}
+    prices:
+      - channel: longcat-api
+        region: global
+        effective_from: "2026-11-02"
+        input_per_mtok: 0.30
+        output_per_mtok: 1.20
+        cache_read_per_mtok: 0.006
+        source_url: https://longcat.chat/platform/docs/pricing/longcat-2.5
+
 retrieval:
   - channel: anthropic-api
     operation: web_search
