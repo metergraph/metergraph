@@ -459,12 +459,25 @@ def _off_peak_multiplier(rules: Mapping[str, Any], at: datetime) -> Decimal:
     """
     discount = rules.get("off_peak_discount") or {}
     windows = discount.get("peak_hours_utc") or ()
+    minute_windows = discount.get("peak_minutes_utc") or ()
     multiplier = _decimal(discount.get("multiplier"))
-    if not windows or multiplier is None:
+    if not (windows or minute_windows) or multiplier is None:
         return Decimal("1")
     moment = at.astimezone(timezone.utc)
     if discount.get("peak_weekdays_only") and moment.weekday() >= 5:
         return multiplier
+    minute = moment.hour * 60 + moment.minute
+    for window in minute_windows:
+        try:
+            start, end = window
+        except (TypeError, ValueError):
+            continue
+        if _tokens(start) is None or _tokens(end) is None:
+            continue
+        start, end = int(start), int(end)
+        on_peak = start <= minute < end if start < end else minute >= start or minute < end
+        if on_peak:
+            return Decimal("1")
     for window in windows:
         try:
             start, end = window

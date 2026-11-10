@@ -3247,3 +3247,44 @@ def test_gemini_video_reconciles_applied_history_then_corrects_output_rate(day, 
     )
     assert result.status == "priced"
     assert result.cost_usd == Decimal(expected)
+
+
+@pytest.mark.parametrize("moment,expected", [
+    ("2026-11-10T07:59:00+00:00", "0.62500000"),
+    ("2026-11-10T08:00:00+00:00", "1.25000000"),
+    ("2026-11-10T23:59:00+00:00", "1.25000000"),
+    ("2026-11-11T00:29:00+00:00", "1.25000000"),
+    ("2026-11-11T00:30:00+00:00", "0.62500000"),
+])
+def test_particle_gateway_peak_pricing(moment, expected):
+    result = load_catalog().snapshot.cost(
+        provider="vercel", model="particle/particle-1",
+        at=datetime.fromisoformat(moment), input_tokens=1_000_000, output_tokens=1_000_000,
+    )
+    assert result.status == "priced"
+    assert result.cost_usd == Decimal(expected)
+
+
+def test_particle_gateway_cached_input_uses_peak_discount():
+    catalog = load_catalog()
+    for moment, expected in [
+        ("2026-11-10T08:00:00+00:00", "0.03000000"),
+        ("2026-11-10T07:59:00+00:00", "0.01500000"),
+    ]:
+        result = catalog.snapshot.cost(
+            provider="vercel", model="particle/particle-1",
+            at=datetime.fromisoformat(moment), input_tokens=1_000_000,
+            cache_read_tokens=1_000_000, output_tokens=0,
+        )
+        assert result.status == "priced"
+        assert result.cost_usd == Decimal(expected)
+
+
+def test_qwen_gateway_cached_input_is_not_counted_twice():
+    result = load_catalog().snapshot.cost(
+        provider="vercel", model="alibaba/qwen3.8-max",
+        at=datetime(2026, 11, 10, tzinfo=timezone.utc), input_tokens=1_000_000,
+        cache_read_tokens=1_000_000, output_tokens=0,
+    )
+    assert result.status == "priced"
+    assert result.cost_usd == Decimal("0.25000000")

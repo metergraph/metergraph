@@ -224,8 +224,8 @@ def test_registry_document_shape_is_required(mutation):
 
 def test_bundled_registry_preserves_current_execution_and_product_fields():
     registry = load_model_registry()
-    assert registry.version == "2026-10-29"
-    assert [route.id for route in registry.candidates("gateway")] == [
+    assert registry.version == "2026-11-10"
+    existing_gateway_ids = [
         "anthropic/claude-sonnet-5",
         "anthropic/claude-opus-5",
         "anthropic/claude-opus-4.8",
@@ -280,6 +280,7 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "inception/mercury-3",
         "minimax/minimax-m3.1-flash",
     ]
+    assert [route.id for route in registry.candidates("gateway")][:len(existing_gateway_ids)] == existing_gateway_ids
     gateway_ids = {route.id for route in registry.candidates("gateway")}
     assert "liquid/lfm2.5-24b-a2b" not in gateway_ids
     assert "reflection/beam" not in gateway_ids
@@ -322,7 +323,7 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "deepseek/deepseek-v3.2",
         "deepseek/deepseek-v3.1",
     ]
-    assert len(registry.routes_for_execution_profile("default")) == 74
+    assert len(registry.routes_for_execution_profile("default")) == 80
     assert len(registry.routes_for_execution_profile("bedrock")) == 8
 
 
@@ -930,3 +931,50 @@ def test_registry_api_is_public():
     registry = load_model_registry()
     assert registry.release_date("openai/gpt-6-luna", load_catalog()) == ReleaseDate(date(2026, 9, 22), "released")
     assert registry.route("default:openai/gpt-6-luna").display_name == "GPT-6 Luna"
+
+
+@pytest.mark.parametrize("model", [
+    "anthropic/claude-fable-5.2", "meituan/longcat-2.5",
+    "particle/particle-1", "alibaba/qwen3.8-max",
+])
+def test_gateway_benchmark_models_are_routable_and_priced(model):
+    registry = load_model_registry()
+    route = registry.route(f"default:{model}")
+    assert route in registry.candidates("gateway")
+    price = load_catalog().snapshot.resolve_price(
+        model=route.model_id, channel=route.pricing_channel,
+        at=datetime(2026, 11, 10, tzinfo=timezone.utc),
+    )
+    assert price is not None
+    assert price.canonical_model == model
+
+
+def test_muse_ember_gateway_route_and_price():
+    registry = load_model_registry()
+    route = registry.route("default:meta/muse-ember")
+    assert route in registry.candidates("gateway")
+    assert route.canonical_id == "meta/muse-ember-1.0"
+    resolved = load_catalog().snapshot.resolve_price(
+        model=route.model_id, channel=route.pricing_channel,
+        at=datetime(2026, 11, 10, tzinfo=timezone.utc),
+    )
+    assert resolved is not None
+    assert resolved.canonical_model == "meta/muse-ember-1.0"
+    assert resolved.price.input_per_mtok == Decimal("0.10")
+    assert resolved.price.output_per_mtok == Decimal("0.50")
+
+
+def test_inkling_tinker_route_and_price():
+    registry = load_model_registry()
+    route = registry.route("default:tinker:inkling-2-small")
+    assert route in registry.candidates("tinker-direct")
+    assert registry.offer_groups["tinker-direct"].credential == "TINKER_API_KEY"
+    assert route.model_id == "thinkingmachines/Inkling-2-Small:peft:262144"
+    resolved = load_catalog().snapshot.resolve_price(
+        model=route.model_id, channel=route.pricing_channel,
+        at=datetime(2026, 11, 10, tzinfo=timezone.utc),
+    )
+    assert resolved is not None
+    assert resolved.canonical_model == "thinkingmachines/inkling-2-small"
+    assert resolved.price.input_per_mtok == Decimal("0.30")
+    assert resolved.price.output_per_mtok == Decimal("1.00")

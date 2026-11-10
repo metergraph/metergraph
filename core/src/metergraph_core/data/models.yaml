@@ -1,4 +1,4 @@
-version: '2026-10-29'
+version: '2026-11-10'
 models:
 - canonical_id: openai/gpt-5.6-sol
   display_name: GPT-5.6 Sol
@@ -912,6 +912,78 @@ models:
     pricing_channel: mistral-api
     execution_profiles:
     - default
+- canonical_id: anthropic/claude-fable-5.2
+  display_name: Claude Fable 5.2
+  publisher: anthropic
+  released: '2026-11-09'
+  routes:
+  - key: default:anthropic/claude-fable-5.2
+    id: anthropic/claude-fable-5.2
+    provider: vercel
+    model_id: anthropic/claude-fable-5.2
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: meituan/longcat-2.5
+  display_name: LongCat-2.5
+  publisher: meituan
+  released: '2026-11-02'
+  routes:
+  - key: default:meituan/longcat-2.5
+    id: meituan/longcat-2.5
+    provider: vercel
+    model_id: meituan/longcat-2.5
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: particle/particle-1
+  display_name: Particle-1
+  publisher: particle
+  released: '2026-10-28'
+  routes:
+  - key: default:particle/particle-1
+    id: particle/particle-1
+    provider: vercel
+    model_id: particle/particle-1
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: alibaba/qwen3.8-max
+  display_name: Qwen3.8 Max
+  publisher: alibaba
+  released: '2026-09-02'
+  routes:
+  - key: default:alibaba/qwen3.8-max
+    id: alibaba/qwen3.8-max
+    provider: vercel
+    model_id: alibaba/qwen3.8-max
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: meta/muse-ember-1.0
+  display_name: Muse Ember
+  publisher: meta
+  released: '2026-11-09'
+  routes:
+  - key: default:meta/muse-ember
+    id: meta/muse-ember
+    provider: vercel
+    model_id: meta/muse-ember
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: thinkingmachines/inkling-2-small
+  display_name: Inkling 2 Small
+  publisher: thinkingmachines
+  released: '2026-11-05'
+  routes:
+  - key: default:tinker:inkling-2-small
+    id: thinkingmachines/inkling-2-small
+    provider: tinker
+    model_id: thinkingmachines/Inkling-2-Small:peft:262144
+    pricing_channel: tinker-serverless
+    execution_profiles:
+    - default
 execution_profiles:
 - id: default
   routes:
@@ -988,7 +1060,14 @@ execution_profiles:
   - default:moonshotai:kimi-k3.1-pro
   - default:moonshotai:kimi-k3.1-pro-highspeed
   - default:minimax/minimax-m3.1-flash
+  - default:meta/muse-ember
+  - default:anthropic/claude-fable-5.2
+  - default:meituan/longcat-2.5
+  - default:particle/particle-1
+  - default:alibaba/qwen3.8-max
   - default:mistral:mistral-small-2603
+  - default:tinker:inkling-2-small
+
 - id: bedrock
   routes:
   - bedrock:anthropic/claude-sonnet-5
@@ -1000,6 +1079,10 @@ execution_profiles:
   - bedrock:deepseek/deepseek-v3.2
   - bedrock:deepseek/deepseek-v3.1
 offer_groups:
+- id: tinker-direct
+  credential: TINKER_API_KEY
+  routes:
+  - default:tinker:inkling-2-small
 - id: gateway
   credential: AI_GATEWAY_API_KEY
   routes:
@@ -1056,6 +1139,11 @@ offer_groups:
   - default:deepseek/deepseek-v4.1-flash-1017-fast
   - default:inception/mercury-3
   - default:minimax/minimax-m3.1-flash
+  - default:meta/muse-ember
+  - default:anthropic/claude-fable-5.2
+  - default:meituan/longcat-2.5
+  - default:particle/particle-1
+  - default:alibaba/qwen3.8-max
 - id: fireworks
   credential: FIREWORKS_API_KEY
   routes:
