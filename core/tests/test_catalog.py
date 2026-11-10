@@ -2467,3 +2467,15 @@ def test_longcat_2_5_direct_is_distinct_from_gateway_preview():
     assert direct.canonical_model == "meituan/longcat-2.5"
     assert preview.canonical_model == "meituan/longcat-2.5-preview"
     assert direct.cost_usd == Decimal("0.39060000")
+
+
+def test_particle_1_uses_published_standard_direct_rates():
+    assert direct_channel_for_provider("particle") == "particle-api"
+    result = SNAPSHOT.cost(
+        provider="particle", model="particle-1", at=_at("2026-10-28"),
+        input_tokens=1_000_000, cache_read_tokens=100_000,
+        output_tokens=100_000,
+    )
+    assert result.status == "priced"
+    assert result.canonical_model == "particle/particle-1"
+    assert result.cost_usd == Decimal("0.42060000")

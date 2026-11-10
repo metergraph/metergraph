@@ -47,6 +47,8 @@ _DIRECT_CHANNEL_BY_PROVIDER = {
     "amazon": "aws-bedrock",
     "meta": "meta-api",
     "meituan": "longcat-api",
+    "particle": "particle-api",
+    "particle-ai": "particle-api",
     "thinkingmachines": "tinker-serverless",
     "tinker": "tinker-serverless",
     "minimax": "minimax-api",

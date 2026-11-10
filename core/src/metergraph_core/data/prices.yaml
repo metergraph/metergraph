@@ -13437,6 +13437,20 @@ models:
         cache_read_per_mtok: 0.006
         source_url: https://longcat.chat/platform/docs/pricing/longcat-2.5
 
+  - canonical_id: particle/particle-1
+    publisher: particle
+    aliases:
+      - {provider: particle, alias: particle-1, channel: particle-api}
+      - {provider: particle-ai, alias: particle-1, channel: particle-api}
+    prices:
+      - channel: particle-api
+        region: global
+        effective_from: "2026-10-28"
+        input_per_mtok: 0.30
+        output_per_mtok: 1.20
+        cache_read_per_mtok: 0.006
+        source_url: https://particle.ai/blog/introducing-particle-1
+
 retrieval:
   - channel: anthropic-api
     operation: web_search
