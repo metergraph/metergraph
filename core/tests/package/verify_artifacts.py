@@ -312,7 +312,7 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert loaded.pricing_verified_at.isoformat() == "2026-11-10"
         assert len(loaded.content_hash) == 64, loaded.content_hash
         registry = load_model_registry()
-        assert registry.version == "2026-10-29", registry.version
+        assert registry.version == "2026-11-10", registry.version
         moonshot_candidates = [route.id for route in registry.candidates("moonshot-direct")]
         assert moonshot_candidates == [
             "moonshotai:kimi-k3.1-pro",
@@ -323,7 +323,7 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert mistral_candidates == ["mistral:mistral-small-2603"], mistral_candidates
         assert registry.offer_groups["mistral-direct"].credential == "MISTRAL_API_KEY"
         gateway_candidates = [route.id for route in registry.candidates("gateway")]
-        assert len(gateway_candidates) == 53, len(gateway_candidates)
+        assert len(gateway_candidates) == 58, len(gateway_candidates)
         assert gateway_candidates[:2] == [
             "anthropic/claude-sonnet-5",
             "anthropic/claude-opus-5",
