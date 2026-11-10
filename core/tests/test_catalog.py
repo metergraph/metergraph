@@ -2420,3 +2420,67 @@ def test_anthropic_5_2_direct_rates(model):
     )
     assert batch_cached.status == 'priced'
     assert batch_cached.cost_usd == Decimal('37.10000000')
+
+
+def test_muse_ember_long_context_counts_cached_input_in_threshold():
+    short = SNAPSHOT.cost(
+        provider="meta", model="muse-ember-1.0", at=_at("2026-11-09"),
+        input_tokens=200_000, cache_read_tokens=100_000, output_tokens=100_000,
+    )
+    long = SNAPSHOT.cost(
+        provider="meta", model="muse-ember-1.0", at=_at("2026-11-09"),
+        input_tokens=300_000, cache_read_tokens=100_000, output_tokens=100_000,
+    )
+    assert short.status == long.status == "priced"
+    assert short.cost_usd == Decimal("0.06040000")
+    assert long.cost_usd == Decimal("0.21120000")
+
+
+def test_inkling_2_small_uses_tinker_serverless_rates():
+    assert direct_channel_for_provider("tinker") == "tinker-serverless"
+    assert direct_channel_for_provider("thinkingmachines") == "tinker-serverless"
+    result = SNAPSHOT.cost(
+        provider="thinkingmachines", model="thinkingmachines/Inkling-2-Small",
+        at=_at("2026-11-05"), input_tokens=1_000_000,
+        cache_read_tokens=100_000, output_tokens=100_000,
+    )
+    assert result.status == "priced"
+    assert result.cost_usd == Decimal("0.37300000")
+    assert SNAPSHOT.cost(
+        provider="tinker", model="thinkingmachines/Inkling-2-Small",
+        at=_at("2026-11-05"), input_tokens=1_000_000,
+        cache_read_tokens=100_000, output_tokens=100_000,
+    ).cost_usd == result.cost_usd
+    assert SNAPSHOT.cost(
+        provider="tinker", model="thinkingmachines/Inkling-2-Small:peft:262144",
+        at=_at("2026-11-05"), input_tokens=1_000_000,
+        cache_read_tokens=100_000, output_tokens=100_000,
+    ).cost_usd == result.cost_usd
+
+
+def test_longcat_2_5_direct_is_distinct_from_gateway_preview():
+    assert direct_channel_for_provider("meituan") == "longcat-api"
+    direct = SNAPSHOT.cost(
+        provider="meituan", model="LongCat-2.5", at=_at("2026-11-02"),
+        input_tokens=1_000_000, cache_read_tokens=100_000, output_tokens=100_000,
+    )
+    preview = SNAPSHOT.cost(
+        provider="vercel", model="meituan/longcat-2.5-preview",
+        at=_at("2026-11-02"), input_tokens=100_000, output_tokens=100_000,
+    )
+    assert direct.status == preview.status == "priced"
+    assert direct.canonical_model == "meituan/longcat-2.5"
+    assert preview.canonical_model == "meituan/longcat-2.5-preview"
+    assert direct.cost_usd == Decimal("0.39060000")
+
+
+def test_particle_1_uses_published_standard_direct_rates():
+    assert direct_channel_for_provider("particle") == "particle-api"
+    result = SNAPSHOT.cost(
+        provider="particle", model="particle-1", at=_at("2026-11-10"),
+        input_tokens=1_000_000, cache_read_tokens=100_000,
+        output_tokens=100_000,
+    )
+    assert result.status == "priced"
+    assert result.canonical_model == "particle/particle-1"
+    assert result.cost_usd == Decimal("0.35300000")

@@ -46,6 +46,11 @@ _DIRECT_CHANNEL_BY_PROVIDER = {
     # through Bedrock, so a trace naming "amazon" was billed on Bedrock.
     "amazon": "aws-bedrock",
     "meta": "meta-api",
+    "meituan": "longcat-api",
+    "particle": "particle-api",
+    "particle-ai": "particle-api",
+    "thinkingmachines": "tinker-serverless",
+    "tinker": "tinker-serverless",
     "minimax": "minimax-api",
     "mistral": "mistral-api",
     "moonshotai": "moonshot-api",
