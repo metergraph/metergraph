@@ -27,7 +27,7 @@ def test_prices_yaml_parses():
     assert VERSION
     assert DOC["models"]
     assert LOADED.currency == "USD"
-    assert LOADED.pricing_verified_at.isoformat() == "2026-11-07"
+    assert LOADED.pricing_verified_at.isoformat() == "2026-11-09"
 
 
 def test_openrouter_cache_reads_are_not_charged_as_fresh_input():
@@ -2375,3 +2375,48 @@ def test_gpt56_cyber_long_context_counts_separate_cache_writes():
     )
     assert result.status == 'priced'
     assert result.cost_usd == Decimal('6.95625000')
+
+
+def test_gpt6_cyber_long_context_uses_published_rates():
+    result = SNAPSHOT.cost(
+        provider='openai', model='gpt-6-cyber', at=_at('2026-11-09'),
+        input_tokens=300_000, cache_read_tokens=100_000, output_tokens=100_000,
+    )
+    assert result.status == 'priced'
+    assert result.cost_usd == Decimal('23.40000000')
+
+
+def test_gpt6_cyber_long_context_cache_write_is_unpriced():
+    result = SNAPSHOT.cost(
+        provider='openai', model='gpt-6-cyber', at=_at('2026-11-09'),
+        input_tokens=300_000, cache_write_5m_tokens=10_000, output_tokens=0,
+    )
+    assert result.status == 'partial'
+    assert 'cache_write_5m_rate_unavailable' in result.reasons
+    assert result.components.cache_write_usd == 0
+
+
+@pytest.mark.parametrize('model', ['claude-fable-5-2', 'claude-mythos-5-2'])
+def test_anthropic_5_2_direct_rates(model):
+    result = SNAPSHOT.cost(
+        provider='anthropic', model=model, at=_at('2026-11-09'),
+        input_tokens=1_000_000, output_tokens=1_000_000,
+        cache_read_tokens=1_000_000, cache_write_5m_tokens=1_000_000,
+        cache_write_1h_tokens=1_000_000,
+    )
+    assert result.status == 'priced'
+    assert result.cost_usd == Decimal('74.20000000')
+    batch = SNAPSHOT.cost(
+        provider='anthropic', model=model, at=_at('2026-11-09'),
+        input_tokens=1_000_000, output_tokens=1_000_000, batch=True,
+    )
+    assert batch.status == 'priced'
+    assert batch.cost_usd == Decimal('24.00000000')
+    batch_cached = SNAPSHOT.cost(
+        provider='anthropic', model=model, at=_at('2026-11-09'),
+        input_tokens=1_000_000, output_tokens=1_000_000,
+        cache_read_tokens=1_000_000, cache_write_5m_tokens=1_000_000,
+        cache_write_1h_tokens=1_000_000, batch=True,
+    )
+    assert batch_cached.status == 'priced'
+    assert batch_cached.cost_usd == Decimal('37.10000000')
