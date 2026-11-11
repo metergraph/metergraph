@@ -93,6 +93,7 @@ class ModelDefinition:
     canonical_id: str
     display_name: str
     publisher: str
+    # Empty for an identity-only model.
     routes: tuple[ModelRoute, ...]
     # The publisher's general-availability date, when recorded.
     released: date | None = None
@@ -280,9 +281,7 @@ def parse_model_registry(document: Any) -> ModelRegistry:
             )
         released = _optional_date(model.get("released"), f"{canonical_id}: released")
         model_routes: list[ModelRoute] = []
-        route_values = _list(model.get("routes"), f"{canonical_id}: routes")
-        if not route_values:
-            raise ModelRegistryError(f"{canonical_id}: routes must not be empty")
+        route_values = _list(model.get("routes", []), f"{canonical_id}: routes")
         for route_value in route_values:
             route = _mapping(route_value, f"{canonical_id}: route")
             route_key = _text(route.get("key"), f"{canonical_id}: route key")

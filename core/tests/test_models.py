@@ -978,3 +978,40 @@ def test_inkling_tinker_route_and_price():
     assert resolved.canonical_model == "thinkingmachines/inkling-2-small"
     assert resolved.price.input_per_mtok == Decimal("0.30")
     assert resolved.price.output_per_mtok == Decimal("1.00")
+
+
+@pytest.mark.parametrize('explicit_routes', [False, True])
+def test_identity_only_models_do_not_expand_execution_choices(explicit_routes):
+    value = document()
+    before = parse_model_registry(value)
+    identity = {'canonical_id': 'example/archive', 'display_name': 'Archive', 'publisher': 'example', 'released': '2025-01-01'}
+    if explicit_routes:
+        identity['routes'] = []
+    value['models'].append(identity)
+    registry = parse_model_registry(value)
+    assert registry.model('example/archive').routes == ()
+    assert registry.release_date('example/archive', load_catalog()) == ReleaseDate(date(2025, 1, 1), 'released')
+    assert registry.routes == before.routes
+    assert registry.routes_for_execution_profile('default') == before.routes_for_execution_profile('default')
+    for group in before.offer_groups:
+        assert registry.candidates(group) == before.candidates(group)
+    credentials = {'OPENAI_API_KEY', 'AI_GATEWAY_API_KEY'}
+    assert registry.reachable_candidates(credentials) == before.reachable_candidates(credentials)
+    validate_model_registry(registry, load_catalog())
+
+
+@pytest.mark.parametrize('routes', [None, {}, 'route'])
+def test_identity_only_models_still_reject_invalid_route_types(routes):
+    value = document()
+    value['models'].append({'canonical_id': 'example/archive', 'display_name': 'Archive', 'publisher': 'example', 'routes': routes})
+    with pytest.raises(ModelRegistryError, match='routes must be a list'):
+        parse_model_registry(value)
+
+
+@pytest.mark.parametrize('group', ['execution_profiles', 'offer_groups'])
+def test_identity_only_model_does_not_satisfy_an_executable_route_reference(group):
+    value = document()
+    value['models'].append({'canonical_id': 'example/archive', 'display_name': 'Archive', 'publisher': 'example', 'routes': []})
+    value[group][0]['routes'].append('example/archive')
+    with pytest.raises(ModelRegistryError, match='unknown route'):
+        parse_model_registry(value)
