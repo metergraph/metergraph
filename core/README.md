@@ -253,6 +253,10 @@ IDs may intentionally repeat across execution profiles when gateway and
 Bedrock use different physical routes; each route therefore also has a unique
 internal `key`.
 
+A model can omit `routes` or use an empty list to record identity without
+execution support. It remains available through `registry.model(canonical_id)`,
+but contributes no executable routes or offer-group candidates.
+
 A model entry may record `released`, the publisher's general-availability
 date as an ISO date. `models.release_date(canonical_id, load_catalog())`
 returns that date with basis `released`, or, when none is recorded, the
