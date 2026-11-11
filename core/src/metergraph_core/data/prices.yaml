@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-10.2"
+version: "2026-11-11"
 currency: USD
-pricing_verified_at: "2026-11-10"
+pricing_verified_at: "2026-11-11"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -3637,10 +3637,18 @@ models:
       - channel: meta-api
         region: global
         effective_from: "2026-09-11"
+        effective_to: "2026-11-11"
         input_per_mtok: 1.25
         output_per_mtok: 4.25
         cache_read_per_mtok: 0.15
         source_url: https://vercel.com/ai-gateway/models/muse-spark-1.3
+      - channel: meta-api
+        region: global
+        effective_from: "2026-11-11"
+        input_per_mtok: 1.25
+        output_per_mtok: 4.25
+        cache_read_per_mtok: 0.15
+        source_url: https://dev.meta.ai/docs/pricing-rate-limits
 
   - canonical_id: typesafe-ai/jev-1.13.0
     publisher: typesafe-ai
