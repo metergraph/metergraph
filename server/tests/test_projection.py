@@ -1,6 +1,8 @@
 import json
 from decimal import Decimal
 
+import pytest
+
 from metergraph_server import prices
 from metergraph_server.ingest import COLUMNS, project_row
 
@@ -214,3 +216,27 @@ def test_reliability_projection_resolves_conflicting_dimensions():
     assert assessed['refused'] is True
     unavailable = dict(zip(COLUMNS, project_row(_row(availability='unavailable', refused=False), SNAPSHOT)))
     assert unavailable['refused'] is None
+
+
+@pytest.mark.parametrize('code,availability', [(429,'unavailable'), (503,'unavailable'), (401,'excluded'), (200,'available')])
+def test_reliability_projection_derives_http_outcome(code, availability):
+    values = dict(zip(COLUMNS, project_row(_row(http_status_code=code), SNAPSHOT)))
+    assert values['availability'] == availability
+    assert values['refused'] is None
+
+
+def test_reliability_projection_http_failure_overrides_non_refusal():
+    values = dict(zip(COLUMNS, project_row(_row(http_status_code=429, availability='available', refused=False), SNAPSHOT)))
+    assert values['availability'] == 'unavailable'
+    assert values['refused'] is None
+
+
+def test_reliability_projection_explicit_refusal_precedes_http_error():
+    values = dict(zip(COLUMNS, project_row(_row(http_status_code=403, refused=True), SNAPSHOT)))
+    assert values['http_status_code'] == 403
+    assert values['availability'] == 'available'
+    assert values['refused'] is True
+    conflict = dict(zip(COLUMNS, project_row(_row(http_status_code=429, availability='unavailable', refused=True), SNAPSHOT)))
+    assert conflict['http_status_code'] == 429
+    assert conflict['availability'] is None
+    assert conflict['refused'] is None

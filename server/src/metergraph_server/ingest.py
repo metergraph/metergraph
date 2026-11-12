@@ -208,6 +208,7 @@ def project_row(row: dict, catalog: CatalogSnapshot) -> tuple:
     )
     billing = resolve_billing(enrichment, normalize_gateway_evidence(row))
     status_code, finish_reason, finish_reason_raw = _status_fields(row)
+    http_status_code = _http_status(row.get("http_status_code"))
     availability = _availability(row.get("availability"))
     refused = _bool(row.get("refused"))
     if refused is True:
@@ -215,7 +216,13 @@ def project_row(row: dict, catalog: CatalogSnapshot) -> tuple:
             availability, refused = None, None
         else:
             availability = "available"
-    elif availability in {"unavailable", "excluded"}:
+    elif http_status_code == 429 or http_status_code is not None and http_status_code >= 500:
+        availability = "unavailable"
+    elif http_status_code is not None and 400 <= http_status_code < 500:
+        availability = "excluded"
+    elif http_status_code is not None and 200 <= http_status_code < 300 and availability is None:
+        availability = "available"
+    if availability in {"unavailable", "excluded"}:
         refused = None
     return (
         ts,
@@ -255,7 +262,7 @@ def project_row(row: dict, catalog: CatalogSnapshot) -> tuple:
         _text(row.get("sdk")),
         _text(row.get("sdk_version")),
         _text(row.get("request_id")),
-        _http_status(row.get("http_status_code")),
+        http_status_code,
         availability,
         refused,
     )

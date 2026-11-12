@@ -429,5 +429,69 @@
       "availability": null,
       "refused": null
     }
+  },
+  {
+    "name": "stream_content_block_refusal",
+    "input": {
+      "stream_chunks": [
+        {
+          "content_block": {
+            "type": "refusal"
+          }
+        },
+        {
+          "choices": []
+        }
+      ]
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "stream_part_refusal",
+    "input": {
+      "stream_chunks": [
+        {
+          "part": {
+            "type": "refusal"
+          }
+        },
+        {
+          "choices": []
+        }
+      ]
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "stream_chat_delta_refusal",
+    "input": {
+      "stream_chunks": [
+        {
+          "choices": [
+            {
+              "delta": {
+                "refusal": "policy"
+              }
+            }
+          ]
+        },
+        {
+          "choices": []
+        }
+      ]
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
   }
 ]
