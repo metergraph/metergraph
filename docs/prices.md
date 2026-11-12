@@ -32,6 +32,14 @@ models:
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
 ```
 
+A model entry may set `family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}`:
+the stable product line it belongs to across versions. The `id` is lowercase
+`<publisher>/<line>` under the entry's own `publisher`, which must also prefix its
+`canonical_id`; the `display_name` is one line with no surrounding whitespace, and every
+model sharing an `id` gives the same one. A family is display metadata only: it never implies a
+successor, upgrade or substitute, and never changes aliases or prices. Leave it out when
+the product line is ambiguous; it is never inferred from the model's name.
+
 A row may also set `request_fee_per_1k_usd`: a fixed fee charged once per call on top of
 tokens, in USD per 1,000 calls. Use it where a channel bills a model's built-in work per
 request, such as a gateway pricing a search model's search per call. It appears in the

@@ -6,12 +6,13 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-11"
+version: "2026-11-11.2"
 currency: USD
 pricing_verified_at: "2026-11-11"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
+    family: {id: openai/gpt-sol, display_name: GPT Sol}
     aliases:
       - {provider: openai, alias: gpt-6-sol, channel: openai-api}
       - {provider: litellm, alias: gpt-6-sol, channel: openai-api}
@@ -105,6 +106,7 @@ models:
 
   - canonical_id: openai/gpt-6-luna
     publisher: openai
+    family: {id: openai/gpt-luna, display_name: GPT Luna}
     aliases:
       - {provider: openai, alias: gpt-6-luna, channel: openai-api}
       - {provider: litellm, alias: gpt-6-luna, channel: openai-api}
@@ -198,6 +200,7 @@ models:
 
   - canonical_id: openai/gpt-6-astra
     publisher: openai
+    family: {id: openai/gpt-astra, display_name: GPT Astra}
     aliases:
       - {provider: openai, alias: gpt-6-astra, channel: openai-api}
       - {provider: litellm, alias: gpt-6-astra, channel: openai-api}
@@ -301,6 +304,7 @@ models:
 
   - canonical_id: openai/gpt-6.1-sol
     publisher: openai
+    family: {id: openai/gpt-sol, display_name: GPT Sol}
     aliases:
       - {provider: openai, alias: gpt-6.1-sol, channel: openai-api}
       - {provider: litellm, alias: gpt-6.1-sol, channel: openai-api}
@@ -384,6 +388,7 @@ models:
 
   - canonical_id: openai/gpt-6.1-terra
     publisher: openai
+    family: {id: openai/gpt-terra, display_name: GPT Terra}
     aliases:
       - {provider: openai, alias: gpt-6.1-terra, channel: openai-api}
       - {provider: litellm, alias: gpt-6.1-terra, channel: openai-api}
@@ -447,6 +452,7 @@ models:
 
   - canonical_id: openai/gpt-5.6-sol
     publisher: openai
+    family: {id: openai/gpt-sol, display_name: GPT Sol}
     aliases:
       - {provider: openai, alias: gpt-5.6, channel: openai-api}
       - {provider: openai, alias: gpt-5.6-sol, channel: openai-api}
@@ -560,6 +566,7 @@ models:
 
   - canonical_id: openai/gpt-5.6-terra
     publisher: openai
+    family: {id: openai/gpt-terra, display_name: GPT Terra}
     aliases:
       - {provider: openai, alias: gpt-5.6-terra, channel: openai-api}
       - {provider: litellm, alias: gpt-5.6-terra, channel: openai-api}
@@ -643,6 +650,7 @@ models:
 
   - canonical_id: openai/gpt-5.6-luna
     publisher: openai
+    family: {id: openai/gpt-luna, display_name: GPT Luna}
     aliases:
       - {provider: openai, alias: gpt-5.6-luna, channel: openai-api}
       - {provider: litellm, alias: gpt-5.6-luna, channel: openai-api}
@@ -737,6 +745,7 @@ models:
 
   - canonical_id: openai/gpt-5.4-mini
     publisher: openai
+    family: {id: openai/gpt-mini, display_name: GPT mini}
     aliases:
       - {provider: openai, alias: gpt-5.4-mini, channel: openai-api}
       - {provider: openai, alias: gpt-5.4-mini-2026-03-17, channel: openai-api}
@@ -786,6 +795,7 @@ models:
 
   - canonical_id: openai/gpt-5.4
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - {provider: openai, alias: gpt-5.4, channel: openai-api}
       - {provider: openai, alias: gpt-5.4-2026-03-05, channel: openai-api}
@@ -842,6 +852,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.4-nano
     publisher: openai
+    family: {id: openai/gpt-nano, display_name: GPT nano}
     aliases:
       - {provider: openai, alias: gpt-5.4-nano, channel: openai-api}
       - {provider: openai, alias: gpt-5.4-nano-2026-03-17, channel: openai-api}
@@ -891,6 +902,7 @@ models:
 
   - canonical_id: openai/gpt-4o-mini
     publisher: openai
+    family: {id: openai/gpt-mini, display_name: GPT mini}
     aliases:
       - {provider: openai, alias: gpt-4o-mini, channel: openai-api}
       - {provider: openai, alias: gpt-4o-mini-2024-07-18, channel: openai-api}
@@ -998,6 +1010,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-4.1
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - {provider: openai, alias: gpt-4.1, channel: openai-api}
       - {provider: openai, alias: gpt-4.1-2025-04-14, channel: openai-api}
@@ -1042,6 +1055,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-4.1-mini
     publisher: openai
+    family: {id: openai/gpt-mini, display_name: GPT mini}
     aliases:
       - {provider: openai, alias: gpt-4.1-mini, channel: openai-api}
       - {provider: openai, alias: gpt-4.1-mini-2025-04-14, channel: openai-api}
@@ -1084,6 +1098,7 @@ models:
 
   - canonical_id: openai/gpt-4.1-nano
     publisher: openai
+    family: {id: openai/gpt-nano, display_name: GPT nano}
     aliases:
       - {provider: openai, alias: gpt-4.1-nano, channel: openai-api}
       - {provider: openai, alias: gpt-4.1-nano-2025-04-14, channel: openai-api}
@@ -1128,6 +1143,7 @@ models:
 
   - canonical_id: openai/gpt-5.2
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - {provider: openai, alias: gpt-5.2, channel: openai-api}
       - {provider: openai, alias: gpt-5.2-2025-12-11, channel: openai-api}
@@ -1172,6 +1188,7 @@ models:
 
   - canonical_id: openai/gpt-5.2-pro
     publisher: openai
+    family: {id: openai/gpt-pro, display_name: GPT Pro}
     aliases:
       - {provider: openai, alias: gpt-5.2-pro, channel: openai-api}
       - {provider: openai, alias: gpt-5.2-pro-2025-12-11, channel: openai-api}
@@ -1214,6 +1231,7 @@ models:
 
   - canonical_id: anthropic/claude-fable-5.2
     publisher: anthropic
+    family: {id: anthropic/claude-fable, display_name: Claude Fable}
     aliases:
       - {provider: anthropic, alias: claude-fable-5-2, channel: anthropic-api}
       - {provider: vercel, alias: anthropic/claude-fable-5.2, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true, input_includes_cache_write: true}}
@@ -1248,6 +1266,7 @@ models:
 
   - canonical_id: anthropic/claude-fable-5.1
     publisher: anthropic
+    family: {id: anthropic/claude-fable, display_name: Claude Fable}
     aliases:
       - {provider: anthropic, alias: claude-fable-5-1, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-fable-5-1, channel: anthropic-api}
@@ -1297,6 +1316,7 @@ models:
 
   - canonical_id: anthropic/claude-fable-5
     publisher: anthropic
+    family: {id: anthropic/claude-fable, display_name: Claude Fable}
     aliases:
       - {provider: anthropic, alias: claude-fable-5, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-fable-5, channel: anthropic-api}
@@ -1342,6 +1362,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: anthropic/claude-opus-5.5
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: claude-opus-5-5, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-opus-5-5, channel: anthropic-api}
@@ -1402,6 +1423,7 @@ models:
         source_url: https://aws.amazon.com/bedrock/pricing/
   - canonical_id: anthropic/claude-opus-5
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: claude-opus-5, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-opus-5-20260724, channel: anthropic-api}
@@ -1489,6 +1511,7 @@ models:
         source_url: https://aws.amazon.com/bedrock/pricing/
   - canonical_id: anthropic/claude-opus-4.8
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: claude-opus-4-8, channel: anthropic-api}
       - {provider: litellm, alias: claude-opus-4-8, channel: anthropic-api}
@@ -1525,6 +1548,7 @@ models:
 
   - canonical_id: anthropic/claude-opus-4.7
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: claude-opus-4-7, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-opus-4-7-20260416, channel: anthropic-api}
@@ -1572,6 +1596,7 @@ models:
 
   - canonical_id: anthropic/claude-opus-4.6
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: claude-opus-4-6, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-opus-4.6, channel: anthropic-api}
@@ -1624,6 +1649,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: anthropic/claude-sonnet-5.5
     publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
     aliases:
       - {provider: anthropic, alias: claude-sonnet-5-5, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-sonnet-5-5, channel: anthropic-api}
@@ -1698,6 +1724,7 @@ models:
 
   - canonical_id: anthropic/claude-haiku-5.5
     publisher: anthropic
+    family: {id: anthropic/claude-haiku, display_name: Claude Haiku}
     aliases:
       - {provider: anthropic, alias: claude-haiku-5-5, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-haiku-5-5, channel: anthropic-api}
@@ -1754,6 +1781,7 @@ models:
 
   - canonical_id: anthropic/claude-sonnet-5
     publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
     aliases:
       - {provider: anthropic, alias: claude-sonnet-5, channel: anthropic-api}
       - {provider: litellm, alias: claude-sonnet-5, channel: anthropic-api}
@@ -1802,6 +1830,7 @@ models:
 
   - canonical_id: anthropic/claude-haiku-4.5
     publisher: anthropic
+    family: {id: anthropic/claude-haiku, display_name: Claude Haiku}
     aliases:
       - {provider: anthropic, alias: claude-haiku-4-5, channel: anthropic-api}
       - {provider: anthropic, alias: claude-haiku-4-5-20251001, channel: anthropic-api}
@@ -1870,6 +1899,7 @@ models:
 
   - canonical_id: anthropic/claude-sonnet-4.6
     publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
     aliases:
       - {provider: anthropic, alias: claude-sonnet-4-6, channel: anthropic-api}
       - {provider: litellm, alias: claude-sonnet-4-6, channel: anthropic-api}
@@ -1964,6 +1994,7 @@ models:
         source_url: https://aws.amazon.com/bedrock/pricing/
   - canonical_id: anthropic/claude-sonnet-4.5
     publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
     aliases:
       - {provider: anthropic, alias: claude-sonnet-4-5, channel: anthropic-api}
       - {provider: anthropic, alias: claude-sonnet-4-5-20250929, channel: anthropic-api}
@@ -2010,6 +2041,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: google/gemini-3-pro
     publisher: google
+    family: {id: google/gemini-pro, display_name: Gemini Pro}
     aliases:
       - {provider: google, alias: gemini-3-pro, channel: google-api}
       - {provider: google, alias: gemini-3-pro-preview, channel: google-api}
@@ -2047,6 +2079,7 @@ models:
 
   - canonical_id: google/gemini-3.1-pro-preview
     publisher: google
+    family: {id: google/gemini-pro, display_name: Gemini Pro}
     aliases:
       - {provider: google, alias: gemini-3.1-pro-preview, channel: google-api}
       - {provider: google, alias: models/gemini-3.1-pro-preview, channel: google-api}
@@ -2155,6 +2188,7 @@ models:
 
   - canonical_id: google/gemini-3.5-flash
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - &gemini-flash-latest-35
         {provider: google, alias: gemini-flash-latest, channel: google-api, effective_from: "2026-05-19", effective_to: "2026-07-21", source_url: https://ai.google.dev/gemini-api/docs/changelog}
@@ -2227,6 +2261,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: google/gemini-3.5-flash-lite
     publisher: google
+    family: {id: google/gemini-flash-lite, display_name: Gemini Flash-Lite}
     aliases:
       - &gemini-flash-lite-latest-35
         {provider: google, alias: gemini-flash-lite-latest, channel: google-api, effective_from: "2026-07-21", source_url: https://ai.google.dev/gemini-api/docs/changelog}
@@ -2275,6 +2310,7 @@ models:
 
   - canonical_id: google/gemini-2.5-pro
     publisher: google
+    family: {id: google/gemini-pro, display_name: Gemini Pro}
     aliases:
       - {provider: google, alias: gemini-2.5-pro, channel: google-api}
       - {provider: google, alias: models/gemini-2.5-pro, channel: google-api}
@@ -2313,6 +2349,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: google/gemini-2.5-flash
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - {provider: google, alias: gemini-2.5-flash, channel: google-api}
       - {provider: google, alias: models/gemini-2.5-flash, channel: google-api}
@@ -2362,6 +2399,7 @@ models:
 
   - canonical_id: google/gemini-2.5-flash-lite
     publisher: google
+    family: {id: google/gemini-flash-lite, display_name: Gemini Flash-Lite}
     aliases:
       - {provider: google, alias: gemini-2.5-flash-lite, channel: google-api}
       - {provider: google, alias: models/gemini-2.5-flash-lite, channel: google-api}
@@ -2388,6 +2426,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: google/gemma-4-26b-a4b-it
     publisher: google
+    family: {id: google/gemma, display_name: Gemma}
     aliases:
       - provider: google
         alias: google/gemma-4-26b-a4b-it
@@ -2437,6 +2476,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: google/gemma-3-27b-it
     publisher: google
+    family: {id: google/gemma, display_name: Gemma}
     aliases:
       - {provider: bedrock, alias: google.gemma-3-27b-it, channel: aws-bedrock}
       - provider: openrouter
@@ -2499,6 +2539,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: meta/muse-wonder-1.0
     publisher: meta
+    family: {id: meta/muse-wonder, display_name: Muse Wonder}
     aliases:
       - {provider: meta, alias: muse-wonder-1.0, channel: meta-api, rules: {input_includes_cache_read: true}}
       - {provider: litellm, alias: muse-wonder-1.0, channel: meta-api, rules: {input_includes_cache_read: true}}
@@ -2530,6 +2571,7 @@ models:
 
   - canonical_id: meta/muse-spark-1.1
     publisher: meta
+    family: {id: meta/muse-spark, display_name: Muse Spark}
     aliases:
       - {provider: meta, alias: muse-spark-1.1, channel: meta-api}
       - {provider: unknown, alias: muse-spark-1.1, channel: meta-api}
@@ -2562,6 +2604,7 @@ models:
         source_url: https://dev.meta.ai/docs/pricing-rate-limits
   - canonical_id: mistral/mistral-large-4
     publisher: mistral
+    family: {id: mistral/mistral-large, display_name: Mistral Large}
     aliases:
       - {provider: mistral, alias: mistral-large-4, channel: mistral-api}
       - {provider: mistral, alias: mistral-large-latest, channel: mistral-api, effective_from: "2026-10-06", source_url: https://docs.mistral.ai/resources/changelogs}
@@ -2628,6 +2671,7 @@ models:
 
   - canonical_id: mistral/mistral-large-3
     publisher: mistral
+    family: {id: mistral/mistral-large, display_name: Mistral Large}
     aliases:
       - {provider: bedrock, alias: mistral.mistral-large-3-675b-instruct, channel: aws-bedrock}
       - {provider: litellm, alias: mistral-large-3, channel: mistral-api}
@@ -2665,6 +2709,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: mistral/ministral-14b
     publisher: mistral
+    family: {id: mistral/ministral, display_name: Ministral}
     aliases:
       - {provider: mistral, alias: ministral-14b-2512, channel: mistral-api}
       - {provider: mistral, alias: ministral-14b-latest, channel: mistral-api, effective_from: "2025-12-02", source_url: https://docs.mistral.ai/resources/changelogs}
@@ -2820,6 +2865,7 @@ models:
 
   - canonical_id: deepseek/v4-flash
     publisher: deepseek
+    family: {id: deepseek/deepseek-flash, display_name: DeepSeek Flash}
     aliases:
       - &deepseek-v4-flash-retired
         {provider: deepseek, alias: deepseek-v4-flash, channel: deepseek-api, effective_from: "2026-04-24", effective_to: "2026-09-10T04:00:00+00:00", source_url: https://api-docs.deepseek.com/updates/}
@@ -2911,6 +2957,7 @@ models:
 
   - canonical_id: deepseek/v4-pro
     publisher: deepseek
+    family: {id: deepseek/deepseek-pro, display_name: DeepSeek Pro}
     aliases:
       - {provider: deepseek, alias: deepseek-v4-pro, channel: deepseek-api}
       - {provider: deepseek, alias: deepseek/deepseek/deepseek-v4-pro, channel: deepseek-api}
@@ -2995,6 +3042,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: xai/grok-4.3
     publisher: xai
+    family: {id: xai/grok, display_name: Grok}
     aliases:
       - {provider: x-ai, alias: grok-4.3, channel: xai-api}
       - {provider: x-ai, alias: grok-4.3-latest, channel: xai-api}
@@ -3060,6 +3108,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: perplexity/sonar
     publisher: perplexity
+    family: {id: perplexity/sonar, display_name: Sonar}
     aliases:
       - {provider: perplexity-ai, alias: sonar, channel: perplexity-api}
       - {provider: litellm, alias: perplexity/sonar, channel: perplexity-api}
@@ -3116,6 +3165,7 @@ models:
 
   - canonical_id: openai/gpt-5-mini
     publisher: openai
+    family: {id: openai/gpt-mini, display_name: GPT mini}
     aliases:
       - {provider: openai, alias: gpt-5-mini, channel: openai-api}
       - {provider: litellm, alias: gpt-5-mini, channel: openai-api}
@@ -3161,6 +3211,7 @@ models:
 
   - canonical_id: anthropic/claude-3-haiku
     publisher: anthropic
+    family: {id: anthropic/claude-haiku, display_name: Claude Haiku}
     aliases:
       - {provider: anthropic, alias: claude-3-haiku, channel: anthropic-api}
       - provider: anthropic
@@ -3196,6 +3247,7 @@ models:
 
   - canonical_id: google/gemini-3.6-flash
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - &gemini-flash-latest-36
         {provider: google, alias: gemini-flash-latest, channel: google-api, effective_from: "2026-07-21", effective_to: "2026-08-13", source_url: https://ai.google.dev/gemini-api/docs/changelog}
@@ -3294,6 +3346,7 @@ models:
 
   - canonical_id: google/gemini-3.7-flash
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - &gemini-flash-latest-37
         {provider: google, alias: gemini-flash-latest, channel: google-api, effective_from: "2026-08-13", effective_to: "2026-09-02", source_url: https://ai.google.dev/gemini-api/docs/changelog}
@@ -3370,6 +3423,7 @@ models:
         source_url: https://ai.google.dev/gemini-api/docs/pricing
   - canonical_id: google/gemini-3.8-flash
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - {provider: vertex-ai, alias: gemini-3.8-flash, channel: google-vertex-ai}
       - {provider: google, alias: gemini-3.8-flash, channel: google-api}
@@ -3441,6 +3495,7 @@ models:
 
   - canonical_id: google/gemma-4-31b-it
     publisher: google
+    family: {id: google/gemma, display_name: Gemma}
     aliases:
       - {provider: google, alias: google/gemma-4-31b-it, channel: vercel-ai-gateway}
       - {provider: google, alias: gemma-4-31b-it, channel: google-api}
@@ -3481,6 +3536,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: meta/muse-glimmer-30b
     publisher: meta
+    family: {id: meta/muse-glimmer, display_name: Muse Glimmer}
     aliases:
       - provider: meta
         alias: meta/muse-glimmer-30b
@@ -3517,6 +3573,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: deepseek/deepseek-v4.1-flash
     publisher: deepseek
+    family: {id: deepseek/deepseek-flash, display_name: DeepSeek Flash}
     aliases:
       - &deepseek-v41-flash
         {provider: deepseek, alias: deepseek-flash, channel: deepseek-api, effective_from: "2026-09-10T04:00:00+00:00", source_url: https://api-docs.deepseek.com/updates/}
@@ -3615,6 +3672,7 @@ models:
 
   - canonical_id: meta/muse-spark-1.3
     publisher: meta
+    family: {id: meta/muse-spark, display_name: Muse Spark}
     aliases:
       - provider: meta
         alias: meta/muse-spark-1.3
@@ -4246,6 +4304,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-oss-120b
     publisher: openai
+    family: {id: openai/gpt-oss, display_name: gpt-oss}
     aliases:
       - provider: fireworks
         alias: accounts/fireworks/models/gpt-oss-120b
@@ -4336,6 +4395,7 @@ models:
 
   - canonical_id: xai/grok-4.1-fast-reasoning
     publisher: xai
+    family: {id: xai/grok-fast, display_name: Grok Fast}
     aliases:
       - provider: xai
         alias: xai/grok-4.1-fast-reasoning
@@ -4365,6 +4425,7 @@ models:
   # Non-reasoning shares the fast-reasoning launch rate.
   - canonical_id: xai/grok-4.1-fast-non-reasoning
     publisher: xai
+    family: {id: xai/grok-fast, display_name: Grok Fast}
     aliases:
       - provider: xai
         alias: spacexai/grok-4.1-fast-non-reasoning
@@ -4390,6 +4451,7 @@ models:
 
   - canonical_id: xai/grok-4.6
     publisher: xai
+    family: {id: xai/grok, display_name: Grok}
     aliases:
       - {provider: unknown, alias: grok-4.6, channel: xai-api}
       - {provider: unknown, alias: grok-4.6-latest, channel: xai-api, effective_from: "2026-08-12", source_url: https://docs.x.ai/developers/release-notes}
@@ -4478,6 +4540,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: xai/grok-4.7
     publisher: xai
+    family: {id: xai/grok, display_name: Grok}
     aliases:
       - &grok-47-direct
         {provider: x-ai, alias: grok-4.7, channel: xai-api, effective_from: "2026-09-21", source_url: https://docs.x.ai/developers/release-notes}
@@ -4562,6 +4625,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: google/gemini-3-flash-preview
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - &gemini-flash-latest-3-preview
         {provider: google, alias: gemini-flash-latest, channel: google-api, effective_from: "2026-01-21", effective_to: "2026-05-19", source_url: https://ai.google.dev/gemini-api/docs/changelog}
@@ -4595,6 +4659,7 @@ models:
   # price for it would be invented rather than sourced.
   - canonical_id: google/gemini-3.1-flash-lite
     publisher: google
+    family: {id: google/gemini-flash-lite, display_name: Gemini Flash-Lite}
     aliases:
       - &gemini-flash-lite-latest-31
         {provider: google, alias: gemini-flash-lite-latest, channel: google-api, effective_from: "2026-03-03", effective_to: "2026-07-21", source_url: https://ai.google.dev/gemini-api/docs/changelog}
@@ -4845,6 +4910,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: google/gemini-omni-flash-preview
     publisher: google
+    family: {id: google/gemini-omni-flash, display_name: Gemini Omni Flash}
     aliases:
       - {provider: google, alias: gemini-omni-flash-preview, channel: google-api}
       - {provider: google, alias: models/gemini-omni-flash-preview, channel: google-api}
@@ -4861,6 +4927,7 @@ models:
 
   - canonical_id: google/gemini-omni-1.1-flash
     publisher: google
+    family: {id: google/gemini-omni-flash, display_name: Gemini Omni Flash}
     aliases:
       - {provider: google, alias: gemini-omni-1.1-flash, channel: google-api}
       - {provider: google, alias: models/gemini-omni-1.1-flash, channel: google-api}
@@ -4913,6 +4980,7 @@ models:
 # priced zero, not the absence of a price.
   - canonical_id: alibaba/qwen3.7-max
     publisher: alibaba
+    family: {id: alibaba/qwen-max, display_name: Qwen Max}
     aliases:
       - {provider: alibaba, alias: alibaba/qwen3.7-max, channel: alibaba-api}
       - {provider: alibaba, alias: qwen3.7-max, channel: alibaba-api}
@@ -4954,6 +5022,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: alibaba/qwen3.7-plus
     publisher: alibaba
+    family: {id: alibaba/qwen-plus, display_name: Qwen Plus}
     aliases:
       - {provider: alibaba, alias: qwen3.7-plus, channel: alibaba-api}
       - {provider: alibaba, alias: alibaba/qwen3.7-plus, channel: vercel-ai-gateway, rules: {"input_includes_cache_read": true, "input_includes_cache_write": true}}
@@ -5008,6 +5077,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: alibaba/qwen3.8-max
     publisher: alibaba
+    family: {id: alibaba/qwen-max, display_name: Qwen Max}
     aliases:
       - {provider: alibaba, alias: alibaba/qwen3.8-max, channel: alibaba-api}
       - {provider: alibaba, alias: qwen3.8-max, channel: alibaba-api}
@@ -5086,6 +5156,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: alibaba/qwen3.8-flash
     publisher: alibaba
+    family: {id: alibaba/qwen-flash, display_name: Qwen Flash}
     aliases:
       - provider: alibaba
         alias: alibaba/qwen3.8-flash
@@ -5158,6 +5229,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: amazon/nova-2-lite
     publisher: amazon
+    family: {id: amazon/nova-lite, display_name: Nova Lite}
     aliases:
       - {provider: amazon, alias: amazon-nova/nova-2-lite, channel: aws-bedrock}
       - {provider: amazon, alias: amazon/amazon-nova/nova-2-lite, channel: aws-bedrock}
@@ -5199,6 +5271,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: amazon/nova-lite
     publisher: amazon
+    family: {id: amazon/nova-lite, display_name: Nova Lite}
     aliases:
       - {provider: amazon, alias: amazon/nova-lite, channel: aws-bedrock}
       - {provider: amazon, alias: amazon/nova-lite-v1, channel: aws-bedrock}
@@ -5244,6 +5317,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: amazon/nova-micro
     publisher: amazon
+    family: {id: amazon/nova-micro, display_name: Nova Micro}
     aliases:
       - {provider: amazon, alias: amazon/nova-micro, channel: aws-bedrock}
       - {provider: amazon, alias: amazon/nova-micro-v1, channel: aws-bedrock}
@@ -5289,6 +5363,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: amazon/nova-pro
     publisher: amazon
+    family: {id: amazon/nova-pro, display_name: Nova Pro}
     aliases:
       - {provider: amazon, alias: amazon-nova/nova-pro-v1, channel: aws-bedrock}
       - {provider: amazon, alias: amazon/amazon-nova/nova-pro-v1, channel: aws-bedrock}
@@ -5339,6 +5414,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: anthropic/claude-haiku-3.5
     publisher: anthropic
+    family: {id: anthropic/claude-haiku, display_name: Claude Haiku}
     aliases:
       - provider: anthropic
         alias: anthropic/claude-haiku-3.5
@@ -5381,6 +5457,7 @@ models:
         source_url: https://vercel.com/ai-gateway/models/claude-haiku-3.5/providers
   - canonical_id: anthropic/claude-mythos-5.2
     publisher: anthropic
+    family: {id: anthropic/claude-mythos, display_name: Claude Mythos}
     aliases:
       - {provider: anthropic, alias: claude-mythos-5-2, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-mythos-5-2, channel: anthropic-api}
@@ -5404,6 +5481,7 @@ models:
 
   - canonical_id: anthropic/claude-mythos-5.1
     publisher: anthropic
+    family: {id: anthropic/claude-mythos, display_name: Claude Mythos}
     aliases:
       - {provider: anthropic, alias: claude-mythos-5-1, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-mythos-5-1, channel: anthropic-api}
@@ -5428,6 +5506,7 @@ models:
 
   - canonical_id: anthropic/claude-mythos-5
     publisher: anthropic
+    family: {id: anthropic/claude-mythos, display_name: Claude Mythos}
     aliases:
       - {provider: anthropic, alias: anthropic/claude-mythos-5, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-mythos-preview, channel: anthropic-api}
@@ -5469,6 +5548,7 @@ models:
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
   - canonical_id: anthropic/claude-opus-4
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: anthropic/claude-4-opus-20250514, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-opus-4, channel: anthropic-api}
@@ -5523,6 +5603,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: anthropic/claude-opus-4.1
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: anthropic/claude-opus-4-1, channel: anthropic-api}
       - {provider: anthropic, alias: anthropic/claude-opus-4.1, channel: anthropic-api}
@@ -5568,6 +5649,7 @@ models:
         source_url: https://platform.claude.com/docs/en/about-claude/pricing
   - canonical_id: anthropic/claude-opus-4.5
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: claude-opus-4-5, channel: anthropic-api}
       - {provider: anthropic, alias: claude-opus-4-5-20251101, channel: anthropic-api}
@@ -5612,6 +5694,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: anthropic/claude-opus-5-fast
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - {provider: anthropic, alias: anthropic/claude-opus-5-fast, channel: anthropic-api}
       - {provider: anthropic, alias: claude-opus-5-fast, channel: anthropic-api}
@@ -5638,6 +5721,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: anthropic/claude-opus-5.5-fast
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - provider: anthropic
         alias: anthropic/claude-opus-5.5-fast
@@ -5656,6 +5740,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: anthropic/claude-sonnet-4
     publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
     aliases:
       - {provider: anthropic, alias: claude-sonnet-4, channel: anthropic-api}
       - {provider: anthropic, alias: claude-sonnet-4-20250514, channel: anthropic-api}
@@ -5711,6 +5796,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: google/gemini-3-flash
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - {provider: vercel, alias: google/gemini-3-flash, channel: vercel-ai-gateway}
       - {provider: google, alias: gemini-3-flash, channel: vercel-ai-gateway}
@@ -5731,6 +5817,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: meta/muse-spark-1.2
     publisher: meta
+    family: {id: meta/muse-spark, display_name: Muse Spark}
     aliases:
       - {provider: litellm, alias: muse-spark-1.2, channel: meta-api}
       - {provider: meta, alias: meta/muse-spark-1.2, channel: meta-api}
@@ -5805,6 +5892,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: mistral/mistral-medium-3.5
     publisher: mistral
+    family: {id: mistral/mistral-medium, display_name: Mistral Medium}
     aliases:
       - {provider: litellm, alias: mistral-medium-2604, channel: mistral-api}
       - {provider: litellm, alias: mistral-medium-3.5, channel: mistral-api}
@@ -5836,6 +5924,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: mistral/mistral-small-4
     publisher: mistral
+    family: {id: mistral/mistral-small, display_name: Mistral Small}
     aliases:
       - {provider: litellm, alias: mistral-small-2603, channel: mistral-api}
       - {provider: litellm, alias: mistral-small-4, channel: mistral-api}
@@ -5877,6 +5966,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - {provider: litellm, alias: gpt-5, channel: openai-api, rules: {"input_includes_cache_read": true}}
       - {provider: openai, alias: gpt-5-2025-08-07, channel: openai-api, rules: {"input_includes_cache_read": true}}
@@ -5920,6 +6010,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.3-codex
     publisher: openai
+    family: {id: openai/gpt-codex, display_name: GPT Codex}
     aliases:
       - {provider: litellm, alias: gpt-5.3-codex, channel: openai-api}
       - {provider: openai, alias: openai/gpt-5.3-codex, channel: openai-api}
@@ -5958,6 +6049,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.4-pro
     publisher: openai
+    family: {id: openai/gpt-pro, display_name: GPT Pro}
     aliases:
       - {provider: litellm, alias: gpt-5.4-pro, channel: openai-api}
       - {provider: litellm, alias: gpt-5.4-pro-2026-03-05, channel: openai-api}
@@ -6004,6 +6096,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.5
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - {provider: litellm, alias: gpt-5.5, channel: openai-api}
       - {provider: litellm, alias: gpt-5.5-2026-04-23, channel: openai-api}
@@ -6062,6 +6155,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-5.5-pro
     publisher: openai
+    family: {id: openai/gpt-pro, display_name: GPT Pro}
     aliases:
       - {provider: litellm, alias: gpt-5.5-pro, channel: openai-api}
       - {provider: litellm, alias: gpt-5.5-pro-2026-04-23, channel: openai-api}
@@ -6116,6 +6210,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-6-cyber
     publisher: openai
+    family: {id: openai/gpt-cyber, display_name: GPT Cyber}
     aliases:
       - {provider: litellm, alias: gpt-6-cyber, channel: openai-api}
       - {provider: openai, alias: openai/gpt-6-cyber, channel: openai-api}
@@ -6136,6 +6231,7 @@ models:
         source_url: https://developers.openai.com/api/docs/models/gpt-6-cyber
   - canonical_id: openai/gpt-5.6-cyber
     publisher: openai
+    family: {id: openai/gpt-cyber, display_name: GPT Cyber}
     aliases:
       - {provider: litellm, alias: gpt-5.6-cyber, channel: openai-api}
       - {provider: openai, alias: openai/gpt-5.6-cyber, channel: openai-api}
@@ -6188,6 +6284,7 @@ models:
         source_url: https://ai-gateway.vercel.sh/v1/models
   - canonical_id: xai/grok-4.20-non-reasoning
     publisher: xai
+    family: {id: xai/grok, display_name: Grok}
     aliases:
       - {provider: vercel, alias: spacexai/grok-4.20-non-reasoning, channel: vercel-ai-gateway}
       - {provider: litellm, alias: grok-4.20-0309-non-reasoning, channel: xai-api}
@@ -6230,6 +6327,7 @@ models:
         source_url: https://docs.x.ai/developers/models
   - canonical_id: xai/grok-4.20-reasoning
     publisher: xai
+    family: {id: xai/grok, display_name: Grok}
     aliases:
       - {provider: vercel, alias: spacexai/grok-4.20-reasoning, channel: vercel-ai-gateway}
       - {provider: litellm, alias: grok-4.20-0309-reasoning, channel: xai-api}
@@ -6288,6 +6386,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: xai/grok-4.5
     publisher: xai
+    family: {id: xai/grok, display_name: Grok}
     aliases:
       - {provider: litellm, alias: grok-4.5, channel: xai-api}
       - {provider: litellm, alias: grok-4.5-latest, channel: xai-api, effective_from: "2026-07-08", source_url: https://docs.x.ai/developers/release-notes}
@@ -6509,6 +6608,7 @@ models:
 
   - canonical_id: deepseek/deepseek-v4.1-flash-1017
     publisher: deepseek
+    family: {id: deepseek/deepseek-flash, display_name: DeepSeek Flash}
     aliases:
       - provider: deepseek
         alias: deepseek/deepseek-v4.1-flash-1017
@@ -6533,6 +6633,7 @@ models:
 
   - canonical_id: deepseek/deepseek-v4.1-flash-1017-fast
     publisher: deepseek
+    family: {id: deepseek/deepseek-flash, display_name: DeepSeek Flash}
     aliases:
       - provider: deepseek
         alias: deepseek/deepseek-v4.1-flash-1017-fast
@@ -6955,6 +7056,7 @@ models:
 
   - canonical_id: alibaba/qwen3.5-flash
     publisher: alibaba
+    family: {id: alibaba/qwen-flash, display_name: Qwen Flash}
     aliases:
       - provider: vercel
         alias: alibaba/qwen3.5-flash
@@ -7077,6 +7179,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: alibaba/qwen3.8-max-0902
     publisher: alibaba
+    family: {id: alibaba/qwen-max, display_name: Qwen Max}
     aliases:
       - provider: vercel
         alias: alibaba/qwen3.8-max-0902
@@ -7144,6 +7247,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: anthropic/claude-fable-5-batch
     publisher: anthropic
+    family: {id: anthropic/claude-fable, display_name: Claude Fable}
     aliases:
       - provider: vercel
         alias: anthropic/claude-fable-5-batch
@@ -7163,6 +7267,7 @@ models:
 
   - canonical_id: anthropic/claude-fable-5.1-batch
     publisher: anthropic
+    family: {id: anthropic/claude-fable, display_name: Claude Fable}
     aliases:
       - provider: vercel
         alias: anthropic/claude-fable-5.1-batch
@@ -7182,6 +7287,7 @@ models:
 
   - canonical_id: anthropic/claude-haiku-4.5-batch
     publisher: anthropic
+    family: {id: anthropic/claude-haiku, display_name: Claude Haiku}
     aliases:
       - provider: vercel
         alias: anthropic/claude-haiku-4.5-batch
@@ -7201,6 +7307,7 @@ models:
 
   - canonical_id: anthropic/claude-opus-4.5-batch
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - provider: vercel
         alias: anthropic/claude-opus-4.5-batch
@@ -7220,6 +7327,7 @@ models:
 
   - canonical_id: anthropic/claude-opus-4.6-batch
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - provider: vercel
         alias: anthropic/claude-opus-4.6-batch
@@ -7239,6 +7347,7 @@ models:
 
   - canonical_id: anthropic/claude-opus-4.7-batch
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - provider: vercel
         alias: anthropic/claude-opus-4.7-batch
@@ -7258,6 +7367,7 @@ models:
 
   - canonical_id: anthropic/claude-opus-4.8-batch
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - provider: vercel
         alias: anthropic/claude-opus-4.8-batch
@@ -7277,6 +7387,7 @@ models:
 
   - canonical_id: anthropic/claude-opus-5-batch
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - provider: vercel
         alias: anthropic/claude-opus-5-batch
@@ -7296,6 +7407,7 @@ models:
 
   - canonical_id: anthropic/claude-opus-5.5-batch
     publisher: anthropic
+    family: {id: anthropic/claude-opus, display_name: Claude Opus}
     aliases:
       - provider: vercel
         alias: anthropic/claude-opus-5.5-batch
@@ -7315,6 +7427,7 @@ models:
 
   - canonical_id: anthropic/claude-sonnet-4.6-batch
     publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
     aliases:
       - provider: vercel
         alias: anthropic/claude-sonnet-4.6-batch
@@ -7334,6 +7447,7 @@ models:
 
   - canonical_id: anthropic/claude-sonnet-5-batch
     publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
     aliases:
       - provider: vercel
         alias: anthropic/claude-sonnet-5-batch
@@ -7353,6 +7467,7 @@ models:
 
   - canonical_id: anthropic/claude-sonnet-5.5-batch
     publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
     aliases:
       - provider: vercel
         alias: anthropic/claude-sonnet-5.5-batch
@@ -7548,6 +7663,7 @@ models:
 
   - canonical_id: google/gemini-2.5-flash-batch
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - provider: vercel
         alias: google/gemini-2.5-flash-batch
@@ -7566,6 +7682,7 @@ models:
 
   - canonical_id: google/gemini-2.5-flash-lite-batch
     publisher: google
+    family: {id: google/gemini-flash-lite, display_name: Gemini Flash-Lite}
     aliases:
       - provider: vercel
         alias: google/gemini-2.5-flash-lite-batch
@@ -7584,6 +7701,7 @@ models:
 
   - canonical_id: google/gemini-3.1-flash-lite-batch
     publisher: google
+    family: {id: google/gemini-flash-lite, display_name: Gemini Flash-Lite}
     aliases:
       - provider: vercel
         alias: google/gemini-3.1-flash-lite-batch
@@ -7602,6 +7720,7 @@ models:
 
   - canonical_id: google/gemini-3.5-flash-batch
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - provider: vercel
         alias: google/gemini-3.5-flash-batch
@@ -7620,6 +7739,7 @@ models:
 
   - canonical_id: google/gemini-3.5-flash-lite-batch
     publisher: google
+    family: {id: google/gemini-flash-lite, display_name: Gemini Flash-Lite}
     aliases:
       - provider: vercel
         alias: google/gemini-3.5-flash-lite-batch
@@ -7638,6 +7758,7 @@ models:
 
   - canonical_id: google/gemini-3.6-flash-batch
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - provider: vercel
         alias: google/gemini-3.6-flash-batch
@@ -7656,6 +7777,7 @@ models:
 
   - canonical_id: google/gemini-3.7-flash-batch
     publisher: google
+    family: {id: google/gemini-flash, display_name: Gemini Flash}
     aliases:
       - provider: vercel
         alias: google/gemini-3.7-flash-batch
@@ -8295,6 +8417,7 @@ models:
 
   - canonical_id: mistral/codestral
     publisher: mistral
+    family: {id: mistral/codestral, display_name: Codestral}
     aliases:
       - provider: vercel
         alias: mistral/codestral
@@ -8313,6 +8436,7 @@ models:
 
   - canonical_id: mistral/ministral-3b
     publisher: mistral
+    family: {id: mistral/ministral, display_name: Ministral}
     aliases:
       - provider: vercel
         alias: mistral/ministral-3b
@@ -8331,6 +8455,7 @@ models:
 
   - canonical_id: mistral/ministral-8b
     publisher: mistral
+    family: {id: mistral/ministral, display_name: Ministral}
     aliases:
       - provider: vercel
         alias: mistral/ministral-8b
@@ -8380,6 +8505,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: mistral/mistral-small
     publisher: mistral
+    family: {id: mistral/mistral-small, display_name: Mistral Small}
     aliases:
       - provider: vercel
         alias: mistral/mistral-small
@@ -8716,6 +8842,7 @@ models:
         source_url: https://developers.openai.com/api/docs/pricing
   - canonical_id: openai/gpt-4.1-batch
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - provider: vercel
         alias: openai/gpt-4.1-batch
@@ -8734,6 +8861,7 @@ models:
 
   - canonical_id: openai/gpt-4.1-mini-batch
     publisher: openai
+    family: {id: openai/gpt-mini, display_name: GPT mini}
     aliases:
       - provider: vercel
         alias: openai/gpt-4.1-mini-batch
@@ -8752,6 +8880,7 @@ models:
 
   - canonical_id: openai/gpt-4.1-nano-batch
     publisher: openai
+    family: {id: openai/gpt-nano, display_name: GPT nano}
     aliases:
       - provider: vercel
         alias: openai/gpt-4.1-nano-batch
@@ -8788,6 +8917,7 @@ models:
 
   - canonical_id: openai/gpt-4o-mini-batch
     publisher: openai
+    family: {id: openai/gpt-mini, display_name: GPT mini}
     aliases:
       - provider: vercel
         alias: openai/gpt-4o-mini-batch
@@ -8806,6 +8936,7 @@ models:
 
   - canonical_id: openai/gpt-5-batch
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - provider: vercel
         alias: openai/gpt-5-batch
@@ -8824,6 +8955,7 @@ models:
 
   - canonical_id: openai/gpt-5-mini-batch
     publisher: openai
+    family: {id: openai/gpt-mini, display_name: GPT mini}
     aliases:
       - provider: vercel
         alias: openai/gpt-5-mini-batch
@@ -8842,6 +8974,7 @@ models:
 
   - canonical_id: openai/gpt-5-nano-batch
     publisher: openai
+    family: {id: openai/gpt-nano, display_name: GPT nano}
     aliases:
       - provider: vercel
         alias: openai/gpt-5-nano-batch
@@ -8860,6 +8993,7 @@ models:
 
   - canonical_id: openai/gpt-5-pro-batch
     publisher: openai
+    family: {id: openai/gpt-pro, display_name: GPT Pro}
     aliases:
       - provider: vercel
         alias: openai/gpt-5-pro-batch
@@ -8877,6 +9011,7 @@ models:
 
   - canonical_id: openai/gpt-5.2-batch
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - provider: vercel
         alias: openai/gpt-5.2-batch
@@ -8895,6 +9030,7 @@ models:
 
   - canonical_id: openai/gpt-5.4-mini-batch
     publisher: openai
+    family: {id: openai/gpt-mini, display_name: GPT mini}
     aliases:
       - provider: vercel
         alias: openai/gpt-5.4-mini-batch
@@ -8913,6 +9049,7 @@ models:
 
   - canonical_id: openai/gpt-5.4-nano-batch
     publisher: openai
+    family: {id: openai/gpt-nano, display_name: GPT nano}
     aliases:
       - provider: vercel
         alias: openai/gpt-5.4-nano-batch
@@ -8931,6 +9068,7 @@ models:
 
   - canonical_id: openai/gpt-oss-20b
     publisher: openai
+    family: {id: openai/gpt-oss, display_name: gpt-oss}
     aliases:
       - provider: vercel
         alias: openai/gpt-oss-20b
@@ -8965,6 +9103,7 @@ models:
         source_url: https://openrouter.ai/api/v1/models
   - canonical_id: openai/gpt-oss-safeguard-120b
     publisher: openai
+    family: {id: openai/gpt-oss-safeguard, display_name: gpt-oss-safeguard}
     aliases:
       - provider: vercel
         alias: openai/gpt-oss-safeguard-120b
@@ -8982,6 +9121,7 @@ models:
 
   - canonical_id: openai/gpt-oss-safeguard-20b
     publisher: openai
+    family: {id: openai/gpt-oss-safeguard, display_name: gpt-oss-safeguard}
     aliases:
       - provider: vercel
         alias: openai/gpt-oss-safeguard-20b
@@ -10069,6 +10209,7 @@ models:
 
   - canonical_id: amazon/nova-2-lite-v1
     publisher: amazon
+    family: {id: amazon/nova-lite, display_name: Nova Lite}
     aliases:
       - provider: openrouter
         alias: amazon/nova-2-lite-v1
@@ -10088,6 +10229,7 @@ models:
 
   - canonical_id: amazon/nova-premier-v1
     publisher: amazon
+    family: {id: amazon/nova-premier, display_name: Nova Premier}
     aliases:
       - provider: openrouter
         alias: amazon/nova-premier-v1
@@ -10363,6 +10505,7 @@ models:
 
   - canonical_id: deepseek/deepseek-v4-flash-0731
     publisher: deepseek
+    family: {id: deepseek/deepseek-flash, display_name: DeepSeek Flash}
     aliases:
       - provider: openrouter
         alias: deepseek/deepseek-v4-flash-0731
@@ -10383,6 +10526,7 @@ models:
 
   - canonical_id: deepseek/deepseek-v4-pro-0813
     publisher: deepseek
+    family: {id: deepseek/deepseek-pro, display_name: DeepSeek Pro}
     aliases:
       - provider: openrouter
         alias: deepseek/deepseek-v4-pro-0813
@@ -10403,6 +10547,7 @@ models:
 
   - canonical_id: google/gemma-2-27b-it
     publisher: google
+    family: {id: google/gemma, display_name: Gemma}
     aliases:
       - provider: openrouter
         alias: google/gemma-2-27b-it
@@ -10422,6 +10567,7 @@ models:
 
   - canonical_id: google/gemma-3-12b-it
     publisher: google
+    family: {id: google/gemma, display_name: Gemma}
     aliases:
       - provider: openrouter
         alias: google/gemma-3-12b-it
@@ -10441,6 +10587,7 @@ models:
 
   - canonical_id: google/gemma-3-4b-it
     publisher: google
+    family: {id: google/gemma, display_name: Gemma}
     aliases:
       - provider: openrouter
         alias: google/gemma-3-4b-it
@@ -10824,6 +10971,7 @@ models:
 
   - canonical_id: mistral/codestral-2508
     publisher: mistral
+    family: {id: mistral/codestral, display_name: Codestral}
     aliases:
       - provider: openrouter
         alias: mistralai/codestral-2508
@@ -10864,6 +11012,7 @@ models:
 
   - canonical_id: mistral/ministral-3b-2512
     publisher: mistral
+    family: {id: mistral/ministral, display_name: Ministral}
     aliases:
       - provider: openrouter
         alias: mistralai/ministral-3b-2512
@@ -10884,6 +11033,7 @@ models:
 
   - canonical_id: mistral/ministral-8b-2512
     publisher: mistral
+    family: {id: mistral/ministral, display_name: Ministral}
     aliases:
       - provider: openrouter
         alias: mistralai/ministral-8b-2512
@@ -10904,6 +11054,7 @@ models:
 
   - canonical_id: mistral/mistral-large
     publisher: mistral
+    family: {id: mistral/mistral-large, display_name: Mistral Large}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-large
@@ -10924,6 +11075,7 @@ models:
 
   - canonical_id: mistral/mistral-large-2407
     publisher: mistral
+    family: {id: mistral/mistral-large, display_name: Mistral Large}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-large-2407
@@ -10944,6 +11096,7 @@ models:
 
   - canonical_id: mistral/mistral-large-2512
     publisher: mistral
+    family: {id: mistral/mistral-large, display_name: Mistral Large}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-large-2512
@@ -10964,6 +11117,7 @@ models:
 
   - canonical_id: mistral/mistral-large-4-0
     publisher: mistral
+    family: {id: mistral/mistral-large, display_name: Mistral Large}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-large-4-0
@@ -10984,6 +11138,7 @@ models:
 
   - canonical_id: mistral/mistral-medium-3
     publisher: mistral
+    family: {id: mistral/mistral-medium, display_name: Mistral Medium}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-medium-3
@@ -11004,6 +11159,7 @@ models:
 
   - canonical_id: mistral/mistral-medium-3.1
     publisher: mistral
+    family: {id: mistral/mistral-medium, display_name: Mistral Medium}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-medium-3.1
@@ -11044,6 +11200,7 @@ models:
 
   - canonical_id: mistral/mistral-small-24b-instruct-2501
     publisher: mistral
+    family: {id: mistral/mistral-small, display_name: Mistral Small}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-small-24b-instruct-2501
@@ -11063,6 +11220,7 @@ models:
 
   - canonical_id: mistral/mistral-small-3.1-24b-instruct
     publisher: mistral
+    family: {id: mistral/mistral-small, display_name: Mistral Small}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-small-3.1-24b-instruct
@@ -11082,6 +11240,7 @@ models:
 
   - canonical_id: mistral/mistral-small-3.2-24b-instruct
     publisher: mistral
+    family: {id: mistral/mistral-small, display_name: Mistral Small}
     aliases:
       - provider: openrouter
         alias: mistralai/mistral-small-3.2-24b-instruct
@@ -11391,6 +11550,7 @@ models:
 
   - canonical_id: openai/gpt-4
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - provider: openrouter
         alias: openai/gpt-4
@@ -11882,6 +12042,7 @@ models:
 
   - canonical_id: alibaba/qwen3.5-flash-02-23
     publisher: alibaba
+    family: {id: alibaba/qwen-flash, display_name: Qwen Flash}
     aliases:
       - provider: openrouter
         alias: qwen/qwen3.5-flash-02-23
@@ -12445,6 +12606,7 @@ models:
 
   - canonical_id: openai/gpt-5.1
     publisher: openai
+    family: {id: openai/gpt, display_name: GPT}
     aliases:
       - {provider: openai, alias: gpt-5.1, channel: openai-api}
       - {provider: openai, alias: gpt-5.1-2025-11-13, channel: openai-api}
@@ -12495,6 +12657,7 @@ models:
 
   - canonical_id: openai/gpt-5-nano
     publisher: openai
+    family: {id: openai/gpt-nano, display_name: GPT nano}
     aliases:
       - {provider: openai, alias: gpt-5-nano, channel: openai-api}
       - {provider: openai, alias: gpt-5-nano-2025-08-07, channel: openai-api}
@@ -12545,6 +12708,7 @@ models:
 
   - canonical_id: openai/gpt-5-pro
     publisher: openai
+    family: {id: openai/gpt-pro, display_name: GPT Pro}
     aliases:
       - {provider: openai, alias: gpt-5-pro, channel: openai-api}
       - {provider: openai, alias: gpt-5-pro-2025-10-06, channel: openai-api}
@@ -12710,6 +12874,7 @@ models:
 
   - canonical_id: openai/gpt-5.5-cyber
     publisher: openai
+    family: {id: openai/gpt-cyber, display_name: GPT Cyber}
     aliases:
       - {provider: openai, alias: gpt-5.5-cyber, channel: openai-api}
       - {provider: litellm, alias: gpt-5.5-cyber, channel: openai-api}
@@ -12850,6 +13015,7 @@ models:
 
   - canonical_id: openai/gpt-5-codex
     publisher: openai
+    family: {id: openai/gpt-codex, display_name: GPT Codex}
     aliases:
       - provider: vercel
         alias: openai/gpt-5-codex
@@ -12869,6 +13035,7 @@ models:
 
   - canonical_id: openai/gpt-5.1-codex
     publisher: openai
+    family: {id: openai/gpt-codex, display_name: GPT Codex}
     aliases:
       - provider: vercel
         alias: openai/gpt-5.1-codex
@@ -12971,6 +13138,7 @@ models:
 
   - canonical_id: openai/gpt-5.2-codex
     publisher: openai
+    family: {id: openai/gpt-codex, display_name: GPT Codex}
     aliases:
       - provider: vercel
         alias: openai/gpt-5.2-codex
@@ -13131,6 +13299,7 @@ models:
 
   - canonical_id: alibaba/qwen3.5-plus
     publisher: alibaba
+    family: {id: alibaba/qwen-plus, display_name: Qwen Plus}
     aliases:
       - {provider: alibaba, alias: qwen3.5-plus, channel: alibaba-api}
       - {provider: alibaba, alias: qwen3.5-plus-2026-02-15, channel: alibaba-api}
@@ -13180,6 +13349,7 @@ models:
 
   - canonical_id: alibaba/qwen3.5-plus-2026-04-20
     publisher: alibaba
+    family: {id: alibaba/qwen-plus, display_name: Qwen Plus}
     aliases:
       - provider: openrouter
         alias: qwen/qwen3.5-plus-20260420
@@ -13202,6 +13372,7 @@ models:
 
   - canonical_id: alibaba/qwen3.6-plus
     publisher: alibaba
+    family: {id: alibaba/qwen-plus, display_name: Qwen Plus}
     aliases:
       - {provider: alibaba, alias: qwen3.6-plus, channel: alibaba-api}
       - {provider: alibaba, alias: qwen3.6-plus-2026-04-02, channel: alibaba-api}
@@ -13332,6 +13503,7 @@ models:
 
   - canonical_id: perplexity/sonar-pro
     publisher: perplexity
+    family: {id: perplexity/sonar-pro, display_name: Sonar Pro}
     aliases:
       - provider: openrouter
         alias: perplexity/sonar-pro
@@ -13353,6 +13525,7 @@ models:
 
   - canonical_id: perplexity/sonar-reasoning-pro
     publisher: perplexity
+    family: {id: perplexity/sonar-reasoning-pro, display_name: Sonar Reasoning Pro}
     aliases:
       - provider: openrouter
         alias: perplexity/sonar-reasoning-pro
@@ -13374,6 +13547,7 @@ models:
 
   - canonical_id: perplexity/sonar-deep-research
     publisher: perplexity
+    family: {id: perplexity/sonar-deep-research, display_name: Sonar Deep Research}
     aliases:
       - provider: openrouter
         alias: perplexity/sonar-deep-research
@@ -13416,6 +13590,7 @@ models:
 
   - canonical_id: meta/muse-ember-1.0
     publisher: meta
+    family: {id: meta/muse-ember, display_name: Muse Ember}
     aliases:
       - {provider: meta, alias: muse-ember-1.0, channel: meta-api, rules: {input_includes_cache_read: true}}
       - {provider: vercel, alias: meta/muse-ember, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true}}

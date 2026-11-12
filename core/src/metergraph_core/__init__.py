@@ -21,6 +21,7 @@ from .billing import (
     normalize_gateway_evidence,
     resolve_billing,
 )
+from .families import ModelFamily
 from .loader import (
     parse_disputes,
     CatalogError,
@@ -120,6 +121,7 @@ __all__ = [
     "Dispute",
     "LoadedCatalog",
     "ModelDefinition",
+    "ModelFamily",
     "ModelRegistry",
     "ModelRegistryError",
     "ModelRoute",
