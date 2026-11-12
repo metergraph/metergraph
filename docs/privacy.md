@@ -14,6 +14,7 @@ For every captured LLM call, one metadata row:
 - `input_tokens`, `output_tokens`, `cache_read_tokens`, `cache_write_tokens`, `reasoning_tokens`
 - `status`, `status_code`, `finish_reason`, `finish_reason_raw`,
   `error`/`error_type`, `stream`/`batch` flags
+- `http_status_code`, `availability`, `refused`
 - `template_hash`: a structural fingerprint of the request *shape* (roles, ordering, placeholders). Literal text is scrubbed before hashing and is not recoverable from it.
 - `tool_names`: tool **names** only
 - `sdk`, `sdk_version`

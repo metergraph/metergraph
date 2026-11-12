@@ -659,3 +659,20 @@ estimates when all retrieval fees are known. Missing charges are reported in
 For normalized usage, use `price_call` with `ModelUsage` and `RetrievalUsage`.
 To compose an existing token result from the same catalog, use `compose_call_cost`.
 `resolve_billing` accepts complete-call results for gateway reconciliation.
+
+### Model reliability
+
+`classify_model_reliability` inspects structured native response/error facts and
+returns a frozen `ModelReliability` with nullable `http_status_code`,
+`availability` (`available`, `unavailable`, `excluded`) and `refused` fields.
+Explicit policy refusals are available responses; rate limits and provider
+failures are unavailable. Sparse records remain unknown, and response prose is
+never used to infer a refusal. HTTP status is separate from telemetry span status.
+
+```python
+from metergraph_core import classify_model_reliability
+
+result = classify_model_reliability(provider="openai", http_status_code=429)
+assert result.availability == "unavailable"
+assert result.refused is None
+```

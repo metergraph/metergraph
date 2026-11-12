@@ -1,0 +1,433 @@
+[
+  {
+    "name": "chat_normal",
+    "input": {
+      "provider": "openai",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "content": "ok",
+              "refusal": null
+            }
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": false
+    }
+  },
+  {
+    "name": "chat_refusal",
+    "input": {
+      "provider": "openai",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "content": null,
+              "refusal": "policy"
+            }
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "filtered",
+    "input": {
+      "provider": "openai",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "content_filter",
+            "message": {
+              "content": null
+            }
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "claude_refusal",
+    "input": {
+      "provider": "anthropic",
+      "response": {
+        "stop_reason": "refusal",
+        "content": []
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "claude_normal",
+    "input": {
+      "provider": "anthropic",
+      "response": {
+        "stop_reason": "end_turn",
+        "content": [
+          {
+            "type": "text",
+            "text": "ok"
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": false
+    }
+  },
+  {
+    "name": "responses_refusal",
+    "input": {
+      "provider": "openai",
+      "response": {
+        "status": "completed",
+        "output": [
+          {
+            "type": "message",
+            "content": [
+              {
+                "type": "refusal",
+                "refusal": "policy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "sparse",
+    "input": {
+      "provider": "openai",
+      "response": {
+        "usage": {
+          "total_tokens": 10
+        }
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": null,
+      "refused": null
+    }
+  },
+  {
+    "name": "rate_limit",
+    "input": {
+      "provider": "openai",
+      "http_status_code": 429
+    },
+    "expected": {
+      "http_status_code": 429,
+      "availability": "unavailable",
+      "refused": null
+    }
+  },
+  {
+    "name": "provider_error",
+    "input": {
+      "provider": "openai",
+      "http_status_code": 503
+    },
+    "expected": {
+      "http_status_code": 503,
+      "availability": "unavailable",
+      "refused": null
+    }
+  },
+  {
+    "name": "auth_error",
+    "input": {
+      "provider": "openai",
+      "http_status_code": 401
+    },
+    "expected": {
+      "http_status_code": 401,
+      "availability": "excluded",
+      "refused": null
+    }
+  },
+  {
+    "name": "meta_policy",
+    "input": {
+      "provider": "meta",
+      "http_status_code": 400,
+      "error": {
+        "error": {
+          "code": "content_policy_violation"
+        }
+      }
+    },
+    "expected": {
+      "http_status_code": 400,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "tool_reply",
+    "input": {
+      "provider": "openai",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "tool_calls",
+            "message": {
+              "content": null,
+              "refusal": null,
+              "tool_calls": []
+            }
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": false
+    }
+  },
+  {
+    "name": "chat_sparse_message",
+    "input": {
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {}
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": null
+    }
+  },
+  {
+    "name": "chat_partial_choices",
+    "input": {
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "message": {
+              "content": "ok"
+            }
+          },
+          {}
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": null
+    }
+  },
+  {
+    "name": "google_normal",
+    "input": {
+      "provider": "google",
+      "response": {
+        "candidates": [
+          {
+            "finishReason": "STOP",
+            "content": {
+              "parts": [
+                {
+                  "text": "ok"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": false
+    }
+  },
+  {
+    "name": "google_sparse",
+    "input": {
+      "provider": "google",
+      "response": {
+        "candidates": [
+          {
+            "finishReason": "STOP"
+          }
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": null
+    }
+  },
+  {
+    "name": "unknown_google_block",
+    "input": {
+      "provider": "google",
+      "response": {
+        "promptFeedback": {
+          "blockReason": "FUTURE_REASON"
+        }
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": null,
+      "refused": null
+    }
+  },
+  {
+    "name": "response_malformed_output",
+    "input": {
+      "response": {
+        "status": "completed",
+        "output": [
+          {}
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": null,
+      "refused": null
+    }
+  },
+  {
+    "name": "response_incomplete_filter",
+    "input": {
+      "response": {
+        "status": "incomplete",
+        "incomplete_details": {
+          "reason": "content_filter"
+        }
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "generic_connection",
+    "input": {
+      "error": {
+        "name": "APIConnectionError"
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": null,
+      "refused": null
+    }
+  },
+  {
+    "name": "request_timeout",
+    "input": {
+      "error": {
+        "name": "APITimeoutError"
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "unavailable",
+      "refused": null
+    }
+  },
+  {
+    "name": "meta_restriction",
+    "input": {
+      "provider": "meta",
+      "http_status_code": 403,
+      "error": {
+        "error": {
+          "code": "user_blocked",
+          "type": "permission_error",
+          "message": "Access restricted for repeated policy violations"
+        }
+      }
+    },
+    "expected": {
+      "http_status_code": 403,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "meta_other_permission",
+    "input": {
+      "provider": "meta",
+      "http_status_code": 403,
+      "error": {
+        "error": {
+          "code": "user_blocked"
+        }
+      }
+    },
+    "expected": {
+      "http_status_code": 403,
+      "availability": "excluded",
+      "refused": null
+    }
+  },
+  {
+    "name": "finish_only",
+    "input": {
+      "finish_reason": "stop"
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": null
+    }
+  },
+  {
+    "name": "invalid_http_status",
+    "input": {
+      "http_status_code": true
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": null,
+      "refused": null
+    }
+  }
+]
