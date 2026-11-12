@@ -493,5 +493,63 @@
       "availability": "available",
       "refused": true
     }
+  },
+  {
+    "name": "otel_rate_limit",
+    "input": {
+      "attributes": {
+        "http.response.status_code": 429
+      }
+    },
+    "expected": {
+      "http_status_code": 429,
+      "availability": "unavailable",
+      "refused": null
+    }
+  },
+  {
+    "name": "otel_timeout",
+    "input": {
+      "attributes": {
+        "error.type": "timeout"
+      },
+      "error": {
+        "type": "OpenTelemetrySpanError"
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "unavailable",
+      "refused": null
+    }
+  },
+  {
+    "name": "otel_mixed_finish_reasons",
+    "input": {
+      "attributes": {
+        "gen_ai.response.finish_reasons": [
+          "stop",
+          "content_filter"
+        ]
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
+  },
+  {
+    "name": "openinference_filter",
+    "input": {
+      "attributes": {
+        "llm.finish_reason": "content_filter"
+      }
+    },
+    "expected": {
+      "http_status_code": null,
+      "availability": "available",
+      "refused": true
+    }
   }
 ]

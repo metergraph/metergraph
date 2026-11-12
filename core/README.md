@@ -676,3 +676,20 @@ result = classify_model_reliability(provider="openai", http_status_code=429)
 assert result.availability == "unavailable"
 assert result.refused is None
 ```
+
+The optional `attributes` argument accepts existing OpenTelemetry and
+OpenInference facts: `http.response.status_code` (or legacy `http.status_code`),
+`error.type`, `gen_ai.response.finish_reasons`, and `llm.finish_reason`.
+The classifier inspects every reported finish reason; `refused=True` means at
+least one returned choice/candidate was explicitly refused. Normal finish
+reasons alone do not establish `refused=False` when response evidence is absent.
+
+`http_status_code` represents a transport fact. `availability` and `refused` are
+Metergraph-derived projections, not new OpenTelemetry status conventions.
+Availability describes recorded model calls, which can encompass SDK retries;
+it does not measure every physical attempt or provider-wide uptime. Existing
+span errors and raw finish reasons keep their separate diagnostic meaning.
+
+Conventions: [OpenTelemetry GenAI](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/client-inference.md),
+[HTTP](https://opentelemetry.io/docs/specs/semconv/http/http-spans/), and
+[OpenInference](https://github.com/Arize-ai/openinference/blob/main/spec/semantic_conventions.md).

@@ -14,6 +14,7 @@ from typing import Any, Literal
 class ModelReliability:
     http_status_code: int | None = None
     availability: Literal["available", "unavailable", "excluded"] | None = None
+    # True when any returned choice/candidate has an explicit refusal.
     refused: bool | None = None
 
 
@@ -33,9 +34,13 @@ def _reason(value):
 
 def _classify_native(*, provider: str | None = None, response: Any = None,
                                error: Any = None, http_status_code: int | None = None,
-                               finish_reason: str | None = None) -> ModelReliability:
+                               finish_reason: str | None = None,
+                               attributes: Mapping[str, Any] | None = None) -> ModelReliability:
     """Classify explicit native response facts; missing evidence stays unknown."""
+    attributes = attributes if isinstance(attributes, Mapping) else {}
     status = http_status_code
+    if status is None:
+        status = attributes.get("http.response.status_code", attributes.get("http.status_code"))
     if status is None:
         status = (_get(error, 'status_code') or _get(error, 'status') or _get(error, 'statusCode')
                   or _get(_get(error, 'response'), 'status_code'))
@@ -44,7 +49,9 @@ def _classify_native(*, provider: str | None = None, response: Any = None,
     if isinstance(status, bool) or not isinstance(status, int) or not 100 <= status <= 599:
         status = None
     reasons = [_reason(finish_reason), _reason(_get(response, 'stop_reason')),
-               _reason(_get(response, 'finish_reason'))]
+               _reason(_get(response, 'finish_reason')),
+               _reason(attributes.get("llm.finish_reason")),
+               *(_reason(value) for value in _seq(attributes.get("gen_ai.response.finish_reasons")))]
     known = False
     complete = []
     refused = False
@@ -112,8 +119,8 @@ def _classify_native(*, provider: str | None = None, response: Any = None,
         return ModelReliability(status, 'unavailable', None)
     if status is not None and 400 <= status < 500:
         return ModelReliability(status, 'excluded', None)
-    error_type = _get(error, 'name') or _get(error, 'type') or (type(error).__name__ if isinstance(error, BaseException) else None)
-    if error_type in {'APITimeoutError', 'TimeoutError', 'ReadTimeout', 'ConnectTimeout'}:
+    error_type = attributes.get('error.type') or _get(error, 'name') or _get(error, 'type') or (type(error).__name__ if isinstance(error, BaseException) else None)
+    if error_type in {'timeout', 'APITimeoutError', 'TimeoutError', 'ReadTimeout', 'ConnectTimeout'}:
         return ModelReliability(status, 'unavailable', None)
     if known or any(reason in {'stop', 'length', 'tool_calls', 'tool_use', 'max_tokens', 'end_turn'} for reason in reasons):
         return ModelReliability(status, 'available', False if complete and all(complete) else None)
@@ -128,14 +135,18 @@ def classify_model_reliability(*, provider: str | None = None, response: Any = N
                                error: Any = None, http_status_code: int | None = None,
                                finish_reason: str | None = None,
                                stream_chunks: Any = None,
-                               stream_complete: bool = False) -> ModelReliability:
+                               stream_complete: bool = False,
+                               attributes: Mapping[str, Any] | None = None) -> ModelReliability:
     """Classify native facts, retaining explicit refusal evidence across chunks.
 
-    Stream arguments are transient inspection inputs, never stored record fields.
+    OpenTelemetry/OpenInference attributes and stream arguments are transient
+    inspection inputs, never additional stored record fields. Availability is
+    a Metergraph projection over recorded calls, not a span success status.
     Chunk-only normal streams conservatively retain unknown refusal coverage.
     """
     result = _classify_native(provider=provider, response=response, error=error,
-                              http_status_code=http_status_code, finish_reason=finish_reason)
+                              http_status_code=http_status_code, finish_reason=finish_reason,
+                              attributes=attributes)
     stream_available = False
     for chunk in _seq(stream_chunks):
         native = _classify_native(provider=provider, response=chunk)
