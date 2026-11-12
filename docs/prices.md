@@ -96,6 +96,30 @@ pinned alias never falls back to `*` or to another region; a missing row is
 has no alias of its own does not fall back onto a bare id pinned to a non-global
 region.
 
+## Why GPT Sol, Terra, Luna, mini and nano are separate families
+
+A family is a product line kept across versions. A provider's generation tier or a
+recommended replacement is a different thing. OpenAI's GPT-5.6 naming introduced Sol as
+the flagship, Terra at a lower price and Luna for efficient high-volume work, and its
+current guidance keeps them apart: GPT-6.1 Sol for complex work, GPT-6.1 Terra for visual
+reasoning and writing, Luna for scoped tasks. So the catalog keeps `openai/gpt-sol`
+(5.6, 6, 6.1), `openai/gpt-terra` (5.6, 6.1) and `openai/gpt-luna` (5.6, 6) as three lines.
+`openai/gpt-mini` and `openai/gpt-nano` remain lines of their own too.
+
+OpenAI's docs also line the new names up against older tiers. A cost guide treats 5.6
+Luna, Terra and Sol as the nano, mini and full-model tiers. The deprecation schedule
+replaces GPT-5 with 5.6 Sol, GPT-5 mini with 5.6 Terra and GPT-5 nano with 5.6 Luna, and
+later replacements cross those lines: GPT-4.1 mini and GPT-4o mini move to GPT-6 Luna. A
+tier comparison or a recommended replacement says what to migrate to, not which product
+line a model belongs to, so neither merges families. Families never record a successor.
+
+Checked 2026-11-11 against:
+
+- https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.6
+- https://developers.openai.com/api/docs/guides/model-selection
+- https://developers.openai.com/cookbook/examples/agent_optimization/optimizing_agents_for_cost_and_quality
+- https://developers.openai.com/api/docs/deprecations
+
 ## Cost status
 
 Every stored call gets a `cost_status`:

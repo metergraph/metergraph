@@ -505,6 +505,29 @@ def test_bundled_catalog_declares_stable_product_lines():
     assert actual == expected
 
 
+def test_bundled_gpt_tiers_stay_separate_lines_across_versions():
+    # Sol, Terra and Luna are distinct lines; a tier mapping or a recommended
+    # replacement (such as GPT-5 mini to 5.6 Terra) never merges families.
+    catalog = load_catalog()
+    lines = {
+        "openai/gpt-sol": ("openai/gpt-5.6-sol", "openai/gpt-6-sol", "openai/gpt-6.1-sol"),
+        "openai/gpt-terra": ("openai/gpt-5.6-terra", "openai/gpt-6.1-terra"),
+        "openai/gpt-luna": ("openai/gpt-5.6-luna", "openai/gpt-6-luna"),
+        "openai/gpt-mini": ("openai/gpt-5-mini", "openai/gpt-4.1-mini", "openai/gpt-4o-mini"),
+        "openai/gpt-nano": ("openai/gpt-5-nano", "openai/gpt-4.1-nano"),
+    }
+
+    actual = {
+        family_id: {
+            getattr(catalog.model_family(canonical_id), "id", None)
+            for canonical_id in canonical_ids
+        }
+        for family_id, canonical_ids in lines.items()
+    }
+
+    assert actual == {family_id: {family_id} for family_id in lines}
+
+
 def test_bundled_catalog_leaves_mixed_aliases_without_a_family():
     catalog = load_catalog()
 
