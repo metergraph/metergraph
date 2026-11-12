@@ -4,7 +4,7 @@ CatalogSnapshot."""
 import copy
 import hashlib
 import json
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime, time, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -29,6 +29,7 @@ from .catalog import (
     normalize_provider,
 )
 from .billing import Dispute
+from .families import ModelFamily, common_family, parse_model_families
 from .retrieval import RetrievalCatalog, RetrievalCostResult, RetrievalPrice
 
 DEFAULT_CATALOG_PATH = Path(__file__).parent / "data" / "prices.yaml"
@@ -88,6 +89,39 @@ class LoadedCatalog:
     retrieval: RetrievalCatalog
     # Gateways whose amount billing declines per publisher; see Dispute.
     disputes: tuple[Dispute, ...] = ()
+    # Each model's declared product line by canonical id; see ModelFamily.
+    families: Mapping[str, ModelFamily] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+
+    def model_family(self, canonical_id: Any) -> ModelFamily | None:
+        """The product line the catalog declares for ``canonical_id``, or
+        None when it declares none. Aliases are not canonical ids; see
+        :meth:`family_for_model`."""
+        if not isinstance(canonical_id, str):
+            return None
+        return self.families.get(canonical_id)
+
+    def family_for_model(self, provider: Any, model: Any) -> ModelFamily | None:
+        """The product line of a raw provider model name, for display only.
+
+        Every model the catalog binds the name to under ``provider`` or any
+        spelling of it (``google-genai`` for ``google``), as an alias at any
+        date or as its canonical id, must declare the same family; otherwise,
+        or when nothing binds the name, the result is None. It never resolves
+        a canonical id, a price or a route."""
+        if not isinstance(provider, str) or not isinstance(model, str):
+            return None
+        provider = normalize_provider(provider)
+        name = model.strip().lower()
+        bound = {
+            alias.canonical_id
+            for (alias_provider, alias_name), candidates in self.snapshot._aliases.items()
+            if normalize_provider(alias_provider) == provider
+            for alias in candidates
+            if alias_name.strip() == name or alias.canonical_id.strip().lower() == name
+        }
+        return common_family(self.families, bound)
 
     def canonical_model_id(self, provider: str, model_id: str, *, at: Any = None) -> str:
         """Resolve a provider's model name, using ``at`` (default now) for migrations.
@@ -468,6 +502,7 @@ def parse_catalog(
                     batch_cache_write_1h_per_mtok=batch_cache_write_1h_per_mtok,
                 )
             )
+    parse_model_families(document, CatalogError)
     return version, {key: tuple(value) for key, value in aliases.items()}, _unique_ids(prices)
 
 
@@ -612,6 +647,7 @@ def _build_loaded_catalog(
     """The one construction and validation path behind both loaders."""
     version, aliases, prices = parse_catalog(document)
     currency, pricing_verified_at = _catalog_metadata(document)
+    families = parse_model_families(document, CatalogError)
     return LoadedCatalog(
         version=version,
         currency=currency,
@@ -622,6 +658,7 @@ def _build_loaded_catalog(
         canonical_ids=_canonical_index(document),
         retrieval=RetrievalCatalog(parse_retrieval(document)),
         disputes=tuple(parse_disputes(document)),
+        families=MappingProxyType(families),
     )
 
 

@@ -112,6 +112,50 @@ prefix, the latter only onto an `aws-bedrock` alias. Geographic prefixes such as
 `LoadedCatalog.pricing_verified_at` records when the bundled catalog was last
 checked against its linked provider sources.
 
+### Model families
+
+A model entry in `prices.yaml` may name the stable product line it belongs to:
+
+```yaml
+  - canonical_id: anthropic/claude-sonnet-5
+    publisher: anthropic
+    family: {id: anthropic/claude-sonnet, display_name: Claude Sonnet}
+```
+
+```python
+family = catalog.model_family("anthropic/claude-sonnet-5")
+print(family.id, family.display_name)  # anthropic/claude-sonnet Claude Sonnet
+
+catalog.family_for_model("anthropic", "claude-sonnet-4-6")  # same family
+```
+
+`model_family(canonical_id)` returns the frozen `ModelFamily` the catalog
+declares for a canonical ID, or `None`. `LoadedCatalog.families` maps each
+declared canonical ID to its family. `family_for_model(provider, model)` takes
+a raw provider model name, such as one recorded before its model was known,
+and returns a family only when every model the catalog binds that name to
+under that provider or any spelling of it (`google-genai` for `google`, `aws`
+for `bedrock`), as an alias at any date or as its canonical ID, declares the
+same family. A name that has moved between product lines, or that any
+unlabeled model holds, returns `None`. It applies no Bedrock suffix fallback.
+
+A family is display and grouping metadata. It does not say that one model
+succeeds, upgrades or can replace another, and it never changes alias
+resolution, canonical IDs, routes or prices. Families are curated explicitly
+and never inferred from model names, so a model without `family`, including
+every model in an older catalog, has no known family.
+
+`prices.yaml` is the only source of family metadata; `models.yaml` does not
+repeat it. `parse_catalog`, both loaders and `add_model` deltas reject a
+`family` that is not a mapping of exactly `id` and `display_name`; a
+`display_name` that is blank, spans lines, or has leading or trailing
+whitespace (it is rejected, never trimmed); an `id` that is not lowercase
+`<publisher>/<line>` (`[a-z0-9._-]` slugs) under the model's own `publisher`;
+a model with a family whose canonical ID is not under that publisher; and one
+`id` given two different display names. Adding or correcting a family is a
+model metadata change, not a price change: it increments the catalog
+`version` but not `pricing_verified_at`.
+
 ### Direct lookup and usage cost
 
 `lookup_price` returns the price a call is billed at, and `calculate_cost`
@@ -536,6 +580,7 @@ from metergraph_core import (
     CostResult,
     GatewayBillingEvidence,
     LoadedCatalog,
+    ModelFamily,
     ModelRegistry,
     ModelRoute,
     ModelUsage,
@@ -572,7 +617,7 @@ from metergraph_core import (
 The two manually maintained public datasets live under
 `src/metergraph_core/data/`. Update `models.yaml` when model identity, display,
 routing, or managed candidate policy changes. Update `prices.yaml` when rates
-or billing rules change. `sources.yaml` changes through reviewed pull requests,
+or billing rules change, or when a model's product-line `family` does. `sources.yaml` changes through reviewed pull requests,
 as described in
 [Provider review and contributions](#provider-review-and-contributions). Price
 corrections close or add effective windows; they never rewrite historical
