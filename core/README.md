@@ -662,6 +662,10 @@ To compose an existing token result from the same catalog, use `compose_call_cos
 
 ### Model reliability
 
+SDK and import adapters collect content-free provider facts; Core owns the rules
+that classify them. Hosted and self-hosted receivers use `classify_recorded_call`
+to derive stored availability and refusal outcomes from those facts.
+
 `classify_model_reliability` inspects structured native response/error facts and
 returns a frozen `ModelReliability` with nullable `http_status_code`,
 `availability` (`available`, `unavailable`, `excluded`) and `refused` fields.
