@@ -163,3 +163,7 @@ from .calls import (CallCostResult, RetrievalComponent, RetrievalUsage, compose_
 
 __all__ += ["CallCostResult", "RetrievalComponent", "RetrievalUsage", "compose_call_cost",
             "price_call", "price_call_from_response", "response_retrieval_usage"]
+
+from .reliability import ModelReliability, classify_model_reliability
+
+__all__ += ["ModelReliability", "classify_model_reliability"]

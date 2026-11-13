@@ -58,6 +58,9 @@ COLUMNS = (
     "sdk",
     "sdk_version",
     "request_id",
+    "http_status_code",
+    "availability",
+    "refused",
 )
 _INSERT = (
     f"insert into calls ({', '.join(COLUMNS)})"
@@ -89,6 +92,14 @@ def _text(value) -> str | None:
 
 def _bool(value) -> bool | None:
     return value if isinstance(value, bool) else None
+
+
+def _http_status(value) -> int | None:
+    return value if type(value) is int and 100 <= value <= 599 else None
+
+
+def _availability(value) -> str | None:
+    return value if isinstance(value, str) and value in {"available", "unavailable", "excluded"} else None
 
 
 def _timestamp(value) -> datetime:
@@ -197,6 +208,22 @@ def project_row(row: dict, catalog: CatalogSnapshot) -> tuple:
     )
     billing = resolve_billing(enrichment, normalize_gateway_evidence(row))
     status_code, finish_reason, finish_reason_raw = _status_fields(row)
+    http_status_code = _http_status(row.get("http_status_code"))
+    availability = _availability(row.get("availability"))
+    refused = _bool(row.get("refused"))
+    if refused is True:
+        if availability in {"unavailable", "excluded"}:
+            availability, refused = None, None
+        else:
+            availability = "available"
+    elif http_status_code == 429 or http_status_code is not None and http_status_code >= 500:
+        availability = "unavailable"
+    elif http_status_code is not None and 400 <= http_status_code < 500:
+        availability = "excluded"
+    elif http_status_code is not None and 200 <= http_status_code < 300 and availability is None:
+        availability = "available"
+    if availability in {"unavailable", "excluded"}:
+        refused = None
     return (
         ts,
         _resolved_route(row),
@@ -235,6 +262,9 @@ def project_row(row: dict, catalog: CatalogSnapshot) -> tuple:
         _text(row.get("sdk")),
         _text(row.get("sdk_version")),
         _text(row.get("request_id")),
+        http_status_code,
+        availability,
+        refused,
     )
 
 

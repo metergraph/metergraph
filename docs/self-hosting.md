@@ -68,3 +68,13 @@ token.
 - App authentication uses static bearer tokens; run the server inside your network boundary and use distinct tokens per producer so they can be rotated independently. SDK 0.4+ limits routine ingest exposure by exchanging the app token for a short-lived, HMAC-signed session token.
 - The dashboard stores its token in browser localStorage; treat dashboard access as trusted-network access.
 - Durability is a synchronous Postgres commit before the 202; the SDK is fire-and-forget, so a down server drops rows rather than blocking your app. At self-host scale (SDK batches ≤512 KiB) a single instance comfortably handles typical traffic.
+
+The call record also accepts nullable `http_status_code` (integer 100–599),
+`availability` (`available`, `unavailable`, `excluded`) and `refused` (boolean).
+Missing fields on older clients stay unknown. These fields do not alter pricing,
+span status, error counts or call cardinality. They appear in `/v1/calls`.
+`/v1/usage` includes availability/refusal counts, known denominators, rates and
+coverage. Rates divide summed known outcomes; unknown observations are exposed
+separately, and a zero denominator yields null. Explicit refusals with unknown
+availability imply an available response; conflicting explicit dimensions become
+unknown. No response content is retained for reliability classification.

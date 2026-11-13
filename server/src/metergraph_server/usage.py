@@ -98,7 +98,15 @@ def usage(
                percentile_cont(0.95) within group (order by latency_ms) as p95_latency_ms,
                avg(case when error then 1.0 else 0.0 end) as error_rate,
                count(*) filter (where cost_status = 'unpriced') as unpriced_calls,
-               0::bigint as reported_calls
+               0::bigint as reported_calls,
+               count(*) filter (where availability = 'available') as available_calls,
+               count(*) filter (where availability = 'unavailable') as unavailable_calls,
+               count(*) filter (where availability = 'excluded') as availability_excluded_calls,
+               count(*) filter (where availability is null) as availability_unknown_calls,
+               count(*) filter (where refused is true) as refused_calls,
+               count(*) filter (where refused is false) as not_refused_calls,
+               count(*) filter (where refused is null and availability in ('unavailable', 'excluded')) as refusal_not_assessable_calls,
+               count(*) filter (where refused is null and (availability is null or availability = 'available')) as refusal_unknown_calls
         from calls
         where ts >= %s and ts < %s{where}
         group by {group}
@@ -124,6 +132,20 @@ def usage(
             "unpriced_calls": row[10 + offset],
             "reported_calls": row[11 + offset],
         }
+        reliability_names = (
+            "available_calls", "unavailable_calls", "availability_excluded_calls",
+            "availability_unknown_calls", "refused_calls", "not_refused_calls",
+            "refusal_not_assessable_calls", "refusal_unknown_calls",
+        )
+        item.update({name: int(row[12 + offset + index]) for index, name in enumerate(reliability_names)})
+        availability_denominator = item["available_calls"] + item["unavailable_calls"]
+        refusal_denominator = item["refused_calls"] + item["not_refused_calls"]
+        item["availability_denominator"] = availability_denominator
+        item["refusal_denominator"] = refusal_denominator
+        item["availability_rate"] = item["available_calls"] / availability_denominator if availability_denominator else None
+        item["refusal_rate"] = item["refused_calls"] / refusal_denominator if refusal_denominator else None
+        item["availability_coverage"] = "partial" if item["availability_unknown_calls"] else "complete"
+        item["refusal_coverage"] = "partial" if item["refusal_unknown_calls"] else "complete"
         if group_by == "model":
             item["provider"] = row[1]
         items.append(item)
@@ -255,7 +277,8 @@ def calls(
                array[]::text[] as catalog_reasons, cost_status, latency_ms, status,
                status_code, finish_reason, finish_reason_raw, error, error_type,
                stream, session_id, trace_id, template_hash,
-               tool_names, environment, sdk, sdk_version, request_id
+               tool_names, environment, sdk, sdk_version, request_id,
+               http_status_code, availability, refused
         from calls
         where true{where}
         order by ts desc
@@ -271,6 +294,7 @@ def calls(
         "status_code", "finish_reason", "finish_reason_raw", "error", "error_type",
         "stream", "session_id", "trace_id", "template_hash",
         "tool_names", "environment", "sdk", "sdk_version", "request_id",
+        "http_status_code", "availability", "refused",
     )
     items = []
     for row in rows:
