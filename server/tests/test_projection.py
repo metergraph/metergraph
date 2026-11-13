@@ -209,8 +209,8 @@ def test_reliability_projection_is_nullable_and_strict():
         http_status_code=403, refusal_signal=True, response_received=True,
         availability='excluded', refused=False,
     ), SNAPSHOT)))
-    assert observed['availability'] == 'available'
-    assert observed['refused'] is True
+    assert observed['availability'] == 'excluded'
+    assert observed['refused'] is None
     assert {key: value for key, value in observed.items()
             if key not in {'http_status_code', 'availability', 'refused'}} == {
                 key: value for key, value in legacy.items()

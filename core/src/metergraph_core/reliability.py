@@ -183,6 +183,7 @@ def classify_recorded_call(row: Mapping[str, Any]) -> ModelReliability:
 
     Native/developer observations supersede legacy derived fields. Span status
     and generic application errors alone do not establish provider availability.
+    Refusal hints need response evidence and cannot override transport failures.
     """
     otel = row.get('otel')
     reasons = otel.get('finish_reasons') if isinstance(otel, Mapping) else None
@@ -205,21 +206,20 @@ def classify_recorded_call(row: Mapping[str, Any]) -> ModelReliability:
     signal = signal if isinstance(signal, bool) else None
     received = row.get('response_received')
     received = received if isinstance(received, bool) else None
-    if native.refused is True or signal is True:
-        return ModelReliability(native.http_status_code, 'available', True)
-    if received is True:
+    if native.refused is True:
+        return native
+    if received is not None or signal is not None:
         if native.availability in {'unavailable', 'excluded'}:
-            return ModelReliability(native.http_status_code, native.availability, None)
-        return ModelReliability(native.http_status_code, 'available', signal)
-    if signal is False:
-        if received is not False and native.availability not in {'unavailable', 'excluded'}:
-            return ModelReliability(native.http_status_code, 'available', False)
-        return ModelReliability(native.http_status_code, native.availability, None)
+            return native
+        if received is True or native.availability == 'available':
+            return ModelReliability(native.http_status_code, 'available',
+                                    signal if received is not False else None)
+        return native
     # Fresh response/finish/error observations are authoritative even if their
     # refusal coverage is unknown. HTTP-only legacy rows retain compatibility.
     observed = classify_model_reliability(
         error=error or None, attributes={'gen_ai.response.finish_reasons': reasons})
-    if received is not None or observed.availability is not None:
+    if observed.availability is not None:
         return native
     availability = row.get('availability')
     if not isinstance(availability, str) or availability not in {'available', 'unavailable', 'excluded'}:

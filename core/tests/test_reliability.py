@@ -78,6 +78,10 @@ def test_normal_stream_terminal_has_unknown_refusal_coverage():
     ({'finish_reason_raw':'safety','otel':{'finish_reasons':['stop']},'refusal_signal':False}, (None,'available',True)),
     ({'response_received':True,'availability':'unavailable'}, (None,'available',None)),
     ({'response_received':True,'refusal_signal':False}, (None,'available',False)),
+    ({'refusal_signal':False}, (None,None,None)),
+    ({'refusal_signal':True}, (None,None,None)),
+    ({'http_status_code':429,'refusal_signal':True,'response_received':True}, (429,'unavailable',None)),
+    ({'http_status_code':503,'refusal_signal':True}, (503,'unavailable',None)),
     ({'http_status_code':429,'availability':'unavailable','refused':True}, (429,None,None)),
     ({'http_status_code':403,'refused':True}, (403,'available',True)),
 ])
