@@ -205,6 +205,16 @@ def test_reliability_projection_is_nullable_and_strict():
     assert invalid['http_status_code'] is None
     assert invalid['availability'] is None
     assert invalid['refused'] is None
+    observed = dict(zip(COLUMNS, project_row(_row(
+        http_status_code=403, refusal_signal=True, response_received=True,
+        availability='excluded', refused=False,
+    ), SNAPSHOT)))
+    assert observed['availability'] == 'excluded'
+    assert observed['refused'] is None
+    assert {key: value for key, value in observed.items()
+            if key not in {'http_status_code', 'availability', 'refused'}} == {
+                key: value for key, value in legacy.items()
+                if key not in {'http_status_code', 'availability', 'refused'}}
 
 
 def test_reliability_projection_resolves_conflicting_dimensions():
@@ -220,7 +230,7 @@ def test_reliability_projection_resolves_conflicting_dimensions():
 
 @pytest.mark.parametrize('code,availability', [(429,'unavailable'), (503,'unavailable'), (401,'excluded'), (200,'available')])
 def test_reliability_projection_derives_http_outcome(code, availability):
-    values = dict(zip(COLUMNS, project_row(_row(http_status_code=code), SNAPSHOT)))
+    values = dict(zip(COLUMNS, project_row(_row(http_status_code=code, response_received=True), SNAPSHOT)))
     assert values['availability'] == availability
     assert values['refused'] is None
 

@@ -2,10 +2,11 @@
 # Copyright Metergraph contributors. Canonical source: metergraph-core reliability.py.
 """Conservative classification of structured provider reliability evidence.
 
-This module intentionally depends only on the standard library so capture
-clients can vendor the same classifier without a runtime Core dependency.
+Core owns reliability classification from native provider evidence and recorded
+content-free facts. Receivers use these rules to derive stored outcomes.
 """
 from dataclasses import dataclass
+import json
 from collections.abc import Mapping
 from typing import Any, Literal
 
@@ -175,3 +176,62 @@ def classify_model_reliability(*, provider: str | None = None, response: Any = N
     if stream_chunks is not None and not stream_complete and result.refused is False:
         return ModelReliability(result.http_status_code, result.availability, None)
     return result
+
+
+def classify_recorded_call(row: Mapping[str, Any]) -> ModelReliability:
+    """Project content-free recorded provider evidence into reliability outcomes.
+
+    Native/developer observations supersede legacy derived fields. Span status
+    and generic application errors alone do not establish provider availability.
+    Refusal hints need response evidence and cannot override transport failures.
+    """
+    otel = row.get('otel')
+    reasons = otel.get('finish_reasons') if isinstance(otel, Mapping) else None
+    if isinstance(reasons, str):
+        try:
+            reasons = json.loads(reasons)
+        except ValueError:
+            reasons = None
+    reasons = list(_seq(reasons))
+    reasons.extend(value for value in (row.get('finish_reason_raw'), row.get('finish_reason'))
+                   if isinstance(value, str))
+    error = {key: value for key, value in (
+        ('code', row.get('error_code')), ('type', row.get('error_type')))
+        if isinstance(value, str)}
+    native = classify_model_reliability(
+        provider=row.get('provider'), http_status_code=row.get('http_status_code'),
+        error=error or None,
+        attributes={'gen_ai.response.finish_reasons': reasons})
+    signal = row.get('refusal_signal')
+    signal = signal if isinstance(signal, bool) else None
+    received = row.get('response_received')
+    received = received if isinstance(received, bool) else None
+    if native.refused is True:
+        return native
+    if received is not None or signal is not None:
+        if native.availability in {'unavailable', 'excluded'}:
+            return native
+        if received is True or native.availability == 'available':
+            return ModelReliability(native.http_status_code, 'available',
+                                    signal if received is not False else None)
+        return native
+    # Fresh response/finish/error observations are authoritative even if their
+    # refusal coverage is unknown. HTTP-only legacy rows retain compatibility.
+    observed = classify_model_reliability(
+        error=error or None, attributes={'gen_ai.response.finish_reasons': reasons})
+    if observed.availability is not None:
+        return native
+    availability = row.get('availability')
+    if not isinstance(availability, str) or availability not in {'available', 'unavailable', 'excluded'}:
+        availability = None
+    refused = row.get('refused')
+    refused = refused if isinstance(refused, bool) else None
+    if refused is True:
+        if availability in {'unavailable', 'excluded'}:
+            return ModelReliability(native.http_status_code, None, None)
+        return ModelReliability(native.http_status_code, 'available', True)
+    if native.availability in {'unavailable', 'excluded'} or availability is None:
+        availability = native.availability
+    if availability in {'unavailable', 'excluded'}:
+        refused = None
+    return ModelReliability(native.http_status_code, availability, refused)
