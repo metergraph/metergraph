@@ -551,5 +551,25 @@
       "availability": "available",
       "refused": true
     }
+  },
+  {
+    "name": "openai_policy_error",
+    "input": {
+      "provider": "openai",
+      "http_status_code": 400,
+      "error": {
+        "body": {
+          "error": {
+            "code": "content_policy_violation",
+            "type": "invalid_request_error"
+          }
+        }
+      }
+    },
+    "expected": {
+      "http_status_code": 400,
+      "availability": "available",
+      "refused": true
+    }
   }
 ]

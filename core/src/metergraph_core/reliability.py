@@ -108,11 +108,12 @@ def _classify_native(*, provider: str | None = None, response: Any = None,
     payload = _get(error, 'error', _get(error, 'body', error))
     payload = _get(payload, 'error', payload)
     code = _get(payload, 'code')
-    if isinstance(provider, str) and provider.lower() == 'meta':
-        if (status == 400 and code == 'content_policy_violation') or (
-            status == 403 and code == 'user_blocked' and _get(payload, 'type') == 'permission_error'
-            and 'repeated policy violations' in str(_get(payload, 'message', '')).lower()):
-            refused = True
+    if status == 400 and code == 'content_policy_violation':
+        refused = True
+    if (isinstance(provider, str) and provider.lower() == 'meta'
+        and status == 403 and code == 'user_blocked' and _get(payload, 'type') == 'permission_error'
+        and 'repeated policy violations' in str(_get(payload, 'message', '')).lower()):
+        refused = True
     if refused:
         return ModelReliability(status, 'available', True)
     if status == 429 or status is not None and status >= 500:
