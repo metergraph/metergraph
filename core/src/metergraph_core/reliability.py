@@ -6,6 +6,7 @@ Core owns reliability classification from native provider evidence and recorded
 content-free facts. Receivers use these rules to derive stored outcomes.
 """
 from dataclasses import dataclass
+import json
 from collections.abc import Mapping
 from typing import Any, Literal
 
@@ -184,7 +185,13 @@ def classify_recorded_call(row: Mapping[str, Any]) -> ModelReliability:
     and generic application errors alone do not establish provider availability.
     """
     otel = row.get('otel')
-    reasons = list(_seq(otel.get('finish_reasons'))) if isinstance(otel, Mapping) else []
+    reasons = otel.get('finish_reasons') if isinstance(otel, Mapping) else None
+    if isinstance(reasons, str):
+        try:
+            reasons = json.loads(reasons)
+        except ValueError:
+            reasons = None
+    reasons = list(_seq(reasons))
     reasons.extend(value for value in (row.get('finish_reason_raw'), row.get('finish_reason'))
                    if isinstance(value, str))
     error = {key: value for key, value in (

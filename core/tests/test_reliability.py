@@ -71,7 +71,8 @@ def test_normal_stream_terminal_has_unknown_refusal_coverage():
 
 
 @pytest.mark.parametrize('row,expected', [
-    ({'status_code':'error','error':True}, (None,None,None)),
+    ({'status_code':'error','error':True,'otel':{'finish_reasons':'[invalid'}}, (None,None,None)),
+    ({'otel':{'finish_reasons':'["stop","content_filter"]'}}, (None,'available',True)),
     ({'response_received':True,'error_type':'APITimeoutError'}, (None,'unavailable',None)),
     ({'http_status_code':400,'error_code':'content_policy_violation','refusal_signal':False}, (400,'available',True)),
     ({'finish_reason_raw':'safety','otel':{'finish_reasons':['stop']},'refusal_signal':False}, (None,'available',True)),
