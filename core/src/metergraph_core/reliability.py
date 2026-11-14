@@ -206,7 +206,7 @@ def classify_recorded_call(row: Mapping[str, Any]) -> ModelReliability:
     signal = signal if isinstance(signal, bool) else None
     received = row.get('response_received')
     received = received if isinstance(received, bool) else None
-    if native.refused is True:
+    if native.refused is True or native.availability == 'unavailable':
         return native
     if received is not None or signal is not None:
         if native.availability in {'unavailable', 'excluded'}:
