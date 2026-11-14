@@ -241,12 +241,12 @@ def test_reliability_projection_http_failure_overrides_non_refusal():
     assert values['refused'] is None
 
 
-def test_reliability_projection_explicit_refusal_precedes_http_error():
+def test_reliability_projection_legacy_refusal_preserves_transport_failure():
     values = dict(zip(COLUMNS, project_row(_row(http_status_code=403, refused=True), SNAPSHOT)))
     assert values['http_status_code'] == 403
     assert values['availability'] == 'available'
     assert values['refused'] is True
     conflict = dict(zip(COLUMNS, project_row(_row(http_status_code=429, availability='unavailable', refused=True), SNAPSHOT)))
     assert conflict['http_status_code'] == 429
-    assert conflict['availability'] is None
+    assert conflict['availability'] == 'unavailable'
     assert conflict['refused'] is None
