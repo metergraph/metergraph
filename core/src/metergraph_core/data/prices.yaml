@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-12.1"
+version: "2026-11-13.1"
 currency: USD
-pricing_verified_at: "2026-11-12"
+pricing_verified_at: "2026-11-13"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -4978,9 +4978,18 @@ models:
       - channel: google-api
         region: global
         effective_from: "2026-10-31"
+        effective_to: "2026-12-03"
         input_per_mtok: 1.50
         output_per_mtok: 17.50
         source_url: https://ai.google.dev/gemini-api/docs/pricing
+      # Google routes this endpoint to gemini-omni-1.2-flash from this date and
+      # bills it at that model's rates.
+      - channel: google-api
+        region: global
+        effective_from: "2026-12-03"
+        input_per_mtok: 1.50
+        output_per_mtok: 12.00
+        source_url: https://aistudio.google.com/docs/pricing
 
 # Retrieval prices: USD per 1,000 counted operations (completed searches, tool
 # calls, executed grounding queries), billed on the provider's direct channel.
@@ -13783,6 +13792,23 @@ models:
         input_per_mtok: 1.50
         output_per_mtok: 7.50
         source_url: https://vercel.com/ai-gateway/models/gemini-4-hydrogen
+
+  - canonical_id: google/gemini-omni-1.2-flash
+    publisher: google
+    family: {id: google/gemini-omni-flash, display_name: Gemini Omni Flash}
+    aliases:
+      - {provider: google, alias: gemini-omni-1.2-flash, channel: google-api}
+      - {provider: google, alias: models/gemini-omni-1.2-flash, channel: google-api}
+    prices:
+      # Google lists $9.00 text and $12.00 video output here; $12.00 is the
+      # billed rate, the one its stated 5,792 tokens per second of 720p video
+      # at about $0.07 per second resolves to.
+      - channel: google-api
+        region: global
+        effective_from: "2026-11-05"
+        input_per_mtok: 1.50
+        output_per_mtok: 12.00
+        source_url: https://aistudio.google.com/docs/pricing
 
 retrieval:
   - channel: anthropic-api
