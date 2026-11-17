@@ -4983,7 +4983,8 @@ models:
         output_per_mtok: 17.50
         source_url: https://ai.google.dev/gemini-api/docs/pricing
       # Google routes this endpoint to gemini-omni-1.2-flash from this date and
-      # bills it at that model's rates.
+      # bills it at that model's rates. This is the video output rate; the
+      # calculator returns partial when the output modality is unknown.
       - channel: google-api
         region: global
         effective_from: "2026-12-03"
@@ -13800,9 +13801,9 @@ models:
       - {provider: google, alias: gemini-omni-1.2-flash, channel: google-api}
       - {provider: google, alias: models/gemini-omni-1.2-flash, channel: google-api}
     prices:
-      # Google lists $9.00 text and $12.00 video output here; $12.00 is the
-      # billed rate, the one its stated 5,792 tokens per second of 720p video
-      # at about $0.07 per second resolves to.
+      # Google lists $9.00 text and $12.00 video output. This row records the
+      # video rate, while the calculator returns partial for aggregate output
+      # tokens that do not identify their modality.
       - channel: google-api
         region: global
         effective_from: "2026-11-05"
