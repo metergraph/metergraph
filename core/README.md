@@ -207,8 +207,8 @@ otherwise each retains the row's standard cache-write rate.
 A `ModelUsage` count left `None` is unknown, not zero. A missing input or
 output count keeps the subtotal that is known, marks the result `partial`, and
 lists `input_tokens` or `output_tokens` in `missing_dimensions`.
-Google Omni calls with aggregate output tokens are `partial` with
-`output_modality_unavailable` because text and video have different rates.
+Google API Omni 1.1 and 1.2 calls with aggregate output tokens are `partial`
+with `output_modality_unavailable` because text and video have different rates.
 
 `region` selects a regional price and overrides the `region` passed to
 `load_catalog`. When neither names a region:
