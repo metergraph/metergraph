@@ -10,6 +10,11 @@ from typing import Any, Mapping
 
 _MILLION = Decimal("1000000")
 _COST_QUANTUM = Decimal("0.00000001")
+# Aggregate output tokens cannot distinguish Google's text and video rates.
+_OMNI_OUTPUT_AMBIGUOUS_FROM = {
+    "google/gemini-omni-1.1-flash": datetime(2026, 11, 17, tzinfo=timezone.utc),
+    "google/gemini-omni-1.2-flash": datetime(2026, 11, 5, tzinfo=timezone.utc),
+}
 _PROVIDER_ALIASES = {
     "amazon-bedrock": "bedrock",
     "aws": "bedrock",
@@ -608,6 +613,15 @@ def _price_tokens(
         if price.batch_cache_write_1h_per_mtok is not None:
             cache_write_1h_rate = price.batch_cache_write_1h_per_mtok
 
+    ambiguous_from = _OMNI_OUTPUT_AMBIGUOUS_FROM.get(price.model_id)
+    output_modality_unknown = (
+        price.pricing_channel == "google-api"
+        and ambiguous_from is not None
+        and at >= ambiguous_from
+    )
+    if output_modality_unknown:
+        output_rate = None
+
     input_multiplier = Decimal("1")
     output_multiplier = Decimal("1")
     long_context = rules.get("long_context") or {}
@@ -644,7 +658,10 @@ def _price_tokens(
         input_usd = Decimal(billable_input) * input_rate * input_multiplier / _MILLION
     if output_rate is None:
         if output_count:
-            reasons.append("output_rate_unavailable")
+            reasons.append(
+                "output_modality_unavailable"
+                if output_modality_unknown else "output_rate_unavailable"
+            )
     else:
         output_usd = Decimal(output_count) * output_rate * output_multiplier / _MILLION
     if cache_read_count:
