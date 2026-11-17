@@ -224,7 +224,7 @@ def test_registry_document_shape_is_required(mutation):
 
 def test_bundled_registry_preserves_current_execution_and_product_fields():
     registry = load_model_registry()
-    assert registry.version == "2026-11-10"
+    assert registry.version == "2026-11-17"
     existing_gateway_ids = [
         "anthropic/claude-sonnet-5",
         "anthropic/claude-opus-5",

@@ -313,7 +313,14 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert loaded.pricing_verified_at.isoformat() == "2026-11-13"
         assert len(loaded.content_hash) == 64, loaded.content_hash
         registry = load_model_registry()
-        assert registry.version == "2026-11-10", registry.version
+        assert registry.version == "2026-11-17", registry.version
+        gateway_policy = registry.effective_training_policy(
+            "default:openai/gpt-5.6-sol"
+        )
+        assert (
+            gateway_policy.policy.training_on_customer_data,
+            gateway_policy.origin,
+        ) == ("unknown", "provider"), gateway_policy
         moonshot_candidates = [route.id for route in registry.candidates("moonshot-direct")]
         assert moonshot_candidates == [
             "moonshotai:kimi-k3.1-pro",

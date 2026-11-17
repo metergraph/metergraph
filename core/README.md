@@ -316,6 +316,85 @@ mismatches on any route, mismatched offer-group credentials/providers, and dupli
 remains exclusively in `prices.yaml`; being priceable does not automatically
 make a model an approved analysis candidate.
 
+### Training policy
+
+`models.effective_training_policy(route_key)` says whether the route's
+serving provider may train on customer inputs and outputs under its default
+terms. It returns an `EffectiveTrainingPolicy` holding the `TrainingPolicy`,
+the level it came from (`origin`) and the registry `version` that recorded
+it. An unknown route key raises `KeyError`.
+
+```python
+effective = models.effective_training_policy("default:openai/gpt-5.6-sol")
+print(effective.policy.training_on_customer_data, effective.origin)
+```
+
+`training_on_customer_data` is one of:
+
+- `prohibited`: the default applicable terms exclude training on customer
+  inputs and outputs. Any opt-in exception is stated in `notes`.
+- `conditional`: training is excluded only when `conditions` hold, such as a
+  paid tier or an opt-out.
+- `permitted`: the terms allow training.
+- `unknown`: no explicit promise was found. A missing promise is `unknown`,
+  not `permitted`.
+
+Every value except `unknown` cites an HTTPS `source`. Only `conditional` has
+`conditions`, and `notes` records scope or exclusions. No value verifies how
+an account is configured. The registry version and Git history record when a
+policy changed.
+
+The document records policies at three levels, keyed by the route's serving
+`provider` and `pricing_channel`:
+
+```yaml
+provider_defaults:
+  openai:
+    openai-api:
+      training_policy:
+        training_on_customer_data: prohibited
+        source: https://example.com/terms
+models:
+- canonical_id: example/model
+  training_policy_overrides:     # this model on one provider and channel
+    vercel:
+      vercel-ai-gateway:
+        training_policy: {training_on_customer_data: unknown}
+  routes:
+  - key: default:example/model
+    training_policy:             # this route only
+      training_on_customer_data: unknown
+      notes: Preview terms are not yet published.
+```
+
+The route's own `training_policy` wins. Otherwise the model's override for
+the route's provider and channel applies, then that pair's provider default,
+then `unknown` with origin `unspecified`. The first policy found replaces the
+others whole, so an explicit `unknown` stops inheritance. The publisher is
+never used. A gateway or cloud host such as `vercel` or `bedrock` follows its
+own terms, not those of the model's publisher. The parser rejects unknown
+policy fields, a provider/channel pair that no route could use, and a model
+override for a pair the model has no route on. Documents without policies
+still load, and every route resolves to `unknown`.
+
+The bundled registry records a default for every serving provider. The YAML
+is the source of truth for current policy values, sources and conditions:
+
+```python
+for provider, channels in models.training_policy_defaults.items():
+    for channel, policy in channels.items():
+        print(provider, channel, policy.training_on_customer_data, policy.source)
+```
+
+Adding a model normally requires no policy entry: it inherits the serving
+provider's default. Add a model or route override only when its terms differ.
+To update a provider policy, edit that one YAML object and increment the
+existing registry version; source URLs and values are not duplicated in tests
+or a documentation table. Changes still require review against the linked
+official terms. There is no network lookup, scheduled refresher, extra
+dependency or per-policy date to maintain. Policy lookup is explicit and does
+not run during pricing or candidate selection.
+
 ## Billing evidence
 
 Servers can pass content-blind, already-extracted gateway fields through the
