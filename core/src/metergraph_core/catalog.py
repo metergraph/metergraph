@@ -10,9 +10,7 @@ from typing import Any, Mapping
 
 _MILLION = Decimal("1000000")
 _COST_QUANTUM = Decimal("0.00000001")
-# These Google endpoints bill text and video output at different rates, while
-# captured usage has only one aggregate output count. Preserve older applied
-# prices, but stop reporting a full cost for ambiguous output going forward.
+# Aggregate output tokens cannot distinguish Google's text and video rates.
 _OMNI_OUTPUT_AMBIGUOUS_FROM = {
     "google/gemini-omni-1.1-flash": datetime(2026, 11, 17, tzinfo=timezone.utc),
     "google/gemini-omni-1.2-flash": datetime(2026, 11, 5, tzinfo=timezone.utc),
@@ -616,7 +614,11 @@ def _price_tokens(
             cache_write_1h_rate = price.batch_cache_write_1h_per_mtok
 
     ambiguous_from = _OMNI_OUTPUT_AMBIGUOUS_FROM.get(price.model_id)
-    output_modality_unknown = ambiguous_from is not None and at >= ambiguous_from
+    output_modality_unknown = (
+        price.pricing_channel == "google-api"
+        and ambiguous_from is not None
+        and at >= ambiguous_from
+    )
     if output_modality_unknown:
         output_rate = None
 
