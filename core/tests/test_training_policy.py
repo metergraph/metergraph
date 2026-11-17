@@ -91,10 +91,10 @@ def test_unknown_route_key_is_an_error():
 
 
 def test_provider_default_applies_only_to_its_serving_provider_channel():
-    registry = parse_model_registry(with_defaults(openai=prohibited(notes="API only")))
+    registry = parse_model_registry(with_defaults(openai=prohibited()))
     direct = registry.effective_training_policy(DIRECT)
     assert direct.origin == "provider"
-    assert direct.policy == TrainingPolicy("prohibited", source=SOURCE, notes="API only")
+    assert direct.policy == TrainingPolicy("prohibited", source=SOURCE)
     # The gateway route serves an OpenAI-published model, but the publisher
     # never supplies a policy for another serving provider.
     gateway = registry.effective_training_policy(GATEWAY)
@@ -102,7 +102,7 @@ def test_provider_default_applies_only_to_its_serving_provider_channel():
 
 
 def test_model_override_beats_provider_default_and_is_scoped_to_its_provider():
-    value = with_defaults(openai=prohibited(notes="default notes"))
+    value = with_defaults(openai=prohibited())
     value["models"][0]["training_policy_overrides"] = {
         "vercel": {"vercel-ai-gateway": {"training_policy": prohibited(source="https://example.com/gw")}},
         "openai": {"openai-api": {"training_policy": {
@@ -128,7 +128,7 @@ def test_model_override_beats_provider_default_and_is_scoped_to_its_provider():
 def test_route_policy_beats_model_override_and_provider_default():
     value = with_defaults(openai=prohibited())
     value["models"][0]["training_policy_overrides"] = {
-        "openai": {"openai-api": {"training_policy": prohibited(notes="model")}},
+        "openai": {"openai-api": {"training_policy": prohibited()}},
     }
     value["models"][0]["routes"][1]["training_policy"] = {
         "training_on_customer_data": "permitted",
@@ -143,11 +143,10 @@ def test_explicit_unknown_blocks_inheritance():
     value = with_defaults(openai=prohibited())
     value["models"][0]["routes"][1]["training_policy"] = {
         "training_on_customer_data": "unknown",
-        "notes": "Preview terms not yet published.",
     }
     effective = parse_model_registry(value).effective_training_policy(DIRECT)
     assert effective.origin == "route"
-    assert effective.policy == TrainingPolicy("unknown", notes="Preview terms not yet published.")
+    assert effective.policy == TrainingPolicy("unknown")
 
 
 def test_parsed_policy_maps_and_values_are_immutable():
@@ -196,7 +195,7 @@ def test_parsing_does_not_retain_the_input_document():
         ({"training_on_customer_data": "conditional", "source": SOURCE, "conditions": "  "}, "conditions"),
         (prohibited(conditions="Paid tier only."), "conditions"),
         ({"training_on_customer_data": "unknown", "conditions": "x"}, "conditions"),
-        (prohibited(notes=""), "notes"),
+        (prohibited(notes="legacy prose"), "notes"),
         (prohibited(notes=3), "notes"),
         (prohibited(verified_at="2026-11-17"), "unknown field 'verified_at'"),
         (prohibited(sorce=SOURCE), "unknown field 'sorce'"),
@@ -232,10 +231,9 @@ def test_text_fields_are_trimmed():
         "training_on_customer_data": " conditional ",
         "source": f" {SOURCE} ",
         "conditions": " Paid tier. ",
-        "notes": " API only. ",
     }))
     assert registry.training_policy_defaults["openai"]["openai-api"] == TrainingPolicy(
-        "conditional", source=SOURCE, conditions="Paid tier.", notes="API only."
+        "conditional", source=SOURCE, conditions="Paid tier."
     )
 
 
@@ -351,7 +349,6 @@ def test_every_serving_provider_has_a_sourced_bundled_default():
     # edited whenever a provider moves its policy page.
     for policy in policies.values():
         assert policy.source and policy.source.startswith("https://")
-        assert policy.notes
 
 
 def test_bundled_gateway_default_is_unknown_despite_its_optional_filter():
@@ -388,7 +385,7 @@ def test_models_routes_and_policies_stay_hashable():
     value["models"][0]["training_policy_overrides"] = {
         "vercel": {"vercel-ai-gateway": {"training_policy": prohibited()}},
     }
-    value["models"][0]["routes"][1]["training_policy"] = prohibited(notes="route")
+    value["models"][0]["routes"][1]["training_policy"] = prohibited()
     with_overrides = parse_model_registry(value).model(MODEL)
     plain = parse_model_registry(document()).model(MODEL)
     for item in (with_overrides, plain, *with_overrides.routes):
@@ -407,10 +404,8 @@ def test_models_routes_and_policies_stay_hashable():
     [
         ({"training_on_customer_data": "conditional", "source": SOURCE, "conditions": ""}, "conditions"),
         ({"training_on_customer_data": "conditional", "source": SOURCE, "conditions": " "}, "conditions"),
-        ({"training_on_customer_data": "prohibited", "source": SOURCE, "notes": ""}, "notes"),
         ({"training_on_customer_data": "prohibited", "source": 3}, "source"),
         ({"training_on_customer_data": "prohibited", "source": "https://[broken"}, "HTTPS"),
-        ({"training_on_customer_data": "unknown", "notes": ["x"]}, "notes"),
         ({"training_on_customer_data": ["unknown"]}, "training_on_customer_data"),
     ],
 )

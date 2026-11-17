@@ -76,7 +76,7 @@ TRAINING_ON_CUSTOMER_DATA = frozenset(
     {"prohibited", "conditional", "permitted", "unknown"}
 )
 TRAINING_POLICY_FIELDS = frozenset(
-    {"training_on_customer_data", "source", "conditions", "notes"}
+    {"training_on_customer_data", "source", "conditions"}
 )
 # A policy source is metadata, never fetched: an HTTPS URL on a DNS host, as
 # sources.py accepts for price sources.
@@ -94,8 +94,8 @@ class TrainingPolicy:
     """Whether a serving provider's default applicable terms let it train on
     customer inputs and outputs, as published at ``source``.
 
-    ``prohibited`` means the default terms exclude training, with any opt-in
-    exception in ``notes``; ``conditional`` means it depends on
+    ``prohibited`` means the default terms exclude training;
+    ``conditional`` means it depends on
     ``conditions``, such as a paid tier or an opt-out; ``unknown`` means no
     explicit promise was found. None of these verifies an account's
     configuration."""
@@ -103,10 +103,9 @@ class TrainingPolicy:
     training_on_customer_data: str
     source: str | None = None
     conditions: str | None = None
-    notes: str | None = None
 
     def __post_init__(self) -> None:
-        for name in ("source", "conditions", "notes"):
+        for name in ("source", "conditions"):
             text = getattr(self, name)
             if text is not None and (not isinstance(text, str) or not text.strip()):
                 raise ModelRegistryError(f"{name} must be a nonblank string or None")
@@ -386,9 +385,6 @@ def _training_policy(value: Any, field: str) -> TrainingPolicy:
         else _text(policy["source"], f"{field} source"),
         # Empty conditions read as none; a conditional policy then fails.
         "conditions": (conditions or "").strip() or None,
-        "notes": None
-        if policy.get("notes") is None
-        else _text(policy["notes"], f"{field} notes"),
     }
     try:
         return TrainingPolicy(**parsed)

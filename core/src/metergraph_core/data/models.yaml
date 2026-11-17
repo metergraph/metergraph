@@ -9,32 +9,17 @@ provider_defaults:
       training_policy:
         training_on_customer_data: prohibited
         source: https://www.anthropic.com/legal/commercial-terms
-        notes: >-
-          Commercial Terms section B treats inputs and outputs as customer
-          content and bars Anthropic from training models on it. Consumer
-          plan terms do not apply to the API.
   bedrock:
     aws-bedrock:
       training_policy:
         training_on_customer_data: prohibited
         source: https://aws.amazon.com/bedrock/faqs/
-        notes: >-
-          The Security FAQ states AWS and third-party model providers do not
-          use Bedrock inputs or outputs to train Amazon or third-party
-          models. The Bedrock data protection guide adds that model providers
-          cannot access customer prompts and completions. Retention and abuse
-          detection modes are separate from training.
   fireworks:
     fireworks-api:
       training_policy:
-        training_on_customer_data: prohibited
+        training_on_customer_data: conditional
         source: "https://trust.fireworks.ai/faq?search=Does+Fireworks+AI+use+my+Content+(inputs,+outputs,+prompts,+etc.)+to+train+models?"
-        notes: >-
-          The trust FAQ excludes inputs and outputs from training, and the
-          privacy policy (https://fireworks.ai/privacy-policy) excludes
-          training on API inputs absent an explicit opt-in. Covers inference
-          on the open models registered here; a closed partner model needs its
-          own override. Retention is documented separately.
+        conditions: Open-model inference with data sharing disabled.
   mistral:
     mistral-api:
       training_policy:
@@ -45,48 +30,26 @@ provider_defaults:
           (https://help.mistral.ai/en/articles/455207-can-i-opt-out-of-my-input-or-output-data-being-used-for-training),
           a model that is not a Labs or Preview model, no content submitted as
           feedback, and no contrary order form.
-        notes: >-
-          Commercial Terms sections 4.2 and 4.3. Labs and Preview models
-          permit training and the opt-out does not apply to them.
   moonshotai:
     moonshot-api:
       training_policy:
         training_on_customer_data: permitted
         source: https://platform.kimi.ai/docs/agreement/modeluse
-        notes: >-
-          Terms section 4 restricts training only under an enterprise or
-          separate written agreement, which is not represented here. Formerly
-          served at platform.moonshot.ai.
   openai:
     openai-api:
       training_policy:
         training_on_customer_data: prohibited
         source: https://developers.openai.com/api/docs/guides/your-data
-        notes: >-
-          API data is excluded from training by default. An organization that
-          opts in to data sharing is an exception.
   tinker:
     tinker-serverless:
       training_policy:
         training_on_customer_data: prohibited
         source: https://thinkingmachines.ai/legal/terms/
-        notes: >-
-          Terms section 3(c) treats prompts, outputs and datasets as customer
-          content and excludes using it to train or fine-tune the provider's
-          models or to improve third-party technology. Fine-tuning a
-          customer's own model on request is separate.
   vercel:
     vercel-ai-gateway:
       training_policy:
         training_on_customer_data: unknown
         source: https://vercel.com/docs/ai-gateway/security-and-compliance/disallow-prompt-training
-        notes: >-
-          Vercel states AI Gateway itself does not train on prompts or
-          responses, but default routing ignores downstream providers'
-          training policies. The optional disallowPromptTraining filter, per
-          request or team-wide, routes only to providers Vercel lists as
-          no-training and does not apply to BYOK requests. It is not a
-          default commitment.
 models:
 - canonical_id: openai/gpt-5.6-sol
   display_name: GPT-5.6 Sol

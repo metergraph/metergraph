@@ -332,7 +332,7 @@ print(effective.policy.training_on_customer_data, effective.origin)
 `training_on_customer_data` is one of:
 
 - `prohibited`: the default applicable terms exclude training on customer
-  inputs and outputs. Any opt-in exception is stated in `notes`.
+  inputs and outputs.
 - `conditional`: training is excluded only when `conditions` hold, such as a
   paid tier or an opt-out.
 - `permitted`: the terms allow training.
@@ -340,8 +340,8 @@ print(effective.policy.training_on_customer_data, effective.origin)
   not `permitted`.
 
 Every value except `unknown` cites an HTTPS `source`. Only `conditional` has
-`conditions`, and `notes` records scope or exclusions. No value verifies how
-an account is configured. The registry version and Git history record when a
+`conditions`. No value verifies an account’s configuration, opt-ins, or
+separate agreements. The registry version and Git history record when a
 policy changed.
 
 The document records policies at three levels, keyed by the route's serving
@@ -364,7 +364,6 @@ models:
   - key: default:example/model
     training_policy:             # this route only
       training_on_customer_data: unknown
-      notes: Preview terms are not yet published.
 ```
 
 The route's own `training_policy` wins. Otherwise the model's override for
