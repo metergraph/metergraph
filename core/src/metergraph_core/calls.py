@@ -252,7 +252,7 @@ def _record_retrieval_usage(row: Mapping[str, Any], model: str | None) -> tuple[
     if 'server_tool_use' in row:
         found = {item.operation: item for item in response_retrieval_usage(
             {'usage': {'server_tool_use': row['server_tool_use']}}, format='anthropic.messages')}
-    if 'web_search_calls' in row:
+    if 'web_search_calls' in row and (row['web_search_calls'] is not None or 'web_search' not in found):
         found['web_search'] = RetrievalUsage('web_search', row['web_search_calls'])
     tools = row.get('tool_calls')
     if isinstance(tools, list):
