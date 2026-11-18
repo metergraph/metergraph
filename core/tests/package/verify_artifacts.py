@@ -36,7 +36,7 @@ CORE_DIR = Path(__file__).resolve().parents[2]  # core/
 DIST_DIR = CORE_DIR / "dist"
 
 EXPECTED_NAME = "metergraph-core"
-EXPECTED_VERSION = "0.8.21"
+EXPECTED_VERSION = "0.8.23"
 EXPECTED_REQUIRES_PYTHON = ">=3.10"
 EXPECTED_SUMMARY = (
     "Open, effective-dated LLM pricing catalog and deterministic cost calculator "
@@ -74,7 +74,7 @@ GOLDEN_PRICE_ID = "openai/gpt-5.4-mini:openai-api:global:2026-03-17"
 GOLDEN_PINNED_PRICE_ID = "openai/gpt-6.1-sol:aws-bedrock:us-east-1:2026-09-29"
 GOLDEN_RETRIEVAL_COST = "14.00000000"
 GOLDEN_RETRIEVAL_PRICE_ID = "google-api:google_search_grounding:global:2026-08-26"
-CATALOG_VERSION = "2026-11-13.1"
+CATALOG_VERSION = "2026-11-17"
 
 REQUIRED_MODULES = (
     "__init__.py",
@@ -310,7 +310,7 @@ def _verify_isolated_install(wheel: Path) -> None:
         loaded = load_catalog()
         assert loaded.version == {CATALOG_VERSION!r}, loaded.version
         assert loaded.currency == "USD", loaded.currency
-        assert loaded.pricing_verified_at.isoformat() == "2026-11-13"
+        assert loaded.pricing_verified_at.isoformat() == "2026-11-17"
         assert len(loaded.content_hash) == 64, loaded.content_hash
         registry = load_model_registry()
         assert registry.version == "2026-11-17", registry.version
@@ -331,7 +331,7 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert mistral_candidates == ["mistral:mistral-small-2603"], mistral_candidates
         assert registry.offer_groups["mistral-direct"].credential == "MISTRAL_API_KEY"
         gateway_candidates = [route.id for route in registry.candidates("gateway")]
-        assert len(gateway_candidates) == 58, len(gateway_candidates)
+        assert len(gateway_candidates) == 63, len(gateway_candidates)
         assert gateway_candidates[:2] == [
             "anthropic/claude-sonnet-5",
             "anthropic/claude-opus-5",

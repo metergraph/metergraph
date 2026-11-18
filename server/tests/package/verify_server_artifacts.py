@@ -36,11 +36,11 @@ CORE_DIST = CORE_DIR / "dist"
 SERVER_DIST = SERVER_DIR / "dist"
 
 CORE_DISTRIBUTION = "metergraph-core"
-EXPECTED_CORE_SPECIFIERS = {">=0.8.21", "<0.9"}
+EXPECTED_CORE_SPECIFIERS = {">=0.8.23", "<0.9"}
 
 GOLDEN_COST = "0.52500000"
 GOLDEN_PRICE_ID = "openai/gpt-5.4-mini:openai-api:global:2026-03-17"
-CATALOG_VERSION = "2026-11-13.1"
+CATALOG_VERSION = "2026-11-17"
 
 
 class VerifyError(AssertionError):

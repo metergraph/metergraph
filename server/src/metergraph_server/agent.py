@@ -200,7 +200,8 @@ def _usage(days: int = 7, limit: int = 100) -> dict[str, Any]:
                    coalesce(sum(output_tokens), 0),
                    round(avg(latency_ms)),
                    percentile_cont(0.95) within group (order by latency_ms),
-                   count(*) filter (where error is true or status = 'error')
+                   count(*) filter (where error is true or status = 'error'),
+                   count(*) filter (where cost_status = 'partial')
               from calls
              where ts >= %s and ts < %s
              group by 1, 2
@@ -232,6 +233,7 @@ def _usage(days: int = 7, limit: int = 100) -> dict[str, Any]:
                 "avg_latency_ms": int(row[6]) if row[6] is not None else None,
                 "p95_latency_ms": round(row[7]) if row[7] is not None else None,
                 "error_calls": int(row[8] or 0),
+                "partial_cost_calls": int(row[9] or 0),
             }
             for row in rows
         ],
@@ -305,6 +307,7 @@ def _traces(
                        coalesce(sum(cache_read_tokens), 0) as cache_read_tokens,
                        coalesce(sum(cache_write_tokens), 0) as cache_write_tokens,
                        coalesce(sum(cost_usd), 0) as cost_usd,
+                       count(*) filter (where cost_status = 'partial') as partial_cost_calls,
                        bool_or(coalesce(error, false) or status = 'error') as has_error,
                        array_remove(array_agg(distinct route), null) as routes,
                        array_remove(array_agg(distinct provider), null) as providers,
@@ -317,7 +320,7 @@ def _traces(
             )
             select trace_id, trace_name, started_at, max_ts, span_count,
                    input_tokens, output_tokens, cache_read_tokens,
-                   cache_write_tokens, cost_usd, has_error, routes,
+                   cache_write_tokens, cost_usd, partial_cost_calls, has_error, routes,
                    providers, models
               from grouped
             """
@@ -357,10 +360,11 @@ def _traces(
                 "cache_read_tokens": int(row[7]),
                 "cache_write_tokens": int(row[8]),
                 "cost_usd": float(row[9]) if row[9] is not None else None,
-                "status": "error" if row[10] else "success",
-                "routes": row[11] or [],
-                "providers": row[12] or [],
-                "models": row[13] or [],
+                "partial_cost_calls": int(row[10]),
+                "status": "error" if row[11] else "success",
+                "routes": row[12] or [],
+                "providers": row[13] or [],
+                "models": row[14] or [],
             }
             for row in rows
         ],

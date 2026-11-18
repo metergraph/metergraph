@@ -27,7 +27,7 @@ def test_prices_yaml_parses():
     assert VERSION
     assert DOC["models"]
     assert LOADED.currency == "USD"
-    assert LOADED.pricing_verified_at.isoformat() == "2026-11-13"
+    assert LOADED.pricing_verified_at.isoformat() == "2026-11-17"
 
 
 def test_openrouter_cache_reads_are_not_charged_as_fresh_input():
@@ -42,6 +42,41 @@ def test_openrouter_cache_reads_are_not_charged_as_fresh_input():
 
     assert result.status == "priced"
     assert result.cost_usd == Decimal("0.00007500")
+
+
+@pytest.mark.parametrize(
+    "model,at",
+    [
+        ("gemini-omni-1.2-flash", "2026-11-05"),
+        ("gemini-omni-1.1-flash", "2026-11-17"),
+        ("gemini-omni-1.1-flash", "2026-12-03"),
+    ],
+)
+def test_omni_output_requires_modality_before_claiming_a_full_cost(model, at):
+    result = SNAPSHOT.cost(
+        provider="google",
+        model=model,
+        at=_at(at),
+        input_tokens=1_000_000,
+        output_tokens=1_000_000,
+    )
+
+    assert result.status == "partial"
+    assert "output_modality_unavailable" in result.reasons
+    assert result.cost_usd == Decimal("1.50000000")
+
+
+def test_omni_input_only_call_remains_fully_priced():
+    result = SNAPSHOT.price_deployment(
+        model="google/gemini-omni-1.2-flash",
+        channel="google-api",
+        at=_at("2026-11-17"),
+        input_tokens=1_000_000,
+        output_tokens=0,
+    )
+
+    assert result.status == "priced"
+    assert result.cost_usd == Decimal("1.50000000")
 
 
 def test_current_catalog_prices_more_than_one_thousand_provider_model_pairs():

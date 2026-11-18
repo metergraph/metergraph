@@ -106,7 +106,8 @@ def usage(
                count(*) filter (where refused is true) as refused_calls,
                count(*) filter (where refused is false) as not_refused_calls,
                count(*) filter (where refused is null and availability in ('unavailable', 'excluded')) as refusal_not_assessable_calls,
-               count(*) filter (where refused is null and (availability is null or availability = 'available')) as refusal_unknown_calls
+               count(*) filter (where refused is null and (availability is null or availability = 'available')) as refusal_unknown_calls,
+               count(*) filter (where cost_status = 'partial') as partial_cost_calls
         from calls
         where ts >= %s and ts < %s{where}
         group by {group}
@@ -131,6 +132,7 @@ def usage(
             "error_rate": float(row[9 + offset]) if row[9 + offset] is not None else 0.0,
             "unpriced_calls": row[10 + offset],
             "reported_calls": row[11 + offset],
+            "partial_cost_calls": row[20 + offset],
         }
         reliability_names = (
             "available_calls", "unavailable_calls", "availability_excluded_calls",

@@ -8,7 +8,7 @@ from metergraph_server import usage
 def test_usage_reliability_counts_preserve_usage_and_known_denominators(monkeypatch):
     # 8 calls: 3 available, 2 unavailable, 1 excluded, 2 unknown.
     row = ('example-model', 'example-provider', 8, Decimal('2.5'), 100, 50, 0, 0,
-           250, 400, Decimal('.5'), 0, 0, 3, 2, 1, 2, 1, 2, 3, 2)
+           250, 400, Decimal('.5'), 0, 0, 3, 2, 1, 2, 1, 2, 3, 2, 2)
 
     class Connection:
         def execute(self, sql, params):
@@ -30,6 +30,7 @@ def test_usage_reliability_counts_preserve_usage_and_known_denominators(monkeypa
     item = items[0]
     assert item['calls'] == 8
     assert item['cost_usd'] == 2.5
+    assert item['partial_cost_calls'] == 2
     assert item['input_tokens'] == 100
     assert item['availability_denominator'] == 5
     assert item['availability_rate'] == .6
@@ -42,7 +43,7 @@ def test_usage_reliability_counts_preserve_usage_and_known_denominators(monkeypa
 
 def test_legacy_usage_reliability_rates_are_unknown(monkeypatch):
     row = ('example-model', 2, Decimal('1'), 10, 5, 0, 0, 100, 100, Decimal('0'),
-           0, 0, 0, 0, 0, 2, 0, 0, 0, 2)
+           0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0)
 
     class Connection:
         def execute(self, sql, params):
