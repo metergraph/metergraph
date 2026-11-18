@@ -78,3 +78,12 @@ def test_record_can_compose_an_existing_token_result_without_changing_totals():
     standalone = price_call_from_record(row, catalog=loaded)
     composed = price_call_from_record(row, catalog=loaded, token_cost=tokens)
     assert standalone == composed
+
+
+def test_null_counter_preserves_native_server_search_usage():
+    result = price_call_from_record({'provider': 'anthropic', 'model': 'claude-sonnet-4-6',
+        'ts': AT, 'input_tokens': 1000, 'output_tokens': 100,
+        'server_tool_use': {'web_search_requests': 2}, 'web_search_calls': None})
+    assert result.search_units == 2
+    assert result.retrieval_cost_usd == Decimal('.02')
+    assert result.status == 'priced'
