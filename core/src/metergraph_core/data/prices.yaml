@@ -5229,7 +5229,7 @@ models:
       - {provider: alibaba, alias: alibaba/qwen4-max, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true, input_includes_cache_write: true}}
       - {provider: vercel, alias: alibaba/qwen4-max, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true, input_includes_cache_write: true}}
     prices:
-      # Singapore (international) rates; the global-scope regions list lower ones.
+      # Singapore (International) rates. The Global scope lists lower rates.
       - channel: alibaba-api
         region: global
         effective_from: "2026-11-15"
@@ -13862,7 +13862,7 @@ models:
         batch_output_per_mtok: 10.00
         batch_cache_read_per_mtok: 0.10
         source_url: https://aistudio.google.com/docs/pricing
-      # Until 2026-11-17 the gateway listed no cache-read rate, so cache reads bill at its input rate.
+      # Until 2026-11-17, the gateway listed no cache-read rate, so cache reads billed at its input rate.
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-11-12"
@@ -13906,7 +13906,7 @@ models:
         batch_output_per_mtok: 3.75
         batch_cache_read_per_mtok: 0.0375
         source_url: https://aistudio.google.com/docs/pricing
-      # Until 2026-11-17 the gateway listed no cache-read rate, so cache reads bill at its input rate.
+      # Until 2026-11-17, the gateway listed no cache-read rate, so cache reads billed at its input rate.
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-11-12"
