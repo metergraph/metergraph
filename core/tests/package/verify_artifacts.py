@@ -36,7 +36,7 @@ CORE_DIR = Path(__file__).resolve().parents[2]  # core/
 DIST_DIR = CORE_DIR / "dist"
 
 EXPECTED_NAME = "metergraph-core"
-EXPECTED_VERSION = "0.8.22"
+EXPECTED_VERSION = "0.8.23"
 EXPECTED_REQUIRES_PYTHON = ">=3.10"
 EXPECTED_SUMMARY = (
     "Open, effective-dated LLM pricing catalog and deterministic cost calculator "
@@ -314,6 +314,13 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert len(loaded.content_hash) == 64, loaded.content_hash
         registry = load_model_registry()
         assert registry.version == "2026-11-17", registry.version
+        gateway_policy = registry.effective_training_policy(
+            "default:openai/gpt-5.6-sol"
+        )
+        assert (
+            gateway_policy.policy.training_on_customer_data,
+            gateway_policy.origin,
+        ) == ("unknown", "provider"), gateway_policy
         moonshot_candidates = [route.id for route in registry.candidates("moonshot-direct")]
         assert moonshot_candidates == [
             "moonshotai:kimi-k3.1-pro",

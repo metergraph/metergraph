@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field, fields as dataclass_fields
 from datetime import date, datetime, time, timezone
+from difflib import get_close_matches
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Iterable, Mapping
@@ -70,10 +72,78 @@ OFFER_GROUP_PROVIDERS = MappingProxyType(
     }
 )
 DEFAULT_MODEL_REGISTRY_PATH = Path(__file__).parent / "data" / "models.yaml"
+TRAINING_ON_CUSTOMER_DATA = frozenset(
+    {"prohibited", "conditional", "permitted", "unknown"}
+)
+TRAINING_POLICY_FIELDS = frozenset(
+    {"training_on_customer_data", "source", "conditions"}
+)
+# A policy source is metadata, never fetched: an HTTPS URL on a DNS host, as
+# sources.py accepts for price sources.
+_HTTPS_URL = re.compile(r"https://[A-Za-z0-9.-]+(?::[0-9]+)?(?:/\S*)?")
+# Where an effective training policy came from, most specific first.
+TRAINING_POLICY_ORIGINS = ("route", "model", "provider", "unspecified")
 
 
 class ModelRegistryError(ValueError):
     """Raised when a model-registry document violates its contract."""
+
+
+@dataclass(frozen=True, slots=True)
+class TrainingPolicy:
+    """Whether a serving provider's default applicable terms let it train on
+    customer inputs and outputs, as published at ``source``.
+
+    ``prohibited`` means the default terms exclude training;
+    ``conditional`` means it depends on
+    ``conditions``, such as a paid tier or an opt-out; ``unknown`` means no
+    explicit promise was found. None of these verifies an account's
+    configuration."""
+
+    training_on_customer_data: str
+    source: str | None = None
+    conditions: str | None = None
+
+    def __post_init__(self) -> None:
+        for name in ("source", "conditions"):
+            text = getattr(self, name)
+            if text is not None and (not isinstance(text, str) or not text.strip()):
+                raise ModelRegistryError(f"{name} must be a nonblank string or None")
+        value = self.training_on_customer_data
+        if not isinstance(value, str) or value not in TRAINING_ON_CUSTOMER_DATA:
+            raise ModelRegistryError(
+                f"training_on_customer_data must be one of "
+                f"{sorted(TRAINING_ON_CUSTOMER_DATA)}, not {value!r}"
+            )
+        if self.source is None:
+            if value != "unknown":
+                raise ModelRegistryError(f"a {value} training policy needs a source")
+        elif not _HTTPS_URL.fullmatch(self.source):
+            raise ModelRegistryError("source must be an HTTPS URL")
+        if value == "conditional":
+            if self.conditions is None:
+                raise ModelRegistryError(
+                    "a conditional training policy needs conditions"
+                )
+        elif self.conditions is not None:
+            raise ModelRegistryError(
+                f"a {value} training policy cannot have conditions"
+            )
+
+
+@dataclass(frozen=True, slots=True)
+class EffectiveTrainingPolicy:
+    """The training policy that applies to one route, the level it came from
+    (one of ``TRAINING_POLICY_ORIGINS``) and the registry version that
+    recorded it."""
+
+    policy: TrainingPolicy
+    origin: str
+    registry_version: str
+
+
+UNKNOWN_TRAINING_POLICY = TrainingPolicy("unknown")
+_NO_POLICIES: Mapping[str, Mapping[str, TrainingPolicy]] = MappingProxyType({})
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,6 +156,9 @@ class ModelRoute:
     model_id: str
     pricing_channel: str
     execution_profiles: tuple[str, ...]
+    # Replaces every inherited policy for this route when its service terms
+    # differ from the model's or the provider's.
+    training_policy: TrainingPolicy | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,6 +170,12 @@ class ModelDefinition:
     routes: tuple[ModelRoute, ...]
     # The publisher's general-availability date, when recorded.
     released: date | None = None
+    # Serving provider -> pricing channel -> policy for this model's routes
+    # there, replacing that provider's default. Compared but not hashed, so
+    # a model stays hashable.
+    training_policy_overrides: Mapping[str, Mapping[str, TrainingPolicy]] = field(
+        default_factory=lambda: _NO_POLICIES, hash=False
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,9 +203,43 @@ class ModelRegistry:
     routes: Mapping[str, ModelRoute]
     execution_profiles: Mapping[str, tuple[str, ...]]
     offer_groups: Mapping[str, OfferGroup]
+    # Serving provider -> pricing channel -> default policy, from the
+    # document's provider_defaults.
+    training_policy_defaults: Mapping[str, Mapping[str, TrainingPolicy]] = field(
+        default_factory=lambda: _NO_POLICIES
+    )
 
     def model(self, canonical_id: str) -> ModelDefinition:
         return self.models[canonical_id]
+
+    def effective_training_policy(self, route_key: str) -> EffectiveTrainingPolicy:
+        """The training policy for one route: the route's own policy, else the
+        model's override for the route's serving provider and channel, else
+        that provider and channel's default, else unknown. The first one
+        found replaces the rest whole, so an explicit unknown stops
+        inheritance. The publisher is never consulted: a model served by a
+        gateway or a cloud host follows that service's terms."""
+        route = self.routes[route_key]
+        candidates = (
+            ("route", route.training_policy),
+            (
+                "model",
+                self.models[route.canonical_id]
+                .training_policy_overrides.get(route.provider, {})
+                .get(route.pricing_channel),
+            ),
+            (
+                "provider",
+                self.training_policy_defaults.get(route.provider, {}).get(
+                    route.pricing_channel
+                ),
+            ),
+        )
+        origin, policy = next(
+            ((origin, policy) for origin, policy in candidates if policy is not None),
+            ("unspecified", UNKNOWN_TRAINING_POLICY),
+        )
+        return EffectiveTrainingPolicy(policy, origin, self.version)
 
     def release_date(
         self, canonical_id: str, catalog: LoadedCatalog
@@ -214,6 +327,103 @@ def _unique_text_list(value: Any, field: str) -> tuple[str, ...]:
     return items
 
 
+def _reject_fields(unknown: Iterable[Any], field: str) -> None:
+    extra = sorted(str(key) for key in unknown)
+    if extra:
+        raise ModelRegistryError(f"{field}: unknown field {extra[0]!r}")
+
+
+_POLICY_PLACEMENT_FIELDS = (
+    "provider_defaults",
+    "training_policy_overrides",
+    "training_policy",
+)
+# Derive ordinary keys from the existing types, rather than maintain another
+# schema list. Unknown keys still receive the full policy typo check.
+_NON_POLICY_FIELDS = frozenset(
+    item.name
+    for model_type in (ModelRoute, ModelDefinition, ModelRegistry)
+    for item in dataclass_fields(model_type)
+    if item.name not in {
+        "training_policy", "training_policy_overrides", "training_policy_defaults"
+    }
+)
+
+
+def _reject_misspelled_policy_fields(
+    value: Mapping[str, Any], allowed: str, field: str
+) -> None:
+    """Other fields here are not checked, so older documents keep loading,
+    but a policy field misspelled or placed at the wrong level would
+    silently inherit a looser policy. Known ordinary fields skip similarity
+    checks; unknown keys retain the full check, including prefix typos."""
+    _reject_fields(
+        (
+            key
+            for key in value
+            if key != allowed
+            and key not in _NON_POLICY_FIELDS
+            and get_close_matches(str(key), _POLICY_PLACEMENT_FIELDS, n=1, cutoff=0.85)
+        ),
+        field,
+    )
+
+
+def _training_policy(value: Any, field: str) -> TrainingPolicy:
+    policy = _mapping(value, field)
+    _reject_fields(set(policy) - TRAINING_POLICY_FIELDS, field)
+    conditions = policy.get("conditions")
+    if conditions is not None and not isinstance(conditions, str):
+        raise ModelRegistryError(f"{field} conditions must be a string")
+    parsed = {
+        "training_on_customer_data": _text(
+            policy.get("training_on_customer_data"),
+            f"{field} training_on_customer_data",
+        ),
+        "source": None
+        if policy.get("source") is None
+        else _text(policy["source"], f"{field} source"),
+        # Empty conditions read as none; a conditional policy then fails.
+        "conditions": (conditions or "").strip() or None,
+    }
+    try:
+        return TrainingPolicy(**parsed)
+    except ModelRegistryError as exc:
+        raise ModelRegistryError(f"{field}: {exc}") from None
+
+
+def _provider_policies(
+    value: Any, field: str
+) -> Mapping[str, Mapping[str, TrainingPolicy]]:
+    """A serving provider -> pricing channel -> {training_policy: ...} map,
+    frozen to provider -> channel -> TrainingPolicy."""
+    providers: dict[str, Mapping[str, TrainingPolicy]] = {}
+    for provider, channels_value in _mapping(value, field).items():
+        if provider not in ROUTE_PROVIDERS:
+            raise ModelRegistryError(
+                f"{field}: unknown route provider {provider!r}"
+            )
+        channels: dict[str, TrainingPolicy] = {}
+        for channel, entry_value in _mapping(
+            channels_value, f"{field} {provider}"
+        ).items():
+            if channel != ROUTE_PROVIDER_CHANNELS[provider]:
+                raise ModelRegistryError(
+                    f"{field}: provider {provider!r} cannot use pricing channel "
+                    f"{channel!r}"
+                )
+            where = f"{field} {provider}/{channel}"
+            entry = _mapping(entry_value, where)
+            _reject_fields(set(entry) - {"training_policy"}, where)
+            if "training_policy" not in entry:
+                raise ModelRegistryError(f"{where}: needs training_policy")
+            channels[channel] = _training_policy(
+                entry["training_policy"], f"{where} training_policy"
+            )
+        providers[provider] = MappingProxyType(channels)
+    return MappingProxyType(providers)
+
+
 def _window_day(value: Any) -> date:
     """The calendar day a catalog price window starts, from a date or a
     timestamp as the catalog loader accepts them."""
@@ -261,6 +471,10 @@ def parse_model_registry(document: Any) -> ModelRegistry:
     root = _mapping(document, "models document")
     version = _text(root.get("version"), "models document version")
     _registry_version_date(version)
+    _reject_misspelled_policy_fields(root, "provider_defaults", "models document")
+    training_policy_defaults = _provider_policies(
+        root.get("provider_defaults", {}), "provider_defaults"
+    )
 
     models: dict[str, ModelDefinition] = {}
     routes: dict[str, ModelRoute] = {}
@@ -280,6 +494,13 @@ def parse_model_registry(document: Any) -> ModelRegistry:
                 f"{canonical_id}: publisher {publisher!r} does not match canonical id"
             )
         released = _optional_date(model.get("released"), f"{canonical_id}: released")
+        _reject_misspelled_policy_fields(
+            model, "training_policy_overrides", canonical_id
+        )
+        training_policy_overrides = _provider_policies(
+            model.get("training_policy_overrides", {}),
+            f"{canonical_id}: training_policy_overrides",
+        )
         model_routes: list[ModelRoute] = []
         route_values = _list(model.get("routes", []), f"{canonical_id}: routes")
         for route_value in route_values:
@@ -327,6 +548,14 @@ def parse_model_registry(document: Any) -> ModelRegistry:
                     f"{route_id}: duplicate physical route {physical_route!r}"
                 )
             physical_routes.add(physical_route)
+            _reject_misspelled_policy_fields(route, "training_policy", route_key)
+            route_policy = (
+                _training_policy(
+                    route["training_policy"], f"{route_key}: training_policy"
+                )
+                if "training_policy" in route
+                else None
+            )
             parsed = ModelRoute(
                 key=route_key,
                 id=route_id,
@@ -339,15 +568,25 @@ def parse_model_registry(document: Any) -> ModelRegistry:
                 model_id=model_id,
                 pricing_channel=pricing_channel,
                 execution_profiles=profiles,
+                training_policy=route_policy,
             )
             routes[route_key] = parsed
             model_routes.append(parsed)
+        served = {(route.provider, route.pricing_channel) for route in model_routes}
+        for provider, channels in training_policy_overrides.items():
+            for channel in channels:
+                if (provider, channel) not in served:
+                    raise ModelRegistryError(
+                        f"{canonical_id}: training_policy_overrides "
+                        f"{provider}/{channel} matches no route of the model"
+                    )
         models[canonical_id] = ModelDefinition(
             canonical_id=canonical_id,
             display_name=display_name,
             publisher=publisher,
             routes=tuple(model_routes),
             released=released,
+            training_policy_overrides=training_policy_overrides,
         )
 
     execution_profiles: dict[str, tuple[str, ...]] = {}
@@ -441,6 +680,7 @@ def parse_model_registry(document: Any) -> ModelRegistry:
         routes=MappingProxyType(routes),
         execution_profiles=MappingProxyType(execution_profiles),
         offer_groups=MappingProxyType(offer_groups),
+        training_policy_defaults=training_policy_defaults,
     )
 
 
