@@ -68,3 +68,25 @@ def test_every_named_operation_is_priced_in_the_shipped_catalog():
         for channel, operation in table.items():
             result = catalog.price_retrieval(channel=channel, operation=operation, units=1, at="2026-10-06")
             assert result.status == "priced", (channel, operation, result)
+
+
+def test_agent_calls_do_not_inherit_legacy_sonar_one_request_assumption():
+    assert count_search_units({"provider": "perplexity", "retrieval_api": "agent"}) is None
+    assert count_search_units({"provider": "perplexity", "retrieval_api": "agent", "web_search_calls": 3}) == 3
+
+
+def test_agent_search_rates_are_separate_from_legacy_sonar_requests():
+    from decimal import Decimal
+    catalog = load_catalog()
+    for operation, expected in [("web_search", "0.0075"), ("web_search_fast", "0.003")]:
+        result = catalog.price_retrieval(channel="perplexity-agent-api", operation=operation, units=3, at="2026-11-18")
+        assert result.cost_usd == Decimal(expected)
+        assert catalog.price_retrieval(channel="perplexity-agent-api", operation=operation, units=3, at="2026-10-01").status == "unpriced"
+
+
+def test_agent_sonar_tokens_use_its_own_channel():
+    from decimal import Decimal
+    from metergraph_core import ModelUsage
+    result = load_catalog().calculate_cost(model="perplexity/sonar", provider="perplexity-agent", at="2026-11-18", usage=ModelUsage(input_tokens=1000, output_tokens=100))
+    assert result.cost_usd == Decimal("0.0005") and result.status == "priced"
+    assert result.price.pricing_channel == "perplexity-agent-api"

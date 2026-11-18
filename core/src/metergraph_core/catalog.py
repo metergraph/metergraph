@@ -45,6 +45,7 @@ _DIRECT_CHANNEL_BY_PROVIDER = {
     "bedrock": "aws-bedrock",
     "deepseek": "deepseek-api",
     "perplexity-ai": "perplexity-api",
+    "perplexity-agent": "perplexity-agent-api",
     "x-ai": "xai-api",
     "alibaba": "alibaba-api",
     # Amazon publishes no first-party inference API: its own models are sold
