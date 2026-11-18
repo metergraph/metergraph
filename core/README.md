@@ -282,6 +282,35 @@ such as `priority` or `flex`, returns `partial` with `service_tier` in
 call from its final response or final usage chunk. Fees outside token usage,
 such as web search, are not included.
 
+### Complete costs from captured usage
+
+`price_call_from_record()` accepts normalized SDK or relay usage, without reading
+prompt or response content:
+
+```python
+from metergraph_core import price_call_from_record
+
+result = price_call_from_record({
+    "provider": "perplexity", "model": "perplexity/sonar",
+    "retrieval_api": "agent", "search_type": "web", "web_search_calls": 3,
+    "input_tokens": 1000, "output_tokens": 100, "ts": "2026-11-18T12:00:00Z",
+})
+print(result.status, result.cost_usd, result.retrieval_cost_usd)
+```
+
+Core selects the API channel, retrieval operation, and billing unit. Supported
+record evidence includes OpenAI search counts, Anthropic server-tool usage,
+Google grounding queries, and Perplexity Agent standard/fast invocation counts.
+Older Gemini grounded prompts do not inherit newer per-query rates. An unknown
+rate, count, search type, or processing tier stays partial or unpriced.
+`search_units` and `retrieval_cost_usd` expose the resolved components for storage.
+`known_subtotal_usd` remains separate from a complete total.
+
+A receiver that already resolved tokens against the same catalog may pass
+`token_cost=`. Explicit API identity can select a different token channel; other
+resolved token results are preserved. Qualified gateway totals can still be
+reconciled separately with `resolve_billing()`.
+
 ## Model registry
 
 ```python

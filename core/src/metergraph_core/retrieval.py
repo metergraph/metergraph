@@ -130,7 +130,7 @@ def count_search_units(row: Mapping[str, Any]) -> int | None:
         if count is not None:
             return count
     if str(row.get("provider") or "").strip().lower() in _PERPLEXITY:
-        return 1
+        return None if row.get("retrieval_api") == "agent" else 1
     return _tool_items(row, _SEARCH_TOOL_TYPES)
 
 

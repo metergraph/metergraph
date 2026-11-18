@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-17"
+version: "2026-11-18"
 currency: USD
-pricing_verified_at: "2026-11-17"
+pricing_verified_at: "2026-11-18"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -3210,7 +3210,16 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: perplexity-agent, alias: perplexity/sonar, channel: perplexity-agent-api}
     prices:
+      - channel: perplexity-agent-api
+        region: global
+        effective_from: "2026-11-18"
+        input_per_mtok: 0.25
+        output_per_mtok: 2.50
+        cache_read_per_mtok: 0.0625
+        rules: {input_includes_cache_read: true}
+        source_url: https://docs.perplexity.ai/docs/agent-api/models
       - channel: perplexity-api
         region: global
         effective_from: "2025-04-18"
@@ -13976,6 +13985,21 @@ retrieval:
     per_1k_usd: 14.00
     effective_from: "2026-01-05"
     source_url: https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing
+  # Agent API web-search invocations are distinct from legacy Sonar requests.
+  - channel: perplexity-agent-api
+    operation: web_search
+    region: global
+    unit: tool_call
+    per_1k_usd: 2.50
+    effective_from: "2026-11-18"
+    source_url: https://docs.perplexity.ai/docs/agent-api/tools/web-search
+  - channel: perplexity-agent-api
+    operation: web_search_fast
+    region: global
+    unit: tool_call
+    per_1k_usd: 1.00
+    effective_from: "2026-11-18"
+    source_url: https://docs.perplexity.ai/docs/agent-api/tools/web-search
   # Historical Sonar request fees end before the new API-specific rates.
   # The current Sonar fee is unverified, so its token row stays partial.
   - channel: perplexity-api
