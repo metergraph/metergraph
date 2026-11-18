@@ -510,7 +510,10 @@ def test_bundled_gpt_tiers_stay_separate_lines_across_versions():
     # replacement (such as GPT-5 mini to 5.6 Terra) never merges families.
     catalog = load_catalog()
     lines = {
-        "openai/gpt-sol": ("openai/gpt-5.6-sol", "openai/gpt-6-sol", "openai/gpt-6.1-sol"),
+        "openai/gpt-sol": (
+            "openai/gpt-5.6-sol", "openai/gpt-6-sol", "openai/gpt-6.1-sol", "openai/gpt-6.2-sol",
+        ),
+        "openai/gpt-astra": ("openai/gpt-6-astra", "openai/gpt-6.2-astra"),
         "openai/gpt-terra": ("openai/gpt-5.6-terra", "openai/gpt-6.1-terra"),
         "openai/gpt-luna": ("openai/gpt-5.6-luna", "openai/gpt-6-luna"),
         "openai/gpt-mini": ("openai/gpt-5-mini", "openai/gpt-4.1-mini", "openai/gpt-4o-mini"),

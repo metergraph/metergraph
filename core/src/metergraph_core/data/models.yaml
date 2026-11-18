@@ -1,4 +1,4 @@
-version: '2026-11-10'
+version: '2026-11-17'
 models:
 - canonical_id: openai/gpt-5.6-sol
   display_name: GPT-5.6 Sol
@@ -984,6 +984,82 @@ models:
     pricing_channel: tinker-serverless
     execution_profiles:
     - default
+- canonical_id: google/gemini-4-carbon
+  display_name: Gemini 4 Carbon
+  publisher: google
+  released: '2026-11-10'
+  routes:
+  - key: default:google/gemini-4-carbon
+    id: google/gemini-4-carbon
+    provider: vercel
+    model_id: google/gemini-4-carbon
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: google/gemini-4-hydrogen
+  display_name: Gemini 4 Hydrogen
+  publisher: google
+  released: '2026-11-12'
+  routes:
+  - key: default:google/gemini-4-hydrogen
+    id: google/gemini-4-hydrogen
+    provider: vercel
+    model_id: google/gemini-4-hydrogen
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: alibaba/qwen4-max
+  display_name: Qwen 4 Max
+  publisher: alibaba
+  released: '2026-11-15'
+  routes:
+  - key: default:alibaba/qwen4-max
+    id: alibaba/qwen4-max
+    provider: vercel
+    model_id: alibaba/qwen4-max
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+- canonical_id: openai/gpt-6.2-sol
+  display_name: GPT-6.2 Sol
+  publisher: openai
+  released: '2026-11-17'  # https://developers.openai.com/api/docs/changelog
+  routes:
+  - key: default:openai/gpt-6.2-sol
+    id: openai/gpt-6.2-sol
+    provider: vercel
+    model_id: openai/gpt-6.2-sol
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+  - key: default:openai:gpt-6.2-sol
+    id: openai:gpt-6.2-sol
+    provider: openai
+    model_id: gpt-6.2-sol
+    pricing_channel: openai-api
+    execution_profiles:
+    - default
+    display_name: GPT-6.2 Sol (direct)
+- canonical_id: openai/gpt-6.2-astra
+  display_name: GPT-6.2 Astra
+  publisher: openai
+  released: '2026-11-17'  # https://developers.openai.com/api/docs/changelog
+  routes:
+  - key: default:openai/gpt-6.2-astra
+    id: openai/gpt-6.2-astra
+    provider: vercel
+    model_id: openai/gpt-6.2-astra
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
+  - key: default:openai:gpt-6.2-astra
+    id: openai:gpt-6.2-astra
+    provider: openai
+    model_id: gpt-6.2-astra
+    pricing_channel: openai-api
+    execution_profiles:
+    - default
+    display_name: GPT-6.2 Astra (direct)
 execution_profiles:
 - id: default
   routes:
@@ -1067,6 +1143,13 @@ execution_profiles:
   - default:alibaba/qwen3.8-max
   - default:mistral:mistral-small-2603
   - default:tinker:inkling-2-small
+  - default:google/gemini-4-carbon
+  - default:google/gemini-4-hydrogen
+  - default:alibaba/qwen4-max
+  - default:openai/gpt-6.2-sol
+  - default:openai/gpt-6.2-astra
+  - default:openai:gpt-6.2-sol
+  - default:openai:gpt-6.2-astra
 
 - id: bedrock
   routes:
@@ -1144,6 +1227,11 @@ offer_groups:
   - default:meituan/longcat-2.5
   - default:particle/particle-1
   - default:alibaba/qwen3.8-max
+  - default:google/gemini-4-carbon
+  - default:google/gemini-4-hydrogen
+  - default:alibaba/qwen4-max
+  - default:openai/gpt-6.2-sol
+  - default:openai/gpt-6.2-astra
 - id: fireworks
   credential: FIREWORKS_API_KEY
   routes:
@@ -1160,6 +1248,8 @@ offer_groups:
   - default:openai:gpt-5.4-nano
   - default:openai:gpt-6.1-sol
   - default:openai:gpt-6.1-terra
+  - default:openai:gpt-6.2-sol
+  - default:openai:gpt-6.2-astra
 - id: anthropic-direct
   credential: ANTHROPIC_API_KEY
   routes:

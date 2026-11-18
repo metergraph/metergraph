@@ -224,7 +224,7 @@ def test_registry_document_shape_is_required(mutation):
 
 def test_bundled_registry_preserves_current_execution_and_product_fields():
     registry = load_model_registry()
-    assert registry.version == "2026-11-10"
+    assert registry.version == "2026-11-17"
     existing_gateway_ids = [
         "anthropic/claude-sonnet-5",
         "anthropic/claude-opus-5",
@@ -300,6 +300,8 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "openai:gpt-5.4-nano",
         "openai:gpt-6.1-sol",
         "openai:gpt-6.1-terra",
+        "openai:gpt-6.2-sol",
+        "openai:gpt-6.2-astra",
     ]
     assert [route.id for route in registry.candidates("moonshot-direct")] == [
         "moonshotai:kimi-k3.1-pro",
@@ -323,7 +325,7 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "deepseek/deepseek-v3.2",
         "deepseek/deepseek-v3.1",
     ]
-    assert len(registry.routes_for_execution_profile("default")) == 80
+    assert len(registry.routes_for_execution_profile("default")) == 87
     assert len(registry.routes_for_execution_profile("bedrock")) == 8
 
 
@@ -622,6 +624,49 @@ def test_minimax_m3_1_flash_is_a_gateway_candidate_after_its_promotion():
     assert resolved.canonical_model == "minimax/minimax-m3.1-flash"
     assert resolved.price.input_per_mtok == Decimal("0.15")
     assert resolved.price.output_per_mtok == Decimal("0.60")
+
+
+@pytest.mark.parametrize(
+    ("offer_group", "route_key", "canonical_id", "display_name", "model_id",
+     "input_rate", "output_rate", "cache_read_rate"),
+    [
+        ("gateway", "default:google/gemini-4-carbon", "google/gemini-4-carbon",
+         "Gemini 4 Carbon", "google/gemini-4-carbon", "2.00", "10.00", "0.10"),
+        ("gateway", "default:google/gemini-4-hydrogen", "google/gemini-4-hydrogen",
+         "Gemini 4 Hydrogen", "google/gemini-4-hydrogen", "1.50", "7.50", "0.075"),
+        ("gateway", "default:alibaba/qwen4-max", "alibaba/qwen4-max",
+         "Qwen 4 Max", "alibaba/qwen4-max", "1.50", "4.50", "0.075"),
+        ("gateway", "default:openai/gpt-6.2-sol", "openai/gpt-6.2-sol",
+         "GPT-6.2 Sol", "openai/gpt-6.2-sol", "2.00", "10.00", "0.10"),
+        ("gateway", "default:openai/gpt-6.2-astra", "openai/gpt-6.2-astra",
+         "GPT-6.2 Astra", "openai/gpt-6.2-astra", "8.00", "40.00", "0.40"),
+        ("openai-direct", "default:openai:gpt-6.2-sol", "openai/gpt-6.2-sol",
+         "GPT-6.2 Sol (direct)", "gpt-6.2-sol", "2.00", "10.00", "0.10"),
+        ("openai-direct", "default:openai:gpt-6.2-astra", "openai/gpt-6.2-astra",
+         "GPT-6.2 Astra (direct)", "gpt-6.2-astra", "8.00", "40.00", "0.40"),
+    ],
+)
+def test_november_17_routes_are_priced_candidates(
+    offer_group, route_key, canonical_id, display_name, model_id,
+    input_rate, output_rate, cache_read_rate,
+):
+    registry = load_model_registry()
+    route = registry.route(route_key)
+
+    assert route in registry.candidates(offer_group)
+    assert (route.canonical_id, route.display_name, route.model_id) == (
+        canonical_id, display_name, model_id,
+    )
+    resolved = load_catalog().snapshot.resolve_price(
+        model=route.model_id,
+        channel=route.pricing_channel,
+        at=datetime(2026, 11, 17, tzinfo=timezone.utc),
+    )
+    assert resolved is not None
+    assert resolved.canonical_model == canonical_id
+    assert resolved.price.input_per_mtok == Decimal(input_rate)
+    assert resolved.price.output_per_mtok == Decimal(output_rate)
+    assert resolved.price.cache_read_per_mtok == Decimal(cache_read_rate)
 
 
 @pytest.mark.parametrize(
