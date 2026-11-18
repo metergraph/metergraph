@@ -17,9 +17,8 @@ provider_defaults:
   fireworks:
     fireworks-api:
       training_policy:
-        training_on_customer_data: conditional
-        source: "https://trust.fireworks.ai/faq?search=Does+Fireworks+AI+use+my+Content+(inputs,+outputs,+prompts,+etc.)+to+train+models?"
-        conditions: Open-model inference with data sharing disabled.
+        training_on_customer_data: prohibited
+        source: https://fireworks.ai/privacy-policy
   mistral:
     mistral-api:
       training_policy:
