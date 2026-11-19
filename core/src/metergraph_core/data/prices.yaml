@@ -13940,6 +13940,8 @@ models:
       - {provider: litellm, alias: models/gemini-4-neon, channel: google-api}
       - {provider: unknown, alias: gemini-4-neon, channel: google-api}
       - {provider: unknown, alias: models/gemini-4-neon, channel: google-api}
+      - {provider: google, alias: google/gemini-4-neon, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true}}
+      - {provider: vercel, alias: google/gemini-4-neon, channel: vercel-ai-gateway, rules: {input_includes_cache_read: true}}
     prices:
       - channel: google-api
         region: global
@@ -13951,6 +13953,13 @@ models:
         batch_output_per_mtok: 7.50
         batch_cache_read_per_mtok: 0.075
         source_url: https://aistudio.google.com/docs/pricing
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-11-18"
+        input_per_mtok: 3.00
+        output_per_mtok: 15.00
+        cache_read_per_mtok: 0.15
+        source_url: https://vercel.com/ai-gateway/models/google/gemini-4-neon
 
   - canonical_id: google/gemini-omni-1.2-flash
     publisher: google

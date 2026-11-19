@@ -547,6 +547,22 @@ def test_minimax_m3_1_flash_captured_on_vercel_prices_on_the_gateway():
     assert result.cost_usd == Decimal("0.75")
 
 
+def test_gemini_4_neon_captured_on_vercel_uses_gateway_cache_rate():
+    result = SNAPSHOT.cost(
+        provider="vercel",
+        model="google/gemini-4-neon",
+        at=_at("2026-11-18"),
+        input_tokens=1_000_000,
+        output_tokens=1_000_000,
+        cache_read_tokens=200_000,
+    )
+
+    assert result.status == "priced"
+    assert result.canonical_model == "google/gemini-4-neon"
+    assert result.price.pricing_channel == "vercel-ai-gateway"
+    assert result.cost_usd == Decimal("17.43000000")
+
+
 def test_deepseek_v4_1_flash_1017_fast_has_fixed_gateway_pricing():
     costs = {
         LOADED.price(
