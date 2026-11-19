@@ -359,6 +359,8 @@ class ModelUsage:
     cache_write_5m_tokens: int | None = None
     cache_write_1h_tokens: int | None = None
     batch: bool = False
+    # Actual provider-reported tier, never the requested preference.
+    service_tier: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -546,6 +548,7 @@ def _price_tokens(
     cache_write_5m_tokens: Any,
     cache_write_1h_tokens: Any,
     batch: bool,
+    service_tier: str | None = None,
 ) -> tuple[Decimal, list[str], CostComponents]:
     """Cost a token usage against one already-selected price and its merged
     rules. Every token entry point reaches it through ``_cost_result`` so all
@@ -599,7 +602,30 @@ def _price_tokens(
     cache_read_rate = price.cache_read_per_mtok
     cache_write_5m_rate = price.cache_write_5m_per_mtok
     cache_write_1h_rate = price.cache_write_1h_per_mtok
-    if batch:
+    flex = service_tier == "flex"
+    google_flex = flex and price.publisher == "google" and price.pricing_channel in {
+        "google-api", "google-vertex-ai",
+    }
+    openai_flex = flex and price.publisher == "openai" and price.pricing_channel == "openai-api"
+    if service_tier not in (None, "standard", "default", "auto", "batch") and not (google_flex or openai_flex):
+        reasons.append("unsupported_service_tier")
+    if google_flex:
+        # Google publishes Flex at half the standard token rates, including cache reads.
+        # https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing
+        input_rate, output_rate, cache_read_rate = (
+            rate / 2 if rate is not None else None
+            for rate in (input_rate, output_rate, cache_read_rate)
+        )
+    if openai_flex:
+        # OpenAI Flex uses Batch token pricing. Preserve the served tier separately.
+        # https://developers.openai.com/api/docs/guides/flex-processing
+        if price.batch_cache_read_per_mtok is None and cache_read_rate is not None:
+            cache_read_rate /= 2
+        if price.batch_cache_write_5m_per_mtok is None and cache_write_5m_rate is not None:
+            cache_write_5m_rate /= 2
+        if price.batch_cache_write_1h_per_mtok is None and cache_write_1h_rate is not None:
+            cache_write_1h_rate /= 2
+    if (batch and not google_flex) or openai_flex:
         if price.batch_input_per_mtok is None or price.batch_output_per_mtok is None:
             reasons.append("batch_rate_unavailable")
         else:
@@ -736,6 +762,7 @@ def _cost_result(
         cache_write_5m_tokens=usage.cache_write_5m_tokens,
         cache_write_1h_tokens=usage.cache_write_1h_tokens,
         batch=usage.batch,
+        service_tier=usage.service_tier,
     )
     reasons = [f"missing_{dimension}" for dimension in missing] + reasons
     partial = bool(reasons)

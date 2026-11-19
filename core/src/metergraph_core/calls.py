@@ -279,17 +279,20 @@ def price_call_from_record(
     agent = normalize_provider(provider or '') in {'perplexity-ai', 'perplexity-agent'} and (
         row.get('retrieval_api') == 'agent' or provider == 'perplexity-agent')
     channel = 'perplexity-agent-api' if agent else direct_channel_for_provider(provider)
-    if token_cost is None or token_cost.effective_at is None or agent:
+    tier = row.get('service_tier')
+    if token_cost is None or token_cost.effective_at is None or agent or tier == 'flex':
         values = {key: row.get(key) for key in ('input_tokens', 'output_tokens', 'cache_read_tokens',
             'cache_write_tokens', 'cache_write_5m_tokens', 'cache_write_1h_tokens')}
         def cost(**usage):
-            return loaded.calculate_cost(model=row.get('model'), usage=ModelUsage(**usage, batch=row.get('batch') is True),
+            return loaded.calculate_cost(model=row.get('model'), usage=ModelUsage(**usage, batch=row.get('batch') is True, service_tier=tier),
                 at=when, provider=provider, channel=channel, region=region)
         if row.get('input_tokens_include_cache') is True:
             values['input_tokens'] = _native_input_tokens(values, cost)
         token_cost = cost(**values)
-    tier = row.get('service_tier')
-    if tier is not None and tier not in ('standard', 'default', 'auto', 'batch'):
+    flex_priced = tier == 'flex' and token_cost.price is not None and (
+        (token_cost.publisher == 'openai' and channel == 'openai-api') or
+        (token_cost.publisher == 'google' and channel in ('google-api', 'google-vertex-ai')))
+    if tier is not None and tier not in ('standard', 'default', 'auto', 'batch') and not flex_priced:
         token_cost = replace(token_cost, status='partial',
             missing_dimensions=tuple(dict.fromkeys((*token_cost.missing_dimensions, 'service_tier'))))
     model = token_cost.canonical_model or row.get('model')
