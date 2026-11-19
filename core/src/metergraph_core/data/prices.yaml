@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-18"
+version: "2026-11-19"
 currency: USD
-pricing_verified_at: "2026-11-18"
+pricing_verified_at: "2026-11-19"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -13930,6 +13930,27 @@ models:
         output_per_mtok: 7.50
         cache_read_per_mtok: 0.075
         source_url: https://ai-gateway.vercel.sh/v1/models
+
+  - canonical_id: google/gemini-4-neon
+    publisher: google
+    aliases:
+      - {provider: google, alias: gemini-4-neon, channel: google-api}
+      - {provider: google, alias: models/gemini-4-neon, channel: google-api}
+      - {provider: litellm, alias: gemini-4-neon, channel: google-api}
+      - {provider: litellm, alias: models/gemini-4-neon, channel: google-api}
+      - {provider: unknown, alias: gemini-4-neon, channel: google-api}
+      - {provider: unknown, alias: models/gemini-4-neon, channel: google-api}
+    prices:
+      - channel: google-api
+        region: global
+        effective_from: "2026-11-18"
+        input_per_mtok: 3.00
+        output_per_mtok: 15.00
+        cache_read_per_mtok: 0.15
+        batch_input_per_mtok: 1.50
+        batch_output_per_mtok: 7.50
+        batch_cache_read_per_mtok: 0.075
+        source_url: https://aistudio.google.com/docs/pricing
 
   - canonical_id: google/gemini-omni-1.2-flash
     publisher: google
