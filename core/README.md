@@ -77,6 +77,68 @@ document's canonical JSON (sorted keys, compact separators, ISO dates), so two
 documents with the same content hash the same whatever their key order. That
 differs from the raw-byte hash `load_catalog()` reports for a file.
 
+### Prepared catalogs for request handlers
+
+Create one `Catalogs` instance per catalog source/region and share it across
+request handlers. `current()` returns the prepared object without copying it.
+Treat that object and its document as read-only.
+
+For a service that lets the catalog own its refresh thread, call `start()`
+before accepting traffic and `stop()` during shutdown:
+
+```python
+from metergraph_core import Catalogs
+
+catalogs = Catalogs(region="global", refresh_seconds=300)
+catalogs.start()
+try:
+    print(catalogs.current().version)
+finally:
+    catalogs.stop()
+```
+
+For an application that owns its scheduler or threads, `prepare()` and
+`refresh()` are synchronous operations that create no threads. Prepare before
+accepting traffic; schedule refreshes outside request handlers. This example
+runs one refresh on an application-owned executor:
+
+```python
+from concurrent.futures import ThreadPoolExecutor
+from metergraph_core import Catalogs
+
+catalogs = Catalogs(region="global")
+catalogs.prepare()
+try:
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        refresh = executor.submit(catalogs.refresh)
+        print(catalogs.current().version)
+        refresh.result()
+finally:
+    catalogs.stop()
+```
+
+Both `prepare()` and `start()` enable prepared-only reads: requests never
+trigger loading or refresh. Repeated calls are safe. Without either call,
+`current()` loads on first access and refreshes on demand after
+`refresh_seconds`; concurrent readers retain the previous object during loading.
+
+`refresh()` builds a replacement before publishing it and raises on failure,
+leaving the previous object available. Background and on-demand failures retain
+the previous object and log a warning. An initial load without a fallback must
+succeed before data can be served.
+
+The default source is the bundled catalog. For a changing source, supply a
+`loader` callable, for example `lambda: load_catalog("prices.yaml")` or a
+function that fetches a document and calls `load_catalog_document()`. A loader
+can also build a complete application pricing view before returning it. An
+optional `initial` value provides a prepared fallback during the first source
+refresh. Bound the loader's I/O: `stop()` waits for an owned refresh to finish.
+Applications remain responsible for their own scheduled work.
+
+`stop()` retains prepared data and restores on-demand refresh. The explicit
+`load_catalog()` and `load_catalog_document()` functions remain uncached loaders
+for callers that need direct control of loading.
+
 Planning and evaluation systems that know the deployment channel before making
 a call can resolve the exact effective price without emulating a provider
 response:
@@ -714,6 +776,7 @@ from metergraph_core import (
     cost_from_response,
     discovery_evidence,
     extract,
+    Catalogs,
     load_catalog,
     load_catalog_document,
     load_model_registry,

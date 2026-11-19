@@ -31,6 +31,7 @@ from .loader import (
     parse_catalog,
     parse_retrieval,
 )
+from .catalogs import Catalogs
 from .models import (
     TRAINING_ON_CUSTOMER_DATA,
     EffectiveTrainingPolicy,
@@ -150,6 +151,7 @@ __all__ = [
     "counts_cache_read_in_input",
     "direct_channel_for_provider",
     "normalize_provider",
+    "Catalogs",
     "load_catalog",
     "load_catalog_document",
     "load_model_registry",
