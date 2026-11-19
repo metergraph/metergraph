@@ -187,3 +187,14 @@ def test_openai_flex_respects_the_batch_long_context_exception(inputs):
     assert flex.status == batch.status == 'priced'
     assert flex.token_cost.components == batch.token_cost.components
     assert flex.cost_usd == Decimal(inputs) * Decimal('.000015') + Decimal('.09')
+
+
+@pytest.mark.parametrize('provider,model,expected_model,expected_channel', [
+    ('google', 'projects/example-project/locations/global/publishers/google/models/gemini-3.8-flash', 'gemini-3.8-flash', 'google-vertex-ai'),
+    ('vertex-ai', 'gemini-3.8-flash', 'gemini-3.8-flash', 'google-vertex-ai'),
+    ('google', 'gemini-3.8-flash', 'gemini-3.8-flash', 'google-api'),
+    ('openai', 'projects/example-project/locations/global/publishers/google/models/gemini-3.8-flash', 'projects/example-project/locations/global/publishers/google/models/gemini-3.8-flash', 'openai-api'),
+])
+def test_provider_model_identity_preserves_unrelated_model_names(provider, model, expected_model, expected_channel):
+    from metergraph_core.providers import model_identity
+    assert model_identity(provider, model) == (expected_model, expected_channel)
