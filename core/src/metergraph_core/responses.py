@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from functools import lru_cache
 from typing import Any, Callable, Mapping
 
-from .catalog import CostResult, ModelUsage, _coerce_datetime
+from .catalog import CostResult, ModelUsage, _coerce_datetime, _supports_flex
 from .loader import LoadedCatalog, load_catalog
 
 _STANDARD_TIERS = frozenset({"default", "standard", "standard_only", "auto", "on_demand"})
@@ -151,6 +151,8 @@ def _openai_chat_completions(response: Mapping[str, Any]) -> _Facts:
 
 def _gemini(response: Mapping[str, Any]) -> _Facts:
     usage = _object(_first(response, "usage_metadata", "usageMetadata"))
+    traffic = _text(_first(usage, "traffic_type", "trafficType"))
+    tier = {"ON_DEMAND_FLEX": "flex", "ON_DEMAND": "standard", "ON_DEMAND_PRIORITY": "priority"}.get(traffic, traffic)
     return _Facts(
         model=_text(_first(response, "model_version", "modelVersion")),
         usage={
@@ -169,6 +171,7 @@ def _gemini(response: Mapping[str, Any]) -> _Facts:
             ),
         },
         input_includes_cache=True,
+        service_tier=tier,
         at=_iso(_first(response, "create_time", "createTime")),
     )
 
@@ -308,8 +311,8 @@ def cost_from_response(
     Fees outside token usage, such as web search, are not included.
     ``service_tier`` overrides the tier the response reports, for responses
     that do not state it, such as an OpenAI batch output line. A tier other
-    than standard or batch turns the result ``partial`` with ``service_tier``
-    missing, since the catalog does not carry tier rates.
+    than standard, batch, or supported OpenAI/Google Flex turns the result
+    ``partial`` with ``service_tier`` missing.
     """
     data = _as_mapping(response)
     if format is not None and format not in _READERS:
@@ -337,7 +340,7 @@ def cost_from_response(
     def cost(**usage: Any) -> CostResult:
         return loaded.calculate_cost(
             model=model_id,
-            usage=ModelUsage(**usage, batch=batch),
+            usage=ModelUsage(**usage, batch=batch, service_tier=tier),
             at=when,
             channel=channel,
             provider=provider,
@@ -348,7 +351,7 @@ def cost_from_response(
     if facts.input_includes_cache:
         usage["input_tokens"] = _native_input_tokens(usage, cost)
     result = cost(**usage)
-    if tier is None or tier in _STANDARD_TIERS or batch or result.status == "unpriced":
+    if tier is None or tier in _STANDARD_TIERS or batch or (tier == "flex" and _supports_flex(result.price)) or result.status == "unpriced":
         return result
     return replace(
         result,

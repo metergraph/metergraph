@@ -536,6 +536,13 @@ def _cached_count(value: Any, name: str, reasons: list[str]) -> int | None:
     return count
 
 
+def _supports_flex(price: Price | None) -> bool:
+    return price is not None and (
+        (price.publisher == "openai" and price.pricing_channel == "openai-api") or
+        (price.publisher == "google" and price.pricing_channel in {"google-api", "google-vertex-ai"})
+    )
+
+
 def _price_tokens(
     price: Price,
     rules: Mapping[str, Any],
@@ -607,7 +614,7 @@ def _price_tokens(
         "google-api", "google-vertex-ai",
     }
     openai_flex = flex and price.publisher == "openai" and price.pricing_channel == "openai-api"
-    if service_tier not in (None, "standard", "default", "auto", "batch") and not (google_flex or openai_flex):
+    if service_tier not in (None, "standard", "default", "standard_only", "auto", "on_demand", "batch") and not (google_flex or openai_flex):
         reasons.append("unsupported_service_tier")
     if google_flex:
         # Google publishes Flex at half the standard token rates, including cache reads.

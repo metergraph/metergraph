@@ -146,3 +146,18 @@ def test_normalized_usage_does_not_silently_accept_unknown_tiers():
     result = load_catalog().calculate_cost(provider='anthropic', model='claude-sonnet-4-6',
         at=AT, usage=ModelUsage(input_tokens=1000, output_tokens=100, service_tier='flex'))
     assert result.status == 'partial' and 'unsupported_service_tier' in result.reasons
+
+
+@pytest.mark.parametrize('provider,response', [
+    ('openai', {'id': 'resp_synthetic', 'model': 'gpt-5.4-mini', 'object': 'response',
+        'service_tier': 'flex', 'output': [], 'usage': {'input_tokens': 1000, 'output_tokens': 100}}),
+    ('vertex-ai', {'modelVersion': 'gemini-3.8-flash', 'usageMetadata': {
+        'promptTokenCount': 1000, 'candidatesTokenCount': 100, 'trafficType': 'ON_DEMAND_FLEX'}}),
+])
+def test_native_response_entrypoint_prices_served_flex(provider, response):
+    from metergraph_core import cost_from_response
+    result = cost_from_response(provider, response, at=AT)
+    row = price_call_from_record(dict(provider=provider, model=response.get('model') or response['modelVersion'],
+        ts=AT, input_tokens=1000, output_tokens=100, service_tier='flex'))
+    assert result.status == 'priced'
+    assert result.cost_usd == row.token_cost.cost_usd
