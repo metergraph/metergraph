@@ -1,8 +1,8 @@
 # metergraph-core
 
-Calculate LLM call costs from model, provider, usage, region, and date.
-`metergraph-core` includes an effective-dated pricing catalog, a model registry,
-and a deterministic Python cost engine. It makes no provider calls.
+Calculate the cost of an LLM call from its model, provider, tokens, region, and
+date. `metergraph-core` ships an open, effective-dated model pricing catalog and
+a deterministic Python cost engine.
 
 ## Install
 
@@ -10,7 +10,7 @@ and a deterministic Python cost engine. It makes no provider calls.
 python -m pip install metergraph-core
 ```
 
-## Calculate your first cost
+## Usage
 
 Use `calculate_cost()` when you already have token counts:
 
@@ -102,5 +102,5 @@ for refresh failures, custom sources, read-only values, and shutdown behavior.
 - [Public API exports](https://github.com/metergraph/metergraph/blob/main/core/docs/usage.md#public-api).
 
 Core contains the shared datasets and pricing rules for
-[Metergraph](https://github.com/metergraph/metergraph). HTTP services, databases,
-authentication, ingestion, and dashboards belong to the applications using it.
+[Metergraph](https://github.com/metergraph/metergraph). Core does not own HTTP routes, database access,
+authentication, ingestion, or dashboards; these belong to the applications using it.
