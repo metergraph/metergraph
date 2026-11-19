@@ -161,3 +161,18 @@ def test_native_response_entrypoint_prices_served_flex(provider, response):
         ts=AT, input_tokens=1000, output_tokens=100, service_tier='flex'))
     assert result.status == 'priced'
     assert result.cost_usd == row.token_cost.cost_usd
+
+
+@pytest.mark.parametrize('tier', ['standard', 'flex'])
+def test_sdk_vertex_resource_name_resolves_native_channel(tier):
+    from metergraph_core import load_catalog, ModelUsage
+    loaded = load_catalog()
+    model = 'projects/example-project/locations/global/publishers/google/models/gemini-3.8-flash'
+    row = dict(provider='google', model=model, ts=AT, input_tokens=11, output_tokens=6, service_tier=tier)
+    unknown = loaded.calculate_cost(provider='google', model=model, at=AT, usage=ModelUsage(input_tokens=11, output_tokens=6))
+    for supplied in (None, unknown):
+        result = price_call_from_record(row, catalog=loaded, token_cost=supplied)
+        assert result.status == 'priced'
+        assert result.token_cost.canonical_model == 'google/gemini-3.8-flash'
+        assert result.token_cost.price.pricing_channel == 'google-vertex-ai'
+        assert result.cost_usd == (Decimal('.00001538') if tier == 'flex' else Decimal('.00003075'))

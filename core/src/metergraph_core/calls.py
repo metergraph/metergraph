@@ -275,16 +275,24 @@ def price_call_from_record(
     """
     loaded = catalog if catalog is not None else _bundled_catalog()
     provider = row.get('provider')
+    model = row.get('model')
+    vertex = (
+        re.fullmatch(r'projects/[^/]+/locations/[^/]+/publishers/google/models/([^/]+)', model)
+        if isinstance(model, str) and normalize_provider(provider or '') in {'google', 'vertex-ai'}
+        else None
+    )
+    if vertex:
+        model = vertex.group(1)
     when = at if at is not None else token_cost.effective_at if token_cost is not None and token_cost.effective_at is not None else row.get('ts')
     agent = normalize_provider(provider or '') in {'perplexity-ai', 'perplexity-agent'} and (
         row.get('retrieval_api') == 'agent' or provider == 'perplexity-agent')
-    channel = 'perplexity-agent-api' if agent else direct_channel_for_provider(provider)
+    channel = 'perplexity-agent-api' if agent else 'google-vertex-ai' if vertex else direct_channel_for_provider(provider)
     tier = row.get('service_tier')
-    if token_cost is None or token_cost.effective_at is None or agent or tier == 'flex':
+    if token_cost is None or token_cost.effective_at is None or agent or vertex or tier == 'flex':
         values = {key: row.get(key) for key in ('input_tokens', 'output_tokens', 'cache_read_tokens',
             'cache_write_tokens', 'cache_write_5m_tokens', 'cache_write_1h_tokens')}
         def cost(**usage):
-            return loaded.calculate_cost(model=row.get('model'), usage=ModelUsage(**usage, batch=row.get('batch') is True, service_tier=tier),
+            return loaded.calculate_cost(model=model, usage=ModelUsage(**usage, batch=row.get('batch') is True, service_tier=tier),
                 at=when, provider=provider, channel=channel, region=region)
         if row.get('input_tokens_include_cache') is True:
             values['input_tokens'] = _native_input_tokens(values, cost)
