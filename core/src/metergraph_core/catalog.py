@@ -666,8 +666,8 @@ def _price_tokens(
             prompt_count += cache_read_count
         if not rules.get("input_includes_cache_write"):
             prompt_count += cache_write_count
-    # Some providers publish no long-context batch rate, so batch stays flat.
-    applies = not batch or long_context.get("applies_to_batch", True)
+    # OpenAI Flex shares Batch rates, including its long-context exceptions.
+    applies = not (batch or openai_flex) or long_context.get("applies_to_batch", True)
     if applies and threshold is not None and prompt_count > threshold:
         input_multiplier = _decimal(long_context.get("input_multiplier")) or Decimal("1")
         output_multiplier = _decimal(

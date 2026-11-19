@@ -176,3 +176,14 @@ def test_sdk_vertex_resource_name_resolves_native_channel(tier):
         assert result.token_cost.canonical_model == 'google/gemini-3.8-flash'
         assert result.token_cost.price.pricing_channel == 'google-vertex-ai'
         assert result.cost_usd == (Decimal('.00001538') if tier == 'flex' else Decimal('.00003075'))
+
+
+@pytest.mark.parametrize('inputs', [272000, 272001])
+def test_openai_flex_respects_the_batch_long_context_exception(inputs):
+    row = dict(provider='openai', model='gpt-5.5-pro', ts=AT,
+               input_tokens=inputs, output_tokens=1000)
+    batch = price_call_from_record({**row, 'batch': True, 'service_tier': 'batch'})
+    flex = price_call_from_record({**row, 'service_tier': 'flex'})
+    assert flex.status == batch.status == 'priced'
+    assert flex.token_cost.components == batch.token_cost.components
+    assert flex.cost_usd == Decimal(inputs) * Decimal('.000015') + Decimal('.09')
