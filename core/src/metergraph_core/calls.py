@@ -6,8 +6,9 @@ from decimal import Decimal
 import re
 from typing import Any, Mapping, Sequence
 
-from .catalog import CostResult, ModelUsage, direct_channel_for_provider, normalize_provider
+from .catalog import CostResult, ModelUsage, direct_channel_for_provider, normalize_provider, _supports_flex
 from .loader import LoadedCatalog
+from .providers import model_identity
 from .responses import _as_mapping, _bundled_catalog, _first, cost_from_response, response_format, _native_input_tokens
 
 _ZERO = Decimal('0')
@@ -275,21 +276,25 @@ def price_call_from_record(
     """
     loaded = catalog if catalog is not None else _bundled_catalog()
     provider = row.get('provider')
+    model, channel = model_identity(provider, row.get('model'))
+    identity_changed = (model, channel) != (row.get('model'), direct_channel_for_provider(provider))
     when = at if at is not None else token_cost.effective_at if token_cost is not None and token_cost.effective_at is not None else row.get('ts')
     agent = normalize_provider(provider or '') in {'perplexity-ai', 'perplexity-agent'} and (
         row.get('retrieval_api') == 'agent' or provider == 'perplexity-agent')
-    channel = 'perplexity-agent-api' if agent else direct_channel_for_provider(provider)
-    if token_cost is None or token_cost.effective_at is None or agent:
+    if agent:
+        channel = 'perplexity-agent-api'
+    tier = row.get('service_tier')
+    if token_cost is None or token_cost.effective_at is None or agent or identity_changed or tier == 'flex':
         values = {key: row.get(key) for key in ('input_tokens', 'output_tokens', 'cache_read_tokens',
             'cache_write_tokens', 'cache_write_5m_tokens', 'cache_write_1h_tokens')}
         def cost(**usage):
-            return loaded.calculate_cost(model=row.get('model'), usage=ModelUsage(**usage, batch=row.get('batch') is True),
+            return loaded.calculate_cost(model=model, usage=ModelUsage(**usage, batch=row.get('batch') is True, service_tier=tier),
                 at=when, provider=provider, channel=channel, region=region)
         if row.get('input_tokens_include_cache') is True:
             values['input_tokens'] = _native_input_tokens(values, cost)
         token_cost = cost(**values)
-    tier = row.get('service_tier')
-    if tier is not None and tier not in ('standard', 'default', 'auto', 'batch'):
+    flex_priced = tier == 'flex' and _supports_flex(token_cost.price)
+    if tier is not None and tier not in ('standard', 'default', 'auto', 'batch') and not flex_priced:
         token_cost = replace(token_cost, status='partial',
             missing_dimensions=tuple(dict.fromkeys((*token_cost.missing_dimensions, 'service_tier'))))
     model = token_cost.canonical_model or row.get('model')

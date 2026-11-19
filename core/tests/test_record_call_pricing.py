@@ -87,3 +87,114 @@ def test_null_counter_preserves_native_server_search_usage():
     assert result.search_units == 2
     assert result.retrieval_cost_usd == Decimal('.02')
     assert result.status == 'priced'
+
+
+@pytest.mark.parametrize('provider,model,search,fee', [
+    ('openai', 'gpt-5.4-mini', {'web_search_calls': 2}, '.02'),
+    ('google', 'gemini-3.8-flash', {'grounding_queries': 2, 'grounded_prompt': 1}, '.028'),
+    ('vertex-ai', 'gemini-3.8-flash', {'grounding_queries': 2, 'grounded_prompt': 1}, '.028'),
+])
+def test_served_flex_discounts_tokens_without_discounting_search(provider, model, search, fee):
+    from metergraph_core import load_catalog, ModelUsage
+    loaded = load_catalog()
+    row = dict(provider=provider, model=model, ts=AT, input_tokens=1000, output_tokens=100,
+               cache_read_tokens=200, service_tier='flex', **search)
+    standard = price_call_from_record({**row, 'service_tier': 'standard'}, catalog=loaded)
+    # Hosted ingestion supplies an already calculated standard token result.
+    for supplied in (None, standard.token_cost):
+        flex = price_call_from_record(row, catalog=loaded, token_cost=supplied)
+        assert flex.status == 'priced'
+        assert flex.retrieval_cost_usd == Decimal(fee)
+        assert flex.token_cost.components.input_usd == standard.token_cost.components.input_usd / 2
+        assert flex.token_cost.components.output_usd == standard.token_cost.components.output_usd / 2
+        assert flex.token_cost.components.cache_read_usd == standard.token_cost.components.cache_read_usd / 2
+        assert flex.cost_usd == flex.token_cost.cost_usd + Decimal(fee)
+
+
+@pytest.mark.parametrize('served', ['default', 'standard', None])
+def test_requested_flex_does_not_discount_standard_or_unknown_delivery(served):
+    row = dict(provider='openai', model='gpt-5.4-mini', ts=AT, input_tokens=1000,
+               output_tokens=100, requested_service_tier='flex', service_tier=served)
+    actual = price_call_from_record(row)
+    standard = price_call_from_record({**row, 'requested_service_tier': None})
+    assert actual == standard
+
+
+def test_anthropic_flex_is_not_assumed_to_be_discounted():
+    result = price_call_from_record(dict(provider='anthropic', model='claude-sonnet-4-6',
+        ts=AT, input_tokens=1000, output_tokens=100, service_tier='flex'))
+    assert result.status == 'partial' and result.cost_usd is None
+    assert 'service_tier' in result.missing_dimensions
+
+
+def test_flex_preserves_unknown_token_usage_as_partial():
+    result = price_call_from_record(dict(provider='vertex-ai', model='gemini-3.8-flash',
+        ts=AT, input_tokens=1000, output_tokens=None, service_tier='flex'))
+    assert result.status == 'partial' and result.cost_usd is None
+    assert 'output_tokens' in result.missing_dimensions
+
+
+def test_flex_applies_after_effective_date_and_long_context_resolution():
+    row = dict(provider='vertex-ai', model='gemini-3.8-flash',
+        ts='2027-01-02T12:00:00Z', input_tokens=1000, output_tokens=100, service_tier='flex')
+    result = price_call_from_record(row)
+    assert result.cost_usd == Decimal('.001125')
+
+
+def test_normalized_usage_does_not_silently_accept_unknown_tiers():
+    from metergraph_core import load_catalog, ModelUsage
+    result = load_catalog().calculate_cost(provider='anthropic', model='claude-sonnet-4-6',
+        at=AT, usage=ModelUsage(input_tokens=1000, output_tokens=100, service_tier='flex'))
+    assert result.status == 'partial' and 'unsupported_service_tier' in result.reasons
+
+
+@pytest.mark.parametrize('provider,response', [
+    ('openai', {'id': 'resp_synthetic', 'model': 'gpt-5.4-mini', 'object': 'response',
+        'service_tier': 'flex', 'output': [], 'usage': {'input_tokens': 1000, 'output_tokens': 100}}),
+    ('vertex-ai', {'modelVersion': 'gemini-3.8-flash', 'usageMetadata': {
+        'promptTokenCount': 1000, 'candidatesTokenCount': 100, 'trafficType': 'ON_DEMAND_FLEX'}}),
+])
+def test_native_response_entrypoint_prices_served_flex(provider, response):
+    from metergraph_core import cost_from_response
+    result = cost_from_response(provider, response, at=AT)
+    row = price_call_from_record(dict(provider=provider, model=response.get('model') or response['modelVersion'],
+        ts=AT, input_tokens=1000, output_tokens=100, service_tier='flex'))
+    assert result.status == 'priced'
+    assert result.cost_usd == row.token_cost.cost_usd
+
+
+@pytest.mark.parametrize('tier', ['standard', 'flex'])
+def test_sdk_vertex_resource_name_resolves_native_channel(tier):
+    from metergraph_core import load_catalog, ModelUsage
+    loaded = load_catalog()
+    model = 'projects/example-project/locations/global/publishers/google/models/gemini-3.8-flash'
+    row = dict(provider='google', model=model, ts=AT, input_tokens=11, output_tokens=6, service_tier=tier)
+    unknown = loaded.calculate_cost(provider='google', model=model, at=AT, usage=ModelUsage(input_tokens=11, output_tokens=6))
+    for supplied in (None, unknown):
+        result = price_call_from_record(row, catalog=loaded, token_cost=supplied)
+        assert result.status == 'priced'
+        assert result.token_cost.canonical_model == 'google/gemini-3.8-flash'
+        assert result.token_cost.price.pricing_channel == 'google-vertex-ai'
+        assert result.cost_usd == (Decimal('.00001538') if tier == 'flex' else Decimal('.00003075'))
+
+
+@pytest.mark.parametrize('inputs', [272000, 272001])
+def test_openai_flex_respects_the_batch_long_context_exception(inputs):
+    row = dict(provider='openai', model='gpt-5.5-pro', ts=AT,
+               input_tokens=inputs, output_tokens=1000)
+    batch = price_call_from_record({**row, 'batch': True, 'service_tier': 'batch'})
+    flex = price_call_from_record({**row, 'service_tier': 'flex'})
+    assert flex.status == batch.status == 'priced'
+    assert flex.token_cost.components == batch.token_cost.components
+    assert flex.cost_usd == Decimal(inputs) * Decimal('.000015') + Decimal('.09')
+
+
+@pytest.mark.parametrize('provider,model,expected_model,expected_channel', [
+    ('google', 'projects/example-project/locations/global/publishers/google/models/gemini-3.8-flash', 'gemini-3.8-flash', 'google-vertex-ai'),
+    ('vertex-ai', 'gemini-3.8-flash', 'gemini-3.8-flash', 'google-vertex-ai'),
+    ('google', 'gemini-3.8-flash', 'gemini-3.8-flash', 'google-api'),
+    ('openai', 'projects/example-project/locations/global/publishers/google/models/gemini-3.8-flash', 'projects/example-project/locations/global/publishers/google/models/gemini-3.8-flash', 'openai-api'),
+])
+def test_provider_model_identity_preserves_unrelated_model_names(provider, model, expected_model, expected_channel):
+    from metergraph_core.providers import model_identity
+    assert model_identity(provider, model) == (expected_model, expected_channel)
