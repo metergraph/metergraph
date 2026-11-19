@@ -306,6 +306,15 @@ rate, count, search type, or processing tier stays partial or unpriced.
 `search_units` and `retrieval_cost_usd` expose the resolved components for storage.
 `known_subtotal_usd` remains separate from a complete total.
 
+For failed calls, missing usage is not evidence of a free request. Anthropic
+Messages HTTP rejections with no observed usage are priced at zero with reason
+`provider_failure_not_billable`. This rule excludes batch operations and unknown
+endpoints: a failed result download can follow already-billed inference. Failed
+streams or `usage_complete: false` remain partial; any observed-usage estimate is
+separate from the final charge. Qualified gateway billing evidence retains its
+existing precedence.
+
+
 A receiver that already resolved tokens against the same catalog may pass
 `token_cost=`. Explicit API identity can select a different token channel; other
 resolved token results are preserved. Qualified gateway totals can still be

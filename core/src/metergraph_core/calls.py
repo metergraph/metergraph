@@ -6,9 +6,10 @@ from decimal import Decimal
 import re
 from typing import Any, Mapping, Sequence
 
-from .catalog import CostResult, ModelUsage, direct_channel_for_provider, normalize_provider, _supports_flex
+from .catalog import CostComponents, CostResult, ModelUsage, direct_channel_for_provider, normalize_provider, _supports_flex
 from .loader import LoadedCatalog
 from .providers import model_identity
+from .providers.anthropic import rejected_without_usage
 from .responses import _as_mapping, _bundled_catalog, _first, cost_from_response, response_format, _native_input_tokens
 
 _ZERO = Decimal('0')
@@ -293,6 +294,16 @@ def price_call_from_record(
         if row.get('input_tokens_include_cache') is True:
             values['input_tokens'] = _native_input_tokens(values, cost)
         token_cost = cost(**values)
+    if normalize_provider(provider or '') == 'anthropic' and rejected_without_usage(row):
+        free = replace(token_cost, cost_usd=_ZERO, status='priced',
+            reasons=('provider_failure_not_billable',), missing_dimensions=(),
+            components=CostComponents(_ZERO, _ZERO, _ZERO, _ZERO))
+        return CallCostResult(free, (), _ZERO, _ZERO, None, 'priced', 'exact', (), loaded.content_hash)
+    failed_stream = row.get('stream') is True and (
+        row.get('error') is True or row.get('status') in {'error', 'failed', 'abandoned'})
+    if row.get('usage_complete') is False or failed_stream:
+        token_cost = replace(token_cost, status='partial',
+            missing_dimensions=tuple(dict.fromkeys((*token_cost.missing_dimensions, 'incomplete_usage'))))
     flex_priced = tier == 'flex' and _supports_flex(token_cost.price)
     if tier is not None and tier not in ('standard', 'default', 'auto', 'batch') and not flex_priced:
         token_cost = replace(token_cost, status='partial',
