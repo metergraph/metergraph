@@ -1,4 +1,4 @@
-version: '2026-11-17'
+version: '2026-11-20'
 # Training use of customer inputs and outputs under each serving provider's
 # default terms. A pair left out resolves to unknown. A gateway or cloud host
 # follows its own terms, never the model publisher's. No policy verifies an
@@ -666,6 +666,13 @@ models:
   publisher: openai
   released: '2026-03-05'  # https://en.wikipedia.org/wiki/GPT-5.4
   routes:
+  - key: default:openai/gpt-5.4
+    id: openai/gpt-5.4
+    provider: vercel
+    model_id: openai/gpt-5.4
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
   - key: default:openai:gpt-5.4
     id: openai:gpt-5.4
     provider: openai
@@ -1046,6 +1053,18 @@ models:
     pricing_channel: vercel-ai-gateway
     execution_profiles:
     - default
+- canonical_id: google/gemini-4-neon
+  display_name: Gemini 4 Neon
+  publisher: google
+  released: '2026-11-18'  # https://vercel.com/changelog/gemini-4-neon-now-available-on-ai-gateway
+  routes:
+  - key: default:google/gemini-4-neon
+    id: google/gemini-4-neon
+    provider: vercel
+    model_id: google/gemini-4-neon
+    pricing_channel: vercel-ai-gateway
+    execution_profiles:
+    - default
 - canonical_id: google/gemini-4-hydrogen
   display_name: Gemini 4 Hydrogen
   publisher: google
@@ -1200,6 +1219,8 @@ execution_profiles:
   - default:openai/gpt-6.2-astra
   - default:openai:gpt-6.2-sol
   - default:openai:gpt-6.2-astra
+  - default:openai/gpt-5.4
+  - default:google/gemini-4-neon
 
 - id: bedrock
   routes:
@@ -1282,6 +1303,8 @@ offer_groups:
   - default:alibaba/qwen4-max
   - default:openai/gpt-6.2-sol
   - default:openai/gpt-6.2-astra
+  - default:openai/gpt-5.4
+  - default:google/gemini-4-neon
 - id: fireworks
   credential: FIREWORKS_API_KEY
   routes:

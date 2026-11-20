@@ -328,7 +328,7 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert agent.retrieval_cost_usd == Decimal("0.0075"), agent
         assert agent.search_units == 3, agent
         registry = load_model_registry()
-        assert registry.version == "2026-11-17", registry.version
+        assert registry.version == "2026-11-20", registry.version
         gateway_policy = registry.effective_training_policy(
             "default:openai/gpt-5.6-sol"
         )
@@ -346,7 +346,7 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert mistral_candidates == ["mistral:mistral-small-2603"], mistral_candidates
         assert registry.offer_groups["mistral-direct"].credential == "MISTRAL_API_KEY"
         gateway_candidates = [route.id for route in registry.candidates("gateway")]
-        assert len(gateway_candidates) == 63, len(gateway_candidates)
+        assert len(gateway_candidates) == 65, len(gateway_candidates)
         assert gateway_candidates[:2] == [
             "anthropic/claude-sonnet-5",
             "anthropic/claude-opus-5",
