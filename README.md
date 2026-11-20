@@ -231,7 +231,7 @@ in
 Keeping these facts separate prevents a priceable model from becoming an
 analysis candidate implicitly. Model providers can review and correct how
 their models are priced; see
-[Provider review and contributions](core/README.md#provider-review-and-contributions).
+[Provider review and contributions](core/docs/catalog-maintenance.md#provider-review-and-contributions).
 
 ## Development
 

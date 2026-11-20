@@ -36,7 +36,7 @@ CORE_DIR = Path(__file__).resolve().parents[2]  # core/
 DIST_DIR = CORE_DIR / "dist"
 
 EXPECTED_NAME = "metergraph-core"
-EXPECTED_VERSION = "0.8.28"
+EXPECTED_VERSION = "0.8.29"
 EXPECTED_REQUIRES_PYTHON = ">=3.10"
 EXPECTED_SUMMARY = (
     "Open, effective-dated LLM pricing catalog and deterministic cost calculator "
@@ -292,6 +292,7 @@ def _verify_isolated_install(wheel: Path) -> None:
 
         import metergraph_core
         from metergraph_core import (
+            Catalogs,
             CostResult,
             ModelUsage,
             PriceResult,
@@ -308,6 +309,11 @@ def _verify_isolated_install(wheel: Path) -> None:
         assert "site-packages" in source, source
 
         loaded = load_catalog()
+        catalogs = Catalogs(loader=lambda: loaded)
+        assert catalogs.prepare() is loaded
+        assert catalogs.current() is loaded
+        assert catalogs.refresh() is loaded
+        catalogs.stop()
         assert loaded.version == {CATALOG_VERSION!r}, loaded.version
         assert loaded.currency == "USD", loaded.currency
         assert loaded.pricing_verified_at.isoformat() == {CATALOG_VERSION!r}
