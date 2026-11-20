@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-19"
+version: "2026-11-20"
 currency: USD
-pricing_verified_at: "2026-11-19"
+pricing_verified_at: "2026-11-20"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -2409,6 +2409,7 @@ models:
       - channel: google-api
         region: global
         effective_from: "2025-06-17"
+        effective_to: "2026-12-01"
         input_per_mtok: 1.25
         output_per_mtok: 10.00
         cache_read_per_mtok: 0.125
@@ -2417,6 +2418,26 @@ models:
         rules:
           long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://ai.google.dev/gemini-api/docs/pricing
+      # Routed to gemini-3.8-flash; mirrors its google-api rows.
+      - channel: google-api
+        region: global
+        effective_from: "2026-12-01"
+        effective_to: "2027-01-01"
+        input_per_mtok: 0.75
+        output_per_mtok: 3.75
+        cache_read_per_mtok: 0.075
+        batch_input_per_mtok: 0.375
+        batch_output_per_mtok: 1.875
+        source_url: https://aistudio.google.com/docs/changelog
+      - channel: google-api
+        region: global
+        effective_from: "2027-01-01"
+        input_per_mtok: 1.50
+        output_per_mtok: 7.50
+        cache_read_per_mtok: 0.15
+        batch_input_per_mtok: 0.75
+        batch_output_per_mtok: 3.75
+        source_url: https://aistudio.google.com/docs/changelog
 
       - channel: vercel-ai-gateway
         region: global
@@ -8403,6 +8424,7 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: meta, alias: muse-spark-1.2-contributor, channel: meta-api, rules: {input_includes_cache_read: true}}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -8411,6 +8433,14 @@ models:
         output_per_mtok: 0.2
         cache_read_per_mtok: 0.002
         source_url: https://ai-gateway.vercel.sh/v1/models
+      # First verified Meta API rate, not its launch date.
+      - channel: meta-api
+        region: global
+        effective_from: "2026-11-20"
+        input_per_mtok: 0.10
+        output_per_mtok: 0.20
+        cache_read_per_mtok: 0.002
+        source_url: https://dev.meta.ai/docs/pricing-rate-limits
 
   - canonical_id: meta/muse-spark-1.3-contributor
     publisher: meta
@@ -8421,6 +8451,7 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: meta, alias: muse-spark-1.3-contributor, channel: meta-api, rules: {input_includes_cache_read: true}}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -8429,6 +8460,14 @@ models:
         output_per_mtok: 0.2
         cache_read_per_mtok: 0.002
         source_url: https://ai-gateway.vercel.sh/v1/models
+      # First verified Meta API rate, not its launch date.
+      - channel: meta-api
+        region: global
+        effective_from: "2026-11-20"
+        input_per_mtok: 0.10
+        output_per_mtok: 0.20
+        cache_read_per_mtok: 0.002
+        source_url: https://dev.meta.ai/docs/pricing-rate-limits
 
   - canonical_id: minimax/minimax-m2
     publisher: minimax
