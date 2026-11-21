@@ -2218,6 +2218,7 @@ models:
   - canonical_id: google/gemini-4-argon
     publisher: google
     aliases:
+      - {provider: vertex-ai, alias: gemini-4-argon, channel: google-vertex-ai}
       - {provider: google, alias: gemini-4-argon, channel: google-api}
       - {provider: google, alias: models/gemini-4-argon, channel: google-api}
       - {provider: litellm, alias: gemini-4-argon, channel: google-api}
@@ -2229,6 +2230,28 @@ models:
         channel: vercel-ai-gateway
         rules: {input_includes_cache_read: true}
     prices:
+      # Introductory net prices include Google's 50% promotional credits.
+      - channel: google-vertex-ai
+        region: global
+        effective_from: "2026-10-13"
+        effective_to: "2026-12-01"
+        input_per_mtok: 2.00
+        output_per_mtok: 10.00
+        cache_read_per_mtok: 0.10
+        batch_input_per_mtok: 1.00
+        batch_output_per_mtok: 5.00
+        batch_cache_read_per_mtok: 0.05
+        source_url: https://cloud.google.com/model-garden/pricing
+      - channel: google-vertex-ai
+        region: global
+        effective_from: "2026-12-01"
+        input_per_mtok: 4.00
+        output_per_mtok: 20.00
+        cache_read_per_mtok: 0.20
+        batch_input_per_mtok: 2.00
+        batch_output_per_mtok: 10.00
+        batch_cache_read_per_mtok: 0.10
+        source_url: https://cloud.google.com/model-garden/pricing
       - channel: google-api
         region: global
         effective_from: "2026-10-13"
@@ -13929,6 +13952,7 @@ models:
   - canonical_id: google/gemini-4-hydrogen
     publisher: google
     aliases:
+      - {provider: vertex-ai, alias: gemini-4-hydrogen, channel: google-vertex-ai}
       - {provider: google, alias: gemini-4-hydrogen, channel: google-api}
       - {provider: google, alias: models/gemini-4-hydrogen, channel: google-api}
       - {provider: litellm, alias: gemini-4-hydrogen, channel: google-api}
@@ -13944,6 +13968,16 @@ models:
         channel: vercel-ai-gateway
         rules: {input_includes_cache_read: true}
     prices:
+      - channel: google-vertex-ai
+        region: global
+        effective_from: "2026-11-12"
+        input_per_mtok: 1.50
+        output_per_mtok: 7.50
+        cache_read_per_mtok: 0.075
+        batch_input_per_mtok: 0.75
+        batch_output_per_mtok: 3.75
+        batch_cache_read_per_mtok: 0.0375
+        source_url: https://cloud.google.com/model-garden/pricing
       - channel: google-api
         region: global
         effective_from: "2026-11-12"
@@ -14044,7 +14078,7 @@ retrieval:
     per_1k_usd: 14.00
     effective_from: "2026-08-26"
     source_url: https://ai.google.dev/gemini-api/docs/pricing
-  # Gemini 3 on Vertex is charged per grounding query after 5,000 free a
+  # Gemini 3 and 4 on Vertex are charged per grounding query after 5,000 free a
   # month. Gemini 2.5 and 2.0 are charged per grounded prompt and are not
   # represented.
   - channel: google-vertex-ai
