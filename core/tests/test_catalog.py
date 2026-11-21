@@ -96,7 +96,7 @@ def test_current_catalog_prices_more_than_one_thousand_provider_model_pairs():
     }
 
     # Includes claude-3-5-haiku-20241022 at its last known price.
-    assert len(pairs) == 1170
+    assert len(pairs) == 1171
     assert sum(provider == "vercel" for provider, _ in pairs) == 190
     assert sum(provider == "openrouter" for provider, _ in pairs) == 212
 
