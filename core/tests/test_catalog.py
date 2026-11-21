@@ -27,7 +27,7 @@ def test_prices_yaml_parses():
     assert VERSION
     assert DOC["models"]
     assert LOADED.currency == "USD"
-    assert LOADED.pricing_verified_at.isoformat() == "2026-11-20"
+    assert LOADED.pricing_verified_at.isoformat() == "2026-11-21"
 
 
 def test_openrouter_cache_reads_are_not_charged_as_fresh_input():
@@ -95,9 +95,10 @@ def test_current_catalog_prices_more_than_one_thousand_provider_model_pairs():
         == "priced"
     }
 
-    # Includes claude-3-5-haiku-20241022 at its last known price.
-    assert len(pairs) == 1171
-    assert sum(provider == "vercel" for provider, _ in pairs) == 190
+    # Includes claude-3-5-haiku-20241022 at its last known price, and the six
+    # gateway spellings of typesafe-ai/jev-1.13.0 added with its later rows.
+    assert len(pairs) == 1177
+    assert sum(provider == "vercel" for provider, _ in pairs) == 192
     assert sum(provider == "openrouter" for provider, _ in pairs) == 212
 
 

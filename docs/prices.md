@@ -40,6 +40,21 @@ model sharing an `id` gives the same one. A family is display metadata only: it 
 successor, upgrade or substitute, and never changes aliases or prices. Leave it out when
 the product line is ambiguous; it is never inferred from the model's name.
 
+A model entry may set `model_class`: `generative` (the default when it is left out) for a
+model that writes output, or `decision` for one that answers typed questions (choose an
+option, yes or no, a score) and is billed on input only. The set is closed; any other value
+fails to load. A priced result carries the class as `CostResult.model_class`, and
+`LoadedCatalog.model_class(canonical_id)` reads it for an entry. The class never changes a
+price: pricing is keyed on rates alone.
+
+A usage count is needed only for a component that costs something. When a row's effective
+rate for a component is exactly `0`, a call that does not report that count is still fully
+priced, so a model whose `output_per_mtok` is `0` prices on input tokens alone. A rate that
+is left out is unknown, not free, and its missing count keeps the result `partial`.
+
+A call with no recorded provider resolves through the aliases listed for provider
+`unknown`, and through no others.
+
 A row may also set `request_fee_per_1k_usd`: a fixed fee charged once per call on top of
 tokens, in USD per 1,000 calls. Use it where a channel bills a model's built-in work per
 request, such as a gateway pricing a search model's search per call. It appears in the

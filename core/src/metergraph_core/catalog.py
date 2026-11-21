@@ -61,6 +61,8 @@ _DIRECT_CHANNEL_BY_PROVIDER = {
     "mistral": "mistral-api",
     "moonshotai": "moonshot-api",
     "zai": "zai-api",
+    "typesafe": "typesafe-api",
+    "typesafe-ai": "typesafe-api",
 }
 
 
@@ -110,6 +112,18 @@ MODEL_NOT_ON_CHANNEL = "model_not_on_channel"
 MODEL_NOT_IN_EFFECT = "model_not_in_effect"
 MODEL_NOT_IN_REGION = "model_not_in_region"
 PRICE_NOT_IN_EFFECT = "price_not_in_effect"
+
+# What kind of model a catalog entry prices. A ``generative`` model writes
+# output (an LLM); a ``decision`` model answers typed questions and is billed
+# on input only. An entry that states none is ``generative``. The set is
+# closed: a value outside it is a catalog error, never a guess.
+GENERATIVE = "generative"
+DECISION = "decision"
+MODEL_CLASSES = (GENERATIVE, DECISION)
+DEFAULT_MODEL_CLASS = GENERATIVE
+# A call with no recorded provider resolves through the aliases a catalog
+# lists for a provider it cannot name.
+_UNKNOWN_PROVIDER_KEY = "unknown"
 
 
 def _bedrock_fallback_ids(model_key: str) -> tuple[tuple[str, bool], ...]:
@@ -204,6 +218,8 @@ class Alias:
     source_url: str | None = None
     # Limits an identifier to matching regions; global matches every snapshot.
     price_region: tuple[str, ...] = ()
+    # The class of the model this alias resolves to; see MODEL_CLASSES.
+    model_class: str = DEFAULT_MODEL_CLASS
 
 
 def _crosses_price_region(alias: Alias) -> bool:
@@ -334,6 +350,9 @@ class CostResult:
     # Why an unpriced result is unpriced, when the cause is a value the
     # caller sent. Empty otherwise.
     warnings: tuple["PricingWarning", ...] = ()
+    # The class of the resolved catalog entry (see MODEL_CLASSES), or None
+    # when no entry resolved.
+    model_class: str | None = None
 
     @property
     def model_id(self) -> str | None:
@@ -413,6 +432,8 @@ class ResolvedPrice:
     rules: Mapping[str, Any]
     # The last known price: it ended before the resolved time, unreplaced.
     ended: bool = False
+    # The class of the resolved catalog entry; see MODEL_CLASSES.
+    model_class: str = DEFAULT_MODEL_CLASS
 
 
 def _billed_terms(resolved: ResolvedPrice) -> tuple[Any, ...]:
@@ -578,10 +599,16 @@ def _price_tokens(
         _cached_count(cache_write_1h_tokens, "cache_write_1h_tokens", reasons) or 0
     )
     cache_write_count = cache_write_5m_count + cache_write_1h_count
+    # A missing count is a reason only when its rate is not exactly zero,
+    # which is known once the effective rates are; its place among the
+    # reasons is kept so results read as they always have.
+    input_missing_at = output_missing_at = None
     if input_count is None:
+        input_missing_at = len(reasons)
         reasons.append("missing_input_tokens")
         input_count = 0
     if output_count is None:
+        output_missing_at = len(reasons)
         reasons.append("missing_output_tokens")
         output_count = 0
 
@@ -683,6 +710,24 @@ def _price_tokens(
     off_peak = _off_peak_multiplier(rules, at)
     input_multiplier *= off_peak
     output_multiplier *= off_peak
+
+    # A usage component whose effective rate is exactly zero costs nothing
+    # whatever its count, so an absent count leaves the figure complete: a
+    # model billed on input alone is priced without output usage. An
+    # unknown rate (None) never qualifies. Missing input also keeps its
+    # reason when a long-context tier would read the count it lacks.
+    exempt = []
+    if output_missing_at is not None and output_rate is not None and output_rate == 0:
+        exempt.append(output_missing_at)
+    if (
+        input_missing_at is not None
+        and input_rate is not None
+        and input_rate == 0
+        and threshold is None
+    ):
+        exempt.append(input_missing_at)
+    for index in sorted(exempt, reverse=True):
+        del reasons[index]
 
     input_usd = output_usd = cache_read_usd = cache_write_usd = Decimal("0")
     if input_rate is None:
@@ -792,6 +837,7 @@ def _cost_result(
         currency=resolved.price.currency,
         effective_at=at,
         missing_dimensions=missing,
+        model_class=resolved.model_class,
     )
 
 
@@ -993,6 +1039,7 @@ class CatalogSnapshot:
             price=price,
             rules=MappingProxyType({**price.rules, **alias.rules}),
             ended=ended,
+            model_class=alias.model_class,
         )
 
     def _lookup(
@@ -1187,6 +1234,9 @@ class CatalogSnapshot:
     ) -> CostResult:
         provider_key = str(provider or "").strip().lower()
         provider_key = _PROVIDER_ALIASES.get(provider_key, provider_key)
+        # No recorded provider is as much as an unknown one: such a call
+        # resolves only through the aliases listed for provider "unknown".
+        provider_key = provider_key or _UNKNOWN_PROVIDER_KEY
         model_key = str(model or "").strip().lower()
         when = _coerce_datetime(at)
         candidates = self._aliases.get((provider_key, model_key), ())
@@ -1220,10 +1270,15 @@ class CatalogSnapshot:
                 None,
                 "unpriced",
                 ("no_effective_price",),
+                model_class=alias.model_class,
             )
         return _cost_result(
             ResolvedPrice(
-                alias.canonical_id, price, {**price.rules, **alias.rules}, ended=ended
+                alias.canonical_id,
+                price,
+                {**price.rules, **alias.rules},
+                ended=ended,
+                model_class=alias.model_class,
             ),
             at=when,
             usage=ModelUsage(
