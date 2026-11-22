@@ -473,6 +473,21 @@ def parse_catalog(
                     f"{canonical}: invalid batch_cache_write_1h_per_mtok "
                     f"{batch_cache_write_1h!r}"
                 )
+            priority = (price.get("rules") or {}).get("priority")
+            if priority is not None:
+                if not isinstance(priority, Mapping):
+                    raise CatalogError(f"{canonical}: priority rates must be a mapping")
+                _date(priority.get("effective_from"), field="priority.effective_from", model=canonical)
+                for field in ("input_per_mtok", "output_per_mtok", "cache_read_per_mtok",
+                              "cache_write_5m_per_mtok", "cache_write_1h_per_mtok"):
+                    if field not in priority and field not in ("input_per_mtok", "output_per_mtok"):
+                        continue
+                    value = _decimal(priority.get(field))
+                    if value is None or not value.is_finite() or value < 0:
+                        raise CatalogError(f"{canonical}: invalid priority {field}")
+                limit = priority.get("max_input_tokens")
+                if limit is not None and (type(limit) is not int or limit <= 0):
+                    raise CatalogError(f"{canonical}: invalid priority max_input_tokens")
             prices.append(
                 Price(
                     id=f"{canonical}:{channel}:{region}:{_id_date(effective_from)}",
