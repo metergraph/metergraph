@@ -225,7 +225,8 @@ class LoadedCatalog:
         """The price a call to ``model`` at ``at`` is billed at.
 
         ``channel`` is authoritative; without one, ``provider`` supplies its
-        direct channel. ``region`` overrides the region the catalog was
+        direct channel, and with neither the aliases listed for provider
+        ``unknown`` do. ``region`` overrides the region the catalog was
         loaded with. A result that depends on a dimension the caller left out
         lists it in ``missing_dimensions``."""
         when = _coerce_datetime(at)
