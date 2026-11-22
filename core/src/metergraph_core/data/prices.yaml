@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-21"
+version: "2026-11-22.1"
 currency: USD
-pricing_verified_at: "2026-11-21"
+pricing_verified_at: "2026-11-22"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -48,7 +48,17 @@ models:
         batch_output_per_mtok: 5.00
         rules:
           input_includes_cache_read: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 4.0
+            output_per_mtok: 20.0
+            cache_read_per_mtok: 0.4
+            cache_write_5m_per_mtok: 5.0
+            cache_write_1h_per_mtok: 10.0
         source_url: https://developers.openai.com/api/docs/models/gpt-6-sol
       - channel: vercel-ai-gateway
         region: global
@@ -142,7 +152,17 @@ models:
         batch_output_per_mtok: 0.25
         rules:
           input_includes_cache_read: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 0.2
+            output_per_mtok: 1.0
+            cache_read_per_mtok: 0.02
+            cache_write_5m_per_mtok: 0.25
+            cache_write_1h_per_mtok: 0.5
         source_url: https://developers.openai.com/api/docs/models/gpt-6-luna
       - channel: vercel-ai-gateway
         region: global
@@ -236,7 +256,17 @@ models:
         batch_output_per_mtok: 25.00
         rules:
           input_includes_cache_read: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 20.0
+            output_per_mtok: 100.0
+            cache_read_per_mtok: 2.0
+            cache_write_5m_per_mtok: 25.0
+            cache_write_1h_per_mtok: 50.0
         source_url: https://developers.openai.com/api/docs/models/gpt-6-astra
       - channel: vercel-ai-gateway
         region: global
@@ -341,7 +371,17 @@ models:
         batch_input_per_mtok: 1.00
         batch_output_per_mtok: 5.00
         rules:
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 4.0
+            output_per_mtok: 20.0
+            cache_read_per_mtok: 0.2
+            cache_write_5m_per_mtok: 5.0
+            cache_write_1h_per_mtok: 10.0
         source_url: https://developers.openai.com/api/docs/models/gpt-6.1-sol
       # The 5m field stores AWS's unsplit cache-write rate.
       - channel: aws-bedrock-geo
@@ -426,7 +466,17 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 2.0
+            output_per_mtok: 10.0
+            cache_read_per_mtok: 0.1
+            cache_write_5m_per_mtok: 2.5
+            cache_write_1h_per_mtok: 5.0
         source_url: https://developers.openai.com/api/docs/models/gpt-6.1-terra
       - channel: openrouter-api
         region: global
@@ -481,7 +531,17 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 4.0
+            output_per_mtok: 20.0
+            cache_read_per_mtok: 0.2
+            cache_write_5m_per_mtok: 5.0
+            cache_write_1h_per_mtok: 10.0
         source_url: https://developers.openai.com/api/docs/models/gpt-6.2-sol
       - channel: vercel-ai-gateway
         region: global
@@ -525,7 +585,17 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 16.0
+            output_per_mtok: 80.0
+            cache_read_per_mtok: 0.8
+            cache_write_5m_per_mtok: 20.0
+            cache_write_1h_per_mtok: 40.0
         source_url: https://developers.openai.com/api/docs/models/gpt-6.2-astra
       - channel: vercel-ai-gateway
         region: global
@@ -593,7 +663,17 @@ models:
         batch_output_per_mtok: 10.00
         rules:
           input_includes_cache_read: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 8.0
+            output_per_mtok: 40.0
+            cache_read_per_mtok: 0.8
+            cache_write_5m_per_mtok: 10.0
+            cache_write_1h_per_mtok: 20.0
         source_url: https://developers.openai.com/api/docs/models/gpt-5.6-sol
       - channel: vercel-ai-gateway
         region: global
@@ -702,7 +782,17 @@ models:
         batch_output_per_mtok: 6.00
         rules:
           input_includes_cache_read: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 4.0
+            output_per_mtok: 24.0
+            cache_read_per_mtok: 0.4
+            cache_write_5m_per_mtok: 5.0
+            cache_write_1h_per_mtok: 10.0
         source_url: https://developers.openai.com/api/docs/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -786,7 +876,17 @@ models:
         batch_output_per_mtok: 0.60
         rules:
           input_includes_cache_read: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 0.4
+            output_per_mtok: 2.4
+            cache_read_per_mtok: 0.04
+            cache_write_5m_per_mtok: 0.5
+            cache_write_1h_per_mtok: 1.0
         source_url: https://developers.openai.com/api/docs/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -863,6 +963,11 @@ models:
         batch_output_per_mtok: 2.25
         rules:
           input_includes_cache_read: true
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 1.5
+            output_per_mtok: 9.0
+            cache_read_per_mtok: 0.15
         source_url: https://developers.openai.com/api/docs/models/gpt-5.4-mini
       - channel: vercel-ai-gateway
         region: global
@@ -908,7 +1013,16 @@ models:
         batch_output_per_mtok: 7.50
         rules:
           input_includes_cache_read: true
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 5.0
+            output_per_mtok: 30.0
+            cache_read_per_mtok: 0.5
+            max_input_tokens: 272000
         source_url: https://developers.openai.com/api/docs/models/gpt-5.4
 
       - channel: vercel-ai-gateway
@@ -1021,6 +1135,11 @@ models:
         batch_output_per_mtok: 0.30
         rules:
           input_includes_cache_read: true
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 0.25
+            output_per_mtok: 1.0
+            cache_read_per_mtok: 0.125
         source_url: https://developers.openai.com/api/docs/models/gpt-4o-mini
       - channel: vercel-ai-gateway
         region: global
@@ -1078,6 +1197,11 @@ models:
         batch_output_per_mtok: 5.00
         rules:
           input_includes_cache_read: true
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 4.25
+            output_per_mtok: 17.0
+            cache_read_per_mtok: 2.125
         source_url: https://developers.openai.com/api/docs/models/gpt-4o
       - channel: vercel-ai-gateway
         region: global
@@ -1123,6 +1247,11 @@ models:
         batch_output_per_mtok: 4.00
         rules:
           input_includes_cache_read: true
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 3.5
+            output_per_mtok: 14.0
+            cache_read_per_mtok: 0.875
         source_url: https://developers.openai.com/api/docs/models/gpt-4.1
 
       - channel: vercel-ai-gateway
@@ -1166,6 +1295,11 @@ models:
         batch_output_per_mtok: 0.80
         rules:
           input_includes_cache_read: true
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 0.7
+            output_per_mtok: 2.8
+            cache_read_per_mtok: 0.175
         source_url: https://developers.openai.com/api/docs/models/gpt-4.1-mini
       - channel: vercel-ai-gateway
         region: global
@@ -1254,6 +1388,11 @@ models:
         batch_output_per_mtok: 7.00
         rules:
           input_includes_cache_read: true
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 3.5
+            output_per_mtok: 28.0
+            cache_read_per_mtok: 0.35
         source_url: https://developers.openai.com/api/docs/models/gpt-5.2
       - channel: vercel-ai-gateway
         region: global
@@ -2203,7 +2342,15 @@ models:
         batch_input_per_mtok: 1.00
         batch_output_per_mtok: 6.00
         rules:
-          long_context: {threshold: 200000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 200000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 3.6
+            output_per_mtok: 21.6
+            cache_read_per_mtok: 0.36
         source_url: https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -2241,6 +2388,12 @@ models:
         batch_input_per_mtok: 1.00
         batch_output_per_mtok: 5.00
         batch_cache_read_per_mtok: 0.05
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 3.6
+            output_per_mtok: 18.0
+            cache_read_per_mtok: 0.18
         source_url: https://cloud.google.com/model-garden/pricing
       - channel: google-vertex-ai
         region: global
@@ -2251,6 +2404,12 @@ models:
         batch_input_per_mtok: 2.00
         batch_output_per_mtok: 10.00
         batch_cache_read_per_mtok: 0.10
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 7.2
+            output_per_mtok: 36.0
+            cache_read_per_mtok: 0.36
         source_url: https://cloud.google.com/model-garden/pricing
       - channel: google-api
         region: global
@@ -2360,6 +2519,12 @@ models:
         cache_read_per_mtok: 0.15
         batch_input_per_mtok: 0.75
         batch_output_per_mtok: 4.50
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 2.7
+            output_per_mtok: 16.2
+            cache_read_per_mtok: 0.27
         source_url: https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing
 
   # Direct API only: no Vertex rate is published for this model.
@@ -3331,7 +3496,13 @@ models:
         cache_read_per_mtok: 0.025
         batch_input_per_mtok: 0.125
         batch_output_per_mtok: 1.00
-        rules: {input_includes_cache_read: true}
+        rules:
+          input_includes_cache_read: true
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 0.45
+            output_per_mtok: 3.6
+            cache_read_per_mtok: 0.045
         source_url: https://developers.openai.com/api/docs/models/gpt-5-mini
       - channel: vercel-ai-gateway
         region: global
@@ -3425,6 +3596,12 @@ models:
         input_per_mtok: 0.75
         output_per_mtok: 3.75
         cache_read_per_mtok: 0.075
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 1.35
+            output_per_mtok: 6.75
+            cache_read_per_mtok: 0.135
         source_url: https://cloud.google.com/vertex-ai/generative-ai/pricing
       - channel: google-vertex-ai
         region: global
@@ -3432,6 +3609,12 @@ models:
         input_per_mtok: 1.50
         output_per_mtok: 7.50
         cache_read_per_mtok: 0.15
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 2.7
+            output_per_mtok: 13.5
+            cache_read_per_mtok: 0.27
         source_url: https://cloud.google.com/vertex-ai/generative-ai/pricing
       - channel: google-api
         region: global
@@ -3524,6 +3707,12 @@ models:
         input_per_mtok: 0.75
         output_per_mtok: 3.75
         cache_read_per_mtok: 0.075
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 1.35
+            output_per_mtok: 6.75
+            cache_read_per_mtok: 0.135
         source_url: https://cloud.google.com/vertex-ai/generative-ai/pricing
       - channel: google-vertex-ai
         region: global
@@ -3531,6 +3720,12 @@ models:
         input_per_mtok: 1.50
         output_per_mtok: 7.50
         cache_read_per_mtok: 0.15
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 2.7
+            output_per_mtok: 13.5
+            cache_read_per_mtok: 0.27
         source_url: https://cloud.google.com/vertex-ai/generative-ai/pricing
       - channel: vercel-ai-gateway
         region: global
@@ -3596,6 +3791,12 @@ models:
         input_per_mtok: 0.75
         output_per_mtok: 3.75
         cache_read_per_mtok: 0.075
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 1.35
+            output_per_mtok: 6.75
+            cache_read_per_mtok: 0.135
         source_url: https://cloud.google.com/vertex-ai/generative-ai/pricing
       - channel: google-vertex-ai
         region: global
@@ -3603,6 +3804,12 @@ models:
         input_per_mtok: 1.50
         output_per_mtok: 7.50
         cache_read_per_mtok: 0.15
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 2.7
+            output_per_mtok: 13.5
+            cache_read_per_mtok: 0.27
         source_url: https://cloud.google.com/vertex-ai/generative-ai/pricing
       # The gateway publishes no end date for this rate. Google's direct rate
       # doubles on 2027-01-01; if the gateway follows, this row needs an
@@ -6282,6 +6489,12 @@ models:
         cache_read_per_mtok: 0.125
         batch_input_per_mtok: 0.625
         batch_output_per_mtok: 5
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 2.5
+            output_per_mtok: 20.0
+            cache_read_per_mtok: 0.25
         source_url: https://developers.openai.com/api/docs/models/gpt-5
       - channel: vercel-ai-gateway
         region: global
@@ -6416,7 +6629,16 @@ models:
         batch_input_per_mtok: 2.5
         batch_output_per_mtok: 15
         rules:
-          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+          long_context:
+            threshold: 272000
+            input_multiplier: 2
+            output_multiplier: 1.5
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 12.5
+            output_per_mtok: 75.0
+            cache_read_per_mtok: 1.25
+            max_input_tokens: 272000
         source_url: https://developers.openai.com/api/docs/models/gpt-5.5
       - channel: vercel-ai-gateway
         region: global
@@ -12956,6 +13178,12 @@ models:
         batch_input_per_mtok: 0.625
         batch_output_per_mtok: 5
         batch_cache_read_per_mtok: 0.0625
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 2.5
+            output_per_mtok: 20.0
+            cache_read_per_mtok: 0.25
         source_url: https://developers.openai.com/api/docs/models/gpt-5.1
       - channel: vercel-ai-gateway
         region: global
@@ -13113,6 +13341,12 @@ models:
         batch_input_per_mtok: 1
         batch_output_per_mtok: 4
         batch_cache_read_per_mtok: 0.25
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 3.5
+            output_per_mtok: 14.0
+            cache_read_per_mtok: 0.875
         source_url: https://developers.openai.com/api/docs/models/o3
       - channel: vercel-ai-gateway
         region: global
@@ -13332,6 +13566,7 @@ models:
         cache_read_per_mtok: 0.125
         rules:
           uncaptured_fees: true
+          uncaptured_fee_operation: web_search
         source_url: https://developers.openai.com/api/docs/pricing
 
   - canonical_id: openai/gpt-5-codex
@@ -14085,6 +14320,12 @@ models:
         batch_input_per_mtok: 0.75
         batch_output_per_mtok: 3.75
         batch_cache_read_per_mtok: 0.0375
+        rules:
+          priority:
+            effective_from: '2026-11-22'
+            input_per_mtok: 2.7
+            output_per_mtok: 13.5
+            cache_read_per_mtok: 0.135
         source_url: https://cloud.google.com/model-garden/pricing
       - channel: google-api
         region: global
