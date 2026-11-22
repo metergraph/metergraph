@@ -1,6 +1,10 @@
 """Reusable MeterGraph catalog and deterministic token-cost pricing core."""
 
 from .catalog import (
+    DECISION,
+    DEFAULT_MODEL_CLASS,
+    GENERATIVE,
+    MODEL_CLASSES,
     CostComponents,
     Alias,
     CatalogSnapshot,
@@ -91,6 +95,10 @@ from .sources import (
 )
 
 __all__ = [
+    "DECISION",
+    "DEFAULT_MODEL_CLASS",
+    "GENERATIVE",
+    "MODEL_CLASSES",
     "CatalogDelta",
     "CATALOG_DELTA_SCHEMA_VERSION",
     "CatalogDeltaConflict",

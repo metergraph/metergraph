@@ -14,6 +14,8 @@ from typing import Any, Mapping
 import yaml
 
 from .catalog import (
+    DEFAULT_MODEL_CLASS,
+    MODEL_CLASSES,
     Alias,
     PRICE_ENDED,
     CatalogSnapshot,
@@ -46,6 +48,28 @@ def _freeze(value: Any) -> Any:
     if isinstance(value, list):
         return tuple(_freeze(item) for item in value)
     return value
+
+
+def _model_class(entry: Mapping[str, Any], canonical: str) -> str:
+    """An entry's ``model_class``: one of MODEL_CLASSES, ``generative`` when
+    absent. Any other value is refused rather than read as a default."""
+    if "model_class" not in entry:
+        return DEFAULT_MODEL_CLASS
+    value = entry["model_class"]
+    if not isinstance(value, str) or value not in MODEL_CLASSES:
+        raise CatalogError(
+            f"{canonical}: model_class must be one of {', '.join(MODEL_CLASSES)}, not {value!r}"
+        )
+    return value
+
+
+def parse_model_classes(document: Mapping[str, Any]) -> dict[str, str]:
+    """Each model's class by canonical id, defaulted as :func:`_model_class`."""
+    return {
+        str(entry.get("canonical_id")): _model_class(entry, str(entry.get("canonical_id")))
+        for entry in document.get("models") or []
+        if entry.get("canonical_id")
+    }
 
 
 def _canonical_index(document: dict[str, Any]) -> dict[tuple[str, str], str]:
@@ -93,6 +117,19 @@ class LoadedCatalog:
     families: Mapping[str, ModelFamily] = field(
         default_factory=lambda: MappingProxyType({})
     )
+    # Each model's class by canonical id; see MODEL_CLASSES.
+    model_classes: Mapping[str, str] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+
+    def model_class(self, canonical_id: Any) -> str | None:
+        """The class the catalog declares for ``canonical_id``
+        (``generative`` when the entry states none), or None when no entry
+        has that canonical id. Aliases are not canonical ids: a priced
+        call's class is on its result, ``CostResult.model_class``."""
+        if not isinstance(canonical_id, str):
+            return None
+        return self.model_classes.get(canonical_id)
 
     def model_family(self, canonical_id: Any) -> ModelFamily | None:
         """The product line the catalog declares for ``canonical_id``, or
@@ -188,7 +225,8 @@ class LoadedCatalog:
         """The price a call to ``model`` at ``at`` is billed at.
 
         ``channel`` is authoritative; without one, ``provider`` supplies its
-        direct channel. ``region`` overrides the region the catalog was
+        direct channel, and with neither the aliases listed for provider
+        ``unknown`` do. ``region`` overrides the region the catalog was
         loaded with. A result that depends on a dimension the caller left out
         lists it in ``missing_dimensions``."""
         when = _coerce_datetime(at)
@@ -353,6 +391,7 @@ def parse_catalog(
             raise CatalogError(f"duplicate model entry {canonical!r}")
         seen_models.add(canonical)
         publisher = str(entry.get("publisher") or "").strip().lower() or None
+        model_class = _model_class(entry, canonical)
         for alias in entry.get("aliases") or []:
             provider = str(alias.get("provider") or "").lower()
             name = str(alias.get("alias") or "").lower()
@@ -402,6 +441,7 @@ def parse_catalog(
                 price_region=_price_region(
                     alias.get("price_region"), model=f"{canonical} alias {name}"
                 ),
+                model_class=model_class,
             )
             keys = [(provider, name)]
             for synonym in _PROVIDER_SYNONYMS.get(provider, ()):
@@ -674,6 +714,7 @@ def _build_loaded_catalog(
         retrieval=RetrievalCatalog(parse_retrieval(document)),
         disputes=tuple(parse_disputes(document)),
         families=MappingProxyType(families),
+        model_classes=MappingProxyType(parse_model_classes(document)),
     )
 
 
