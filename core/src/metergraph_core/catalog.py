@@ -1056,7 +1056,13 @@ class CatalogSnapshot:
         some region prices is unpriced with ``region`` missing.
         """
         if channel is None or not str(channel).strip():
-            channel = direct_channel_for_provider(provider)
+            if provider is None or not str(provider).strip():
+                # No recorded provider is as much as an unknown one: such a
+                # call resolves only through the aliases listed for provider
+                # "unknown", as in :meth:`cost`.
+                channel = self._unknown_provider_channel(model, at)
+            else:
+                channel = direct_channel_for_provider(provider)
             if channel is None:
                 return None, ("channel",)
         stated = str(region or "").strip().lower() or None
@@ -1076,6 +1082,14 @@ class CatalogSnapshot:
         if any(_billed_terms(found) != _billed_terms(resolved) for found in regional):
             return resolved, ("region",)
         return resolved, ()
+
+    def _unknown_provider_channel(self, model: Any, at: Any) -> str | None:
+        """The pricing channel of the alias listed for provider "unknown"
+        that names ``model`` at ``at``, or None when there is none."""
+        model_key = str(model or "").strip().lower()
+        candidates = self._aliases.get((_UNKNOWN_PROVIDER_KEY, model_key), ())
+        alias = self._alias_for(candidates, _coerce_datetime(at))
+        return alias.pricing_channel if alias is not None else None
 
     def _explain(
         self, *, model: Any, channel: Any, provider: Any, at: Any, region: Any

@@ -304,6 +304,28 @@ def test_a_missing_provider_matches_only_unknown_aliases():
     assert result.status == "unpriced"
 
 
+@pytest.mark.parametrize("provider", [None, "", "  "])
+def test_a_recorded_call_without_a_provider_resolves_through_the_unknown_aliases(provider):
+    result = price_call_from_record(
+        {"provider": provider, "model": "jev-1.13.0", "input_tokens": 1000}, at=AFTER
+    )
+    assert result.status == "priced"
+    assert result.token_cost.canonical_model == "typesafe-ai/jev-1.13.0"
+    assert result.token_cost.model_class == DECISION
+    assert result.cost_usd == _per_million(1000, JEV_RATE)
+
+
+def test_a_lookup_without_a_provider_or_channel_uses_the_unknown_aliases():
+    found = CATALOG.lookup_price(model="jev-1.13.0", at=AFTER)
+    assert found.status == "priced"
+    assert found.model_id == "typesafe-ai/jev-1.13.0"
+    # A model with no unknown alias still needs a channel (this id has an
+    # alias only for provider vercel).
+    missing = CATALOG.lookup_price(model="anthropic/claude-sonnet-4.6-batch", at=AFTER)
+    assert missing.status == "unpriced"
+    assert missing.missing_dimensions == ("channel",)
+
+
 def test_gateway_and_direct_calls_get_the_same_family_class_and_cost():
     gateway = price_call_from_record(
         {"provider": "vercel", "model": "typesafe-ai/jev", "input_tokens": 1234}, at=AFTER
@@ -400,6 +422,23 @@ def test_a_successful_decision_call_without_a_finish_reason_is_available():
     outcome = classify_recorded_call({"provider": "typesafe", "status": "success", "model_class": "decision"})
     assert outcome.availability == "available"
     assert outcome.refused is None
+
+
+@pytest.mark.parametrize("signal", [False, True])
+def test_a_refusal_signal_does_not_hide_a_successful_decision_call(signal):
+    outcome = classify_recorded_call(
+        {"provider": "typesafe", "status": "success", "model_class": "decision", "refusal_signal": signal}
+    )
+    assert outcome.availability == "available"
+    assert outcome.refused is signal
+
+
+def test_a_failed_transport_still_wins_over_decision_success():
+    outcome = classify_recorded_call(
+        {"provider": "typesafe", "status": "success", "model_class": "decision",
+         "refusal_signal": False, "response_received": False}
+    )
+    assert outcome.availability != "available"
 
 
 def test_a_successful_generative_call_without_a_finish_reason_stays_unknown():

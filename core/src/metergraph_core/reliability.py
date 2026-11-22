@@ -214,6 +214,11 @@ def classify_recorded_call(row: Mapping[str, Any]) -> ModelReliability:
         if received is True or native.availability == 'available':
             return ModelReliability(native.http_status_code, 'available',
                                     signal if received is not False else None)
+        if (received is None and native.availability is None
+                and _succeeded_decision(row, error)):
+            # A recorded decision success is response evidence (see below),
+            # so the refusal signal it carries is kept.
+            return ModelReliability(native.http_status_code, 'available', signal)
         return native
     # Fresh response/finish/error observations are authoritative even if their
     # refusal coverage is unknown. HTTP-only legacy rows retain compatibility.
