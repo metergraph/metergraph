@@ -154,6 +154,20 @@ def counts_cache_read_in_input(
     return pair in _INPUT_INCLUDES_CACHE_READ_PAIRS
 
 
+def counts_cache_write_in_input(
+    publisher: Any, channel: Any, rules: Mapping[str, Any]
+) -> bool:
+    """Native OpenAI writes are a subset of input, unless a row overrides it."""
+    stated = rules.get("input_includes_cache_write")
+    if stated is not None:
+        return bool(stated)
+    return (
+        isinstance(publisher, str) and isinstance(channel, str)
+        and publisher.strip().lower() == "openai"
+        and channel.strip().lower() == "openai-api"
+    )
+
+
 def normalize_provider(provider: str) -> str:
     """Fold a provider spelling through metergraph-core's provider-alias map
     (e.g. ``aws``/``amazon-bedrock`` -> ``bedrock``, ``google-genai`` ->
@@ -607,7 +621,10 @@ def _price_tokens(
             deducted_input = input_count
         else:
             deducted_input += cache_read_count
-    if rules.get("input_includes_cache_write"):
+    input_includes_cache_write = counts_cache_write_in_input(
+        price.publisher, price.pricing_channel, rules
+    )
+    if input_includes_cache_write:
         if cache_write_count > input_count - deducted_input:
             reasons.append("cache_write_exceeds_input")
             deducted_input = input_count
@@ -688,7 +705,7 @@ def _price_tokens(
     if long_context.get("threshold_counts_cached_tokens"):
         if not input_includes_cache_read:
             prompt_count += cache_read_count
-        if not rules.get("input_includes_cache_write"):
+        if not input_includes_cache_write:
             prompt_count += cache_write_count
     # OpenAI Flex shares Batch rates, including its long-context exceptions.
     applies = not (batch or openai_flex) or long_context.get("applies_to_batch", True)

@@ -2419,13 +2419,14 @@ def test_gpt56_cyber_long_context_correction_preserves_prior_prices(day, input_t
     assert result.cost_usd == Decimal(expected)
 
 
-def test_gpt56_cyber_long_context_counts_separate_cache_writes():
+def test_gpt56_cyber_long_context_does_not_recount_inclusive_cache_writes():
     result = SNAPSHOT.cost(
         provider='openai', model='gpt-5.6-cyber', at=_at('2026-10-27'),
         input_tokens=270000, cache_write_tokens=3000, output_tokens=1000,
     )
     assert result.status == 'priced'
-    assert result.cost_usd == Decimal('6.95625000')
+    # 270k input includes 3k writes, so context stays below 272k.
+    assert result.cost_usd == Decimal('3.45937500')
 
 
 def test_gpt6_cyber_long_context_uses_published_rates():
