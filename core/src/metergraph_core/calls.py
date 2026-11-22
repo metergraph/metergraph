@@ -117,6 +117,17 @@ def compose_call_cost(
     resolved_channel = token_cost.price.pricing_channel if token_cost.price else (channel or direct_channel_for_provider(provider))
     publisher = token_cost.publisher or normalize_provider(provider or '')
     missing = list(token_cost.missing_dimensions)
+    fee_operation = token_cost.price.rules.get('uncaptured_fee_operation') if token_cost.price else None
+    if fee_operation and 'uncaptured_fees' in token_cost.reasons and any(
+        item.operation == fee_operation and type(item.units) is int and item.units >= 0
+        for item in retrieval
+    ):
+        fee = catalog.price_retrieval(channel=resolved_channel, operation=fee_operation,
+            units=next(item.units for item in retrieval if item.operation == fee_operation),
+            at=token_cost.effective_at, region=region)
+        if fee.status == 'priced':
+            reasons = tuple(reason for reason in token_cost.reasons if reason != 'uncaptured_fees')
+            token_cost = replace(token_cost, reasons=reasons, status='partial' if reasons or missing else 'priced')
     token_basis = ('exact' if token_cost.status == 'priced' else
                    'fallback_estimate' if token_cost.cost_usd is not None else 'unknown')
     # Retrieval rates are USD. Do not add them to a different currency.
@@ -285,7 +296,7 @@ def price_call_from_record(
     if agent:
         channel = 'perplexity-agent-api'
     tier = row.get('service_tier')
-    if token_cost is None or token_cost.effective_at is None or agent or identity_changed or tier == 'flex':
+    if token_cost is None or token_cost.effective_at is None or agent or identity_changed or tier in ('flex', 'priority', 'fast'):
         values = {key: row.get(key) for key in ('input_tokens', 'output_tokens', 'cache_read_tokens',
             'cache_write_tokens', 'cache_write_5m_tokens', 'cache_write_1h_tokens')}
         def cost(**usage):
@@ -305,7 +316,8 @@ def price_call_from_record(
         token_cost = replace(token_cost, status='partial',
             missing_dimensions=tuple(dict.fromkeys((*token_cost.missing_dimensions, 'incomplete_usage'))))
     flex_priced = tier == 'flex' and _supports_flex(token_cost.price)
-    if tier is not None and tier not in ('standard', 'default', 'auto', 'batch') and not flex_priced:
+    priority_priced = tier in ('priority', 'fast') and 'unsupported_service_tier' not in token_cost.reasons
+    if tier is not None and tier not in ('standard', 'default', 'auto', 'batch') and not (flex_priced or priority_priced):
         token_cost = replace(token_cost, status='partial',
             missing_dimensions=tuple(dict.fromkeys((*token_cost.missing_dimensions, 'service_tier'))))
     model = token_cost.canonical_model or row.get('model')

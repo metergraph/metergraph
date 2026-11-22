@@ -564,6 +564,17 @@ def _supports_flex(price: Price | None) -> bool:
     )
 
 
+def _priority_rates(price: Price | None, at: datetime) -> Mapping[str, Any] | None:
+    if price is None or (price.publisher, price.pricing_channel) not in {
+        ("openai", "openai-api"), ("google", "google-vertex-ai"),
+    }:
+        return None
+    rates = price.rules.get("priority")
+    if not isinstance(rates, Mapping) or at < _coerce_datetime(rates["effective_from"]):
+        return None
+    return rates
+
+
 def _price_tokens(
     price: Price,
     rules: Mapping[str, Any],
@@ -641,7 +652,20 @@ def _price_tokens(
         "google-api", "google-vertex-ai",
     }
     openai_flex = flex and price.publisher == "openai" and price.pricing_channel == "openai-api"
-    if service_tier not in (None, "standard", "default", "standard_only", "auto", "on_demand", "batch") and not (google_flex or openai_flex):
+    priority = service_tier in ("priority", "fast")
+    priority_rates = _priority_rates(price, at) if priority and not batch else None
+    if priority_rates is not None:
+        limit = priority_rates.get("max_input_tokens")
+        if limit is not None and input_count > limit:
+            priority_rates = None
+        else:
+            input_rate, output_rate, cache_read_rate, cache_write_5m_rate, cache_write_1h_rate = (
+                _decimal(priority_rates.get(key)) for key in (
+                    "input_per_mtok", "output_per_mtok", "cache_read_per_mtok",
+                    "cache_write_5m_per_mtok", "cache_write_1h_per_mtok",
+                )
+            )
+    if service_tier not in (None, "standard", "default", "standard_only", "auto", "on_demand", "batch") and not (google_flex or openai_flex or priority_rates is not None):
         reasons.append("unsupported_service_tier")
     if google_flex:
         # Google publishes Flex at half the standard token rates, including cache reads.
