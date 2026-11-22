@@ -31,6 +31,11 @@ The result identifies the applied model and price. Check `status` before using
 its cost as a complete total: missing usage or unsupported rates can make a
 result `partial` or `unpriced`.
 
+Served OpenAI `priority`/`fast` and Vertex `priority` calls use model-specific
+catalog rates where verified. Priority coverage starts on November 22, 2026.
+Requested Priority that falls back to standard uses standard pricing. Search
+fees are priced separately from the token tier.
+
 ## Choose the API for your input
 
 | You have… | Start with… |

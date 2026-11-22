@@ -351,7 +351,8 @@ def cost_from_response(
     if facts.input_includes_cache:
         usage["input_tokens"] = _native_input_tokens(usage, cost)
     result = cost(**usage)
-    if tier is None or tier in _STANDARD_TIERS or batch or (tier == "flex" and _supports_flex(result.price)) or result.status == "unpriced":
+    priority_priced = tier in ("priority", "fast") and "unsupported_service_tier" not in result.reasons
+    if tier is None or tier in _STANDARD_TIERS or batch or (tier == "flex" and _supports_flex(result.price)) or priority_priced or result.status == "unpriced":
         return result
     return replace(
         result,
