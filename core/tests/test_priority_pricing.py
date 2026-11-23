@@ -120,7 +120,8 @@ def test_openai_priority_cache_write_rates():
     result = price_call_from_record(record(service_tier='priority', cache_write_5m_tokens=50, cache_write_1h_tokens=25))
     assert result.status == 'priced'
     assert result.token_cost.components.cache_write_usd == Decimal('.0005')
-    assert result.cost_usd == Decimal('.0065')
+    # The 75 write tokens use the write rates instead of ordinary input.
+    assert result.cost_usd == Decimal('.0062')
 
 
 def test_priority_reprices_a_supplied_standard_token_result():
