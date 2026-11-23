@@ -214,6 +214,11 @@ def classify_recorded_call(row: Mapping[str, Any]) -> ModelReliability:
         if received is True or native.availability == 'available':
             return ModelReliability(native.http_status_code, 'available',
                                     signal if received is not False else None)
+        if (received is None and native.availability is None
+                and _succeeded_decision(row, error)):
+            # A recorded decision success is response evidence (see below),
+            # so the refusal signal it carries is kept.
+            return ModelReliability(native.http_status_code, 'available', signal)
         return native
     # Fresh response/finish/error observations are authoritative even if their
     # refusal coverage is unknown. HTTP-only legacy rows retain compatibility.
@@ -234,4 +239,23 @@ def classify_recorded_call(row: Mapping[str, Any]) -> ModelReliability:
         availability = native.availability
     if availability in {'unavailable', 'excluded'}:
         refused = None
+    if availability is None and _succeeded_decision(row, error):
+        # A decision model answers typed questions and reports no finish
+        # reason, so for it a recorded success is the response evidence a
+        # generative model's finish reason would be. Refusal stays unknown.
+        availability = 'available'
     return ModelReliability(native.http_status_code, availability, refused)
+
+
+_SUCCESS_STATUSES = frozenset({'success', 'succeeded', 'ok', 'complete', 'completed'})
+
+
+def _succeeded_decision(row: Mapping[str, Any], error: Mapping[str, Any]) -> bool:
+    """Whether ``row`` records a successful call to a decision-class model:
+    ``model_class`` is ``decision``, ``status`` is a success value, and no
+    error flag or error type is recorded."""
+    status = row.get('status')
+    return (row.get('model_class') == 'decision'
+            and isinstance(status, str) and status.strip().lower() in _SUCCESS_STATUSES
+            and row.get('error') in (None, False, 0)
+            and not error)

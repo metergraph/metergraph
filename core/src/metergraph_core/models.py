@@ -12,7 +12,7 @@ from typing import Any, Iterable, Mapping
 
 import yaml
 
-from .catalog import _iso_text
+from .catalog import DEFAULT_MODEL_CLASS, MODEL_CLASSES, _iso_text
 from .loader import LoadedCatalog
 
 
@@ -176,6 +176,8 @@ class ModelDefinition:
     training_policy_overrides: Mapping[str, Mapping[str, TrainingPolicy]] = field(
         default_factory=lambda: _NO_POLICIES, hash=False
     )
+    # The same closed set as a prices entry's ``model_class``.
+    model_class: str = DEFAULT_MODEL_CLASS
 
 
 @dataclass(frozen=True, slots=True)
@@ -494,6 +496,12 @@ def parse_model_registry(document: Any) -> ModelRegistry:
                 f"{canonical_id}: publisher {publisher!r} does not match canonical id"
             )
         released = _optional_date(model.get("released"), f"{canonical_id}: released")
+        model_class = model.get("model_class", DEFAULT_MODEL_CLASS)
+        if not isinstance(model_class, str) or model_class not in MODEL_CLASSES:
+            raise ModelRegistryError(
+                f"{canonical_id}: model_class must be one of "
+                f"{', '.join(MODEL_CLASSES)}, not {model_class!r}"
+            )
         _reject_misspelled_policy_fields(
             model, "training_policy_overrides", canonical_id
         )
@@ -587,6 +595,7 @@ def parse_model_registry(document: Any) -> ModelRegistry:
             routes=tuple(model_routes),
             released=released,
             training_policy_overrides=training_policy_overrides,
+            model_class=model_class,
         )
 
     execution_profiles: dict[str, tuple[str, ...]] = {}
@@ -701,6 +710,13 @@ def validate_model_registry(
         entry.get("canonical_id"): entry
         for entry in catalog.document.get("models", [])
     }
+    for model in registry.models.values():
+        declared = catalog.model_class(model.canonical_id)
+        if declared is not None and declared != model.model_class:
+            raise ModelRegistryError(
+                f"{model.canonical_id}: model_class {model.model_class!r} differs "
+                f"from the pricing catalog's {declared!r}"
+            )
     for route in registry.routes.values():
         catalog_model = catalog_models.get(route.canonical_id)
         if catalog_model is None:

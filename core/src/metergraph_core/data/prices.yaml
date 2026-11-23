@@ -6,7 +6,7 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-22"
+version: "2026-11-22.1"
 currency: USD
 pricing_verified_at: "2026-11-22"
 models:
@@ -4058,19 +4058,127 @@ models:
 
   - canonical_id: typesafe-ai/jev-1.13.0
     publisher: typesafe-ai
+    family: {id: typesafe-ai/jev, display_name: Jev}
+    model_class: decision
+    # A decision model: billed per input token, output is free. Its calls
+    # usually report no output usage, which a zero output rate does not need.
     aliases:
       - {provider: typesafe-ai, alias: typesafe-ai/jev-1.13.0, channel: vercel-ai-gateway}
       - {provider: vercel, alias: typesafe-ai/jev-1.13.0, channel: vercel-ai-gateway}
       - {provider: unknown, alias: typesafe/jev-1.13.0, channel: vercel-ai-gateway}
       - {provider: unknown, alias: jev-1.13.0, channel: vercel-ai-gateway}
+      - {provider: vercel, alias: typesafe/jev-1.13.0, channel: vercel-ai-gateway}
+      - {provider: vercel, alias: jev-1.13.0, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: typesafe-ai/jev-1.13.0, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: typesafe/jev-1.13.0, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: jev-1.13.0, channel: vercel-ai-gateway}
+      - {provider: typesafe, alias: jev-1.13.0, channel: typesafe-api}
+      - {provider: typesafe, alias: typesafe/jev-1.13.0, channel: typesafe-api}
+      - {provider: typesafe, alias: typesafe-ai/jev-1.13.0, channel: typesafe-api}
+      - {provider: typesafe-ai, alias: jev-1.13.0, channel: typesafe-api}
+      - {provider: typesafe-ai, alias: typesafe/jev-1.13.0, channel: typesafe-api}
+      - {provider: unknown, alias: typesafe-ai/jev-1.13.0, channel: vercel-ai-gateway}
     prices:
       # Vercel lists an input rate and no output fee for this decision model.
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-09-15"
+        effective_to: "2026-11-21"
         input_per_mtok: 0.04
         output_per_mtok: 0
         source_url: https://vercel.com/ai-gateway/models/jev-1.13.0
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-11-21"
+        input_per_mtok: 0.042
+        output_per_mtok: 0
+        source_url: https://vercel.com/ai-gateway/models/typesafe-ai/jev
+      - channel: typesafe-api
+        region: global
+        effective_from: "2026-11-21"
+        input_per_mtok: 0.042
+        output_per_mtok: 0
+        source_url: https://docs.typesafe.ai/models
+
+  - canonical_id: typesafe-ai/jev-1.14.0
+    publisher: typesafe-ai
+    family: {id: typesafe-ai/jev, display_name: Jev}
+    model_class: decision
+    aliases:
+      - {provider: vercel, alias: typesafe-ai/jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: vercel, alias: typesafe/jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: vercel, alias: jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: typesafe-ai/jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: typesafe/jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: typesafe, alias: jev-1.14.0, channel: typesafe-api}
+      - {provider: typesafe, alias: typesafe/jev-1.14.0, channel: typesafe-api}
+      - {provider: typesafe, alias: typesafe-ai/jev-1.14.0, channel: typesafe-api}
+      - {provider: typesafe-ai, alias: typesafe-ai/jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: typesafe-ai, alias: jev-1.14.0, channel: typesafe-api}
+      - {provider: typesafe-ai, alias: typesafe/jev-1.14.0, channel: typesafe-api}
+      - {provider: unknown, alias: typesafe-ai/jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: unknown, alias: typesafe/jev-1.14.0, channel: vercel-ai-gateway}
+      - {provider: unknown, alias: jev-1.14.0, channel: vercel-ai-gateway}
+    prices:
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-11-21"
+        input_per_mtok: 0.042
+        output_per_mtok: 0
+        source_url: https://vercel.com/ai-gateway/models/typesafe-ai/jev
+      - channel: typesafe-api
+        region: global
+        effective_from: "2026-11-21"
+        input_per_mtok: 0.042
+        output_per_mtok: 0
+        source_url: https://docs.typesafe.ai/models
+
+  - canonical_id: typesafe-ai/jev
+    publisher: typesafe-ai
+    family: {id: typesafe-ai/jev, display_name: Jev}
+    model_class: decision
+    # The version-neutral ids: the gateway's typesafe-ai/jev, and the
+    # direct API's moving aliases. Every version is listed at one price.
+    aliases:
+      - {provider: vercel, alias: typesafe-ai/jev, channel: vercel-ai-gateway}
+      - {provider: vercel, alias: typesafe/jev, channel: vercel-ai-gateway}
+      - {provider: vercel, alias: jev, channel: vercel-ai-gateway}
+      - {provider: vercel, alias: jev-latest, channel: vercel-ai-gateway}
+      - {provider: vercel, alias: jev-preview, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: typesafe-ai/jev, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: typesafe/jev, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: jev, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: jev-latest, channel: vercel-ai-gateway}
+      - {provider: gateway, alias: jev-preview, channel: vercel-ai-gateway}
+      - {provider: typesafe, alias: jev, channel: typesafe-api}
+      - {provider: typesafe, alias: jev-latest, channel: typesafe-api}
+      - {provider: typesafe, alias: jev-preview, channel: typesafe-api}
+      - {provider: typesafe, alias: typesafe/jev, channel: typesafe-api}
+      - {provider: typesafe, alias: typesafe-ai/jev, channel: typesafe-api}
+      - {provider: typesafe-ai, alias: typesafe-ai/jev, channel: vercel-ai-gateway}
+      - {provider: typesafe-ai, alias: jev, channel: typesafe-api}
+      - {provider: typesafe-ai, alias: jev-latest, channel: typesafe-api}
+      - {provider: typesafe-ai, alias: jev-preview, channel: typesafe-api}
+      - {provider: typesafe-ai, alias: typesafe/jev, channel: typesafe-api}
+      - {provider: unknown, alias: typesafe-ai/jev, channel: vercel-ai-gateway}
+      - {provider: unknown, alias: typesafe/jev, channel: vercel-ai-gateway}
+      - {provider: unknown, alias: jev, channel: vercel-ai-gateway}
+      - {provider: unknown, alias: jev-latest, channel: vercel-ai-gateway}
+      - {provider: unknown, alias: jev-preview, channel: vercel-ai-gateway}
+    prices:
+      - channel: vercel-ai-gateway
+        region: global
+        effective_from: "2026-11-21"
+        input_per_mtok: 0.042
+        output_per_mtok: 0
+        source_url: https://vercel.com/ai-gateway/models/typesafe-ai/jev
+      - channel: typesafe-api
+        region: global
+        effective_from: "2026-11-21"
+        input_per_mtok: 0.042
+        output_per_mtok: 0
+        source_url: https://docs.typesafe.ai/models
 
   - canonical_id: thinkingmachines/inkling
     publisher: thinkingmachines
