@@ -32,8 +32,8 @@ its cost as a complete total: missing usage or unsupported rates can make a
 result `partial` or `unpriced`.
 
 Azure Foundry pricing requires the deployment's underlying model version, SKU,
-and Azure resource region. For a verified GPT-6 Luna Global Standard deployment,
-use `model="gpt-6-luna@2026-09-22"`,
+and Azure resource region. Verified GPT-6 Astra, Sol, and Luna Global Standard
+deployments use a versioned model such as `model="gpt-6-luna@2026-09-22"`,
 `channel="azure-foundry-global-standard"`, and `region="eastus"` with
 `calculate_cost()`. A generic `provider="azure"` call stays unpriced because its
 deployment type is unknown. Batch and cache-write usage remain partial where
