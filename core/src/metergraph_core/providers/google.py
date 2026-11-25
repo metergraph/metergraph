@@ -28,8 +28,7 @@ def rejected_without_usage(row: Mapping[str, Any], channel: str | None) -> bool:
     status = row.get('http_status_code')
     if type(status) is not int or status not in {400, 401, 403, 404, 413, 422, 429}:
         return False
-    if row.get('tool_calls') not in (None, []):
-        return False
+    # tool_calls can contain request history, not usage from this attempt.
     counters = [row.get(key) for key in (
         'input_tokens', 'output_tokens', 'cache_read_tokens', 'cache_write_tokens',
         'cache_write_5m_tokens', 'cache_write_1h_tokens', 'reasoning_tokens',
