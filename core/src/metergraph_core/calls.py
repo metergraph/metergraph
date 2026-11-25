@@ -10,6 +10,7 @@ from .catalog import CostComponents, CostResult, ModelUsage, direct_channel_for_
 from .loader import LoadedCatalog
 from .providers import model_identity
 from .providers.anthropic import rejected_without_usage
+from .providers.google import rejected_without_usage as google_rejected_without_usage
 from .responses import _as_mapping, _bundled_catalog, _first, cost_from_response, response_format, _native_input_tokens
 
 _ZERO = Decimal('0')
@@ -305,7 +306,9 @@ def price_call_from_record(
         if row.get('input_tokens_include_cache') is True:
             values['input_tokens'] = _native_input_tokens(values, cost)
         token_cost = cost(**values)
-    if normalize_provider(provider or '') == 'anthropic' and rejected_without_usage(row):
+    if (normalize_provider(provider or '') == 'anthropic' and rejected_without_usage(row)) or (
+        normalize_provider(provider or '') in {'google', 'vertex-ai'} and google_rejected_without_usage(row, channel)
+    ):
         free = replace(token_cost, cost_usd=_ZERO, status='priced',
             reasons=('provider_failure_not_billable',), missing_dimensions=(),
             components=CostComponents(_ZERO, _ZERO, _ZERO, _ZERO))
