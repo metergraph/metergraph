@@ -212,12 +212,12 @@ sources:
     fingerprint: null
     low_risk: {eligible: false, dimensions: []}
 
-  # The catalog does not carry Azure Foundry yet. Prices depend on the
-  # deployment type (Global, Data Zone, Regional) and region.
+  # Review Foundry prices by deployment type. Only verified Global Standard
+  # rows are cataloged; this page is not an automatic refresh source.
   - id: azure-foundry-pricing
     provider: azure
-    channel: azure-foundry
-    catalog_channel: false
+    channel: azure-foundry-global-standard
+    catalog_channel: true
     url: https://azure.microsoft.com/en-us/pricing/details/ai-foundry-models/aoai/
     parser: html-tables
     dimensions: [input_per_mtok, output_per_mtok, cache_read_per_mtok, batch_input_per_mtok, batch_output_per_mtok]

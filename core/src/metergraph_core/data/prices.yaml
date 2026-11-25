@@ -6,9 +6,9 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-22.1"
+version: "2026-11-25.1"
 currency: USD
-pricing_verified_at: "2026-11-22"
+pricing_verified_at: "2026-11-25"
 models:
   - canonical_id: openai/gpt-6-sol
     publisher: openai
@@ -118,6 +118,7 @@ models:
     publisher: openai
     family: {id: openai/gpt-luna, display_name: GPT Luna}
     aliases:
+      - {provider: azure-foundry-global-standard, alias: gpt-6-luna@2026-09-22, channel: azure-foundry-global-standard}
       - {provider: openai, alias: gpt-6-luna, channel: openai-api}
       - {provider: litellm, alias: gpt-6-luna, channel: openai-api}
       - {provider: unknown, alias: gpt-6-luna, channel: openai-api}
@@ -164,6 +165,17 @@ models:
             cache_write_5m_per_mtok: 0.25
             cache_write_1h_per_mtok: 0.5
         source_url: https://developers.openai.com/api/docs/models/gpt-6-luna
+      - channel: azure-foundry-global-standard
+        region: global
+        effective_from: "2026-09-22"
+        input_per_mtok: 0.10
+        output_per_mtok: 0.50
+        cache_read_per_mtok: 0.01
+        rules:
+          input_includes_cache_read: true
+          input_includes_cache_write: true
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://azure.microsoft.com/en-us/blog/gpt-6-astra-sol-and-luna-for-production-agents-in-microsoft-foundry/
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-09-23"

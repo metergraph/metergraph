@@ -6,6 +6,7 @@ import pytest
 from metergraph_core import (
     CatalogError,
     CatalogSnapshot,
+    ModelUsage,
     counts_cache_read_in_input,
     direct_channel_for_provider,
     load_catalog,
@@ -27,7 +28,58 @@ def test_prices_yaml_parses():
     assert VERSION
     assert DOC["models"]
     assert LOADED.currency == "USD"
-    assert LOADED.pricing_verified_at.isoformat() == "2026-11-22"
+    assert LOADED.pricing_verified_at.isoformat() == "2026-11-25"
+
+
+def test_foundry_global_standard_requires_explicit_deployment_identity():
+    at = _at("2026-11-25")
+    implicit = SNAPSHOT.cost(
+        provider="azure", model="gpt-6-luna", at=at,
+        input_tokens=10, output_tokens=5,
+    )
+    assert implicit.status == "unpriced"
+
+    explicit = LOADED.calculate_cost(
+        model="gpt-6-luna@2026-09-22", channel="azure-foundry-global-standard",
+        region="eastus", at=at,
+        usage=ModelUsage(input_tokens=10, output_tokens=5),
+    )
+    assert explicit.status == "priced"
+    assert explicit.cost_usd == Decimal("0.00000350")
+
+
+def test_foundry_global_standard_does_not_guess_other_skus_or_cache_writes():
+    at = _at("2026-11-25")
+    for channel in ("azure-foundry", "azure-foundry-data-zone-standard"):
+        result = LOADED.calculate_cost(
+            model="gpt-6-luna@2026-09-22", channel=channel, region="eastus", at=at,
+            usage=ModelUsage(input_tokens=10, output_tokens=5),
+        )
+        assert result.status == "unpriced"
+
+    write = LOADED.calculate_cost(
+        model="gpt-6-luna@2026-09-22", channel="azure-foundry-global-standard",
+        region="eastus", at=at,
+        usage=ModelUsage(input_tokens=10, output_tokens=5, cache_write_tokens=1),
+    )
+    assert write.status == "partial"
+    assert "cache_write_5m_rate_unavailable" in write.reasons
+
+    batch = LOADED.calculate_cost(
+        model="gpt-6-luna@2026-09-22", channel="azure-foundry-global-standard",
+        region="eastus", at=at,
+        usage=ModelUsage(input_tokens=10, output_tokens=5, batch=True),
+    )
+    assert batch.status == "partial"
+    assert "batch_rate_unavailable" in batch.reasons
+
+    long = LOADED.calculate_cost(
+        model="gpt-6-luna@2026-09-22", channel="azure-foundry-global-standard",
+        region="eastus", at=at,
+        usage=ModelUsage(input_tokens=272_001, output_tokens=100_000),
+    )
+    assert long.status == "priced"
+    assert long.cost_usd == Decimal("0.12940020")
 
 
 def test_openrouter_cache_reads_are_not_charged_as_fresh_input():
@@ -97,7 +149,7 @@ def test_current_catalog_prices_more_than_one_thousand_provider_model_pairs():
 
     # Includes claude-3-5-haiku-20241022 at its last known price, and the six
     # gateway spellings of typesafe-ai/jev-1.13.0 added with its later rows.
-    assert len(pairs) == 1177
+    assert len(pairs) == 1178
     assert sum(provider == "vercel" for provider, _ in pairs) == 192
     assert sum(provider == "openrouter" for provider, _ in pairs) == 212
 
