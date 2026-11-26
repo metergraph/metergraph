@@ -53,6 +53,39 @@ def test_foundry_global_standard_requires_explicit_deployment_identity(model, ve
     assert explicit.cost_usd == Decimal(cost)
 
 
+def test_foundry_deployment_pricing_checks_sku_and_recorded_identity():
+    at = _at("2026-11-25")
+    identity = {
+        "deployment": "example-deployment", "model": "gpt-6-luna",
+        "version": "2026-09-22", "sku": "GlobalStandard", "region": "eastus",
+    }
+    usage = ModelUsage(input_tokens=10, output_tokens=5)
+    priced = LOADED.price_foundry_deployment(
+        identity=identity, observed_model="example-deployment", at=at, usage=usage,
+    )
+    assert priced.status == "priced"
+    assert priced.cost_usd == Decimal("0.00000350")
+    assert priced.price.pricing_channel == "azure-foundry-global-standard"
+
+    missing = LOADED.price_foundry_deployment(
+        identity=None, observed_model="example-deployment", at=at, usage=usage,
+    )
+    assert missing.reasons == ("foundry_deployment_unmapped",)
+
+    for changes, reason in (
+        ({"sku": "DataZoneStandard"}, "foundry_sku_unsupported"),
+        ({"version": ""}, "foundry_identity_incomplete"),
+        ({"deployment": "other"}, "foundry_identity_incomplete"),
+        ({"version": "unknown"}, "unknown_deployment"),
+    ):
+        result = LOADED.price_foundry_deployment(
+            identity={**identity, **changes}, observed_model="example-deployment",
+            at=at, usage=usage,
+        )
+        assert result.status == "unpriced"
+        assert reason in result.reasons
+
+
 @pytest.mark.parametrize("model,version,long_cost", [
     ("gpt-6-astra", "2026-09-03", "12.94002000"),
     ("gpt-6-sol", "2026-09-22", "2.58800400"),
