@@ -749,10 +749,22 @@ models:
       - channel: aws-bedrock
         region: us-west-2
         effective_from: "2026-08-17"
+        effective_to: "2026-11-20"
         input_per_mtok: 5.50
         output_per_mtok: 33.00
         cache_read_per_mtok: 0.55
         cache_write_5m_per_mtok: 6.875
+        rules:
+          long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
+        source_url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-56-sol.html
+      # First verified current rate, not the date AWS changed it.
+      - channel: aws-bedrock
+        region: us-west-2
+        effective_from: "2026-11-20"
+        input_per_mtok: 4.40
+        output_per_mtok: 22.00
+        cache_read_per_mtok: 0.44
+        cache_write_5m_per_mtok: 5.50
         rules:
           long_context: {threshold: 272000, input_multiplier: 2, output_multiplier: 1.5}
         source_url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-openai-gpt-56-sol.html
@@ -5229,7 +5241,18 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: zai, alias: glm-5.3, channel: zai-api}
+      - {provider: unknown, alias: glm-5.3, channel: zai-api}
+      - {provider: litellm, alias: glm-5.3, channel: zai-api}
     prices:
+      # First verified Z.ai rate, not its launch date.
+      - channel: zai-api
+        region: global
+        effective_from: "2026-11-20"
+        input_per_mtok: 1.4
+        output_per_mtok: 4.4
+        cache_read_per_mtok: 0.26
+        source_url: https://docs.z.ai/guides/overview/pricing
       - channel: vercel-ai-gateway
         region: global
         effective_from: "2026-08-14"
@@ -5299,7 +5322,18 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: zai, alias: glm-5.3-flash, channel: zai-api}
+      - {provider: unknown, alias: glm-5.3-flash, channel: zai-api}
+      - {provider: litellm, alias: glm-5.3-flash, channel: zai-api}
     prices:
+      # First verified Z.ai rate, not its launch date.
+      - channel: zai-api
+        region: global
+        effective_from: "2026-11-20"
+        input_per_mtok: 0.15
+        output_per_mtok: 0.50
+        cache_read_per_mtok: 0.03
+        source_url: https://docs.z.ai/guides/overview/pricing
       # Vercel lists this well under half the Fireworks rate. Recorded as listed;
       # if it is promotional it will need an `effective_to` when it moves.
       - channel: vercel-ai-gateway
@@ -10616,6 +10650,9 @@ models:
         rules:
           input_includes_cache_read: true
           input_includes_cache_write: true
+      - {provider: zai, alias: glm-5.3-flashx, channel: zai-api}
+      - {provider: unknown, alias: glm-5.3-flashx, channel: zai-api}
+      - {provider: litellm, alias: glm-5.3-flashx, channel: zai-api}
     prices:
       - channel: vercel-ai-gateway
         region: global
@@ -10624,6 +10661,14 @@ models:
         output_per_mtok: 1.25
         cache_read_per_mtok: 0.075
         source_url: https://ai-gateway.vercel.sh/v1/models
+      # First verified Z.ai rate, not its launch date.
+      - channel: zai-api
+        region: global
+        effective_from: "2026-11-20"
+        input_per_mtok: 0.37
+        output_per_mtok: 1.25
+        cache_read_per_mtok: 0.075
+        source_url: https://docs.z.ai/guides/overview/pricing
 
       - channel: openrouter-api
         region: global
@@ -10634,6 +10679,21 @@ models:
         rules:
           varies_by_provider: true
         source_url: https://openrouter.ai/api/v1/models
+  - canonical_id: zai/glm-5.3-flashx-legal
+    publisher: zai
+    aliases:
+      - {provider: zai, alias: glm-5.3-flashx-legal, channel: zai-api}
+      - {provider: unknown, alias: glm-5.3-flashx-legal, channel: zai-api}
+      - {provider: litellm, alias: glm-5.3-flashx-legal, channel: zai-api}
+    prices:
+      # First verified Z.ai rate, not its launch date.
+      - channel: zai-api
+        region: global
+        effective_from: "2026-11-20"
+        input_per_mtok: 0.37
+        output_per_mtok: 1.25
+        cache_read_per_mtok: 0.075
+        source_url: https://docs.z.ai/guides/overview/pricing
   - canonical_id: zai/glm-5v-turbo
     publisher: zai
     aliases:
