@@ -285,6 +285,49 @@ class LoadedCatalog:
             )
         return _cost_result(resolved, at=when, usage=usage, missing=missing)
 
+    def price_foundry_deployment(
+        self,
+        *,
+        identity: Mapping[str, Any] | None,
+        requested_deployment: Any,
+        at: Any,
+        usage: ModelUsage,
+    ) -> CostResult:
+        """Price a caller-declared Foundry mapping only for its requested deployment."""
+        when = _coerce_datetime(at)
+
+        def unpriced(reason: str) -> CostResult:
+            return CostResult(
+                None, None, None, "unpriced", (reason,), effective_at=when
+            )
+
+        if not isinstance(identity, Mapping):
+            return unpriced("foundry_deployment_unmapped")
+        if identity.get("sku") != "GlobalStandard":
+            return unpriced("foundry_sku_unsupported")
+        deployment = identity.get("deployment")
+        model = identity.get("model")
+        version = identity.get("version")
+        region = identity.get("region")
+        if (
+            not all(
+                isinstance(value, str) and value.strip()
+                for value in (deployment, model, version, region)
+            )
+            or not isinstance(requested_deployment, str)
+            or not requested_deployment.strip()
+        ):
+            return unpriced("foundry_identity_incomplete")
+        if requested_deployment != deployment:
+            return unpriced("foundry_deployment_mismatch")
+        return self.calculate_cost(
+            model=f"{model.strip()}@{version.strip()}",
+            channel="azure-foundry-global-standard",
+            region=region.strip().lower(),
+            at=when,
+            usage=usage,
+        )
+
     def price_retrieval(
         self,
         *,

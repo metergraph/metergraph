@@ -31,13 +31,18 @@ The result identifies the applied model and price. Check `status` before using
 its cost as a complete total: missing usage or unsupported rates can make a
 result `partial` or `unpriced`.
 
-Azure Foundry pricing requires the deployment's underlying model version, SKU,
-and Azure resource region. Verified GPT-6 Astra, Sol, and Luna Global Standard
-deployments use a versioned model such as `model="gpt-6-luna@2026-09-22"`,
-`channel="azure-foundry-global-standard"`, and `region="eastus"` with
-`calculate_cost()`. A generic `provider="azure"` call stays unpriced because its
-deployment type is unknown. Batch and cache-write usage remain partial where
-the catalog lacks a matching rate.
+Azure Foundry pricing requires a caller-declared deployment mapping with its
+underlying model version, SKU, and Azure resource region. Pass those facts to
+`price_foundry_deployment()` as
+`identity={"deployment": "my-deployment", "model": "gpt-6-luna",
+"version": "2026-09-22", "sku": "GlobalStandard", "region": "eastus"}`,
+with `requested_deployment="my-deployment"` from the request and token usage.
+The method checks the declared SKU and requires the requested deployment to
+match the mapping before applying the verified catalog rate. It does not
+independently verify the deployment configuration with Azure. A generic
+`provider="azure"` call stays unpriced because its deployment type is unknown.
+Batch and cache-write usage remain partial where the catalog lacks a matching
+rate.
 
 Served OpenAI `priority`/`fast` and Vertex `priority` calls use model-specific
 catalog rates where verified. Priority coverage starts on November 22, 2026.

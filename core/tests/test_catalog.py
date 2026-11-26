@@ -53,6 +53,54 @@ def test_foundry_global_standard_requires_explicit_deployment_identity(model, ve
     assert explicit.cost_usd == Decimal(cost)
 
 
+def test_foundry_deployment_pricing_checks_sku_and_declared_mapping():
+    at = _at("2026-11-25")
+    identity = {
+        "deployment": "example-deployment", "model": "gpt-6-luna",
+        "version": "2026-09-22", "sku": "GlobalStandard", "region": "eastus",
+    }
+    usage = ModelUsage(input_tokens=10, output_tokens=5)
+    priced = LOADED.price_foundry_deployment(
+        identity=identity, requested_deployment="example-deployment", at=at,
+        usage=usage,
+    )
+    assert priced.status == "priced"
+    assert priced.cost_usd == Decimal("0.00000350")
+    assert priced.price.pricing_channel == "azure-foundry-global-standard"
+
+    missing = LOADED.price_foundry_deployment(
+        identity=None, requested_deployment="example-deployment", at=at,
+        usage=usage,
+    )
+    assert missing.reasons == ("foundry_deployment_unmapped",)
+
+    no_request = LOADED.price_foundry_deployment(
+        identity=identity, requested_deployment=None, at=at, usage=usage,
+    )
+    assert no_request.reasons == ("foundry_identity_incomplete",)
+
+    for changes, reason in (
+        ({"sku": "DataZoneStandard"}, "foundry_sku_unsupported"),
+        ({"version": ""}, "foundry_identity_incomplete"),
+        ({"deployment": "other"}, "foundry_deployment_mismatch"),
+        ({"version": "unknown"}, "unknown_deployment"),
+    ):
+        result = LOADED.price_foundry_deployment(
+            identity={**identity, **changes}, requested_deployment="example-deployment",
+            at=at, usage=usage,
+        )
+        assert result.status == "unpriced"
+        assert reason in result.reasons
+
+    mismatch = LOADED.price_foundry_deployment(
+        identity=identity, requested_deployment="another-deployment", at=at,
+        usage=usage,
+    )
+    assert mismatch.status == "unpriced"
+    assert mismatch.reasons == ("foundry_deployment_mismatch",)
+    assert mismatch.effective_at == at
+
+
 @pytest.mark.parametrize("model,version,long_cost", [
     ("gpt-6-astra", "2026-09-03", "12.94002000"),
     ("gpt-6-sol", "2026-09-22", "2.58800400"),
