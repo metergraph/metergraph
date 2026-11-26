@@ -78,3 +78,48 @@ def test_qualified_reported_charge_is_preserved_even_when_catalog_classifies_rej
     decision = resolve_billing(priced, normalize_gateway_evidence(row), at=AT)
     assert decision.cost_usd == Decimal('.01')
     assert decision.cost_provenance == 'gateway_reported'
+
+
+@pytest.mark.parametrize('status', [400, 401, 403, 404, 413, 422, 429])
+@pytest.mark.parametrize('provider,model,endpoint', [
+    ('google', 'projects/example/locations/global/publishers/google/models/gemini-4-argon', 'models.generate_content'),
+    ('vertex-ai', 'gemini-4-argon', 'models.generate_content.stream'),
+])
+def test_vertex_http_rejection_without_usage_has_known_zero_cost(status, provider, model, endpoint):
+    result = price_call_from_record(record(provider=provider, model=model, endpoint=endpoint,
+        http_status_code=status, stream=True, usage_complete=False))
+    assert result.status == 'priced'
+    assert result.cost_usd == Decimal(0)
+    assert 'provider_failure_not_billable' in result.reasons
+
+
+@pytest.mark.parametrize('changes', [
+    {'http_status_code': None}, {'http_status_code': '400'}, {'http_status_code': 200},
+    {'http_status_code': 408}, {'http_status_code': 500}, {'http_status_code': 504},
+    {'server_tool_use': 'invalid'}, {'server_tool_use': {'web_search_requests': 1}},
+    {'url_fetch_calls': 1},
+    {'batch': True}, {'endpoint': 'batches.results'}, {'endpoint': None},
+    {'input_tokens': 1}, {'output_tokens': 1}, {'cache_read_tokens': 1},
+    {'grounding_queries': 1}, {'grounded_prompt': 1}, {'web_search_calls': 1},
+    {'input_tokens': False}, {'grounding_queries': -1},
+    {'provider': 'google', 'model': 'gemini-4-argon'},
+    {'provider': 'openai', 'model': 'gpt-6-luna'},
+    {'status': 'success', 'error': False},
+])
+def test_vertex_ambiguous_or_positive_usage_does_not_become_free(changes):
+    row = record(provider='google',
+        model='projects/example/locations/global/publishers/google/models/gemini-4-argon',
+        endpoint='models.generate_content', http_status_code=400)
+    row.update(changes)
+    result = price_call_from_record(row)
+    assert 'provider_failure_not_billable' not in result.reasons
+
+
+def test_vertex_rejection_with_prior_function_call_has_known_zero_cost():
+    result = price_call_from_record(record(provider='vertex-ai', model='gemini-4-argon',
+        endpoint='models.generate_content', http_status_code=400,
+        tool_calls=[{'id': 'previous-call', 'name': 'lookup_weather',
+                     'arguments': {'city': 'Example City'}, 'status': 'completed'}]))
+    assert result.status == 'priced'
+    assert result.cost_usd == Decimal(0)
+    assert 'provider_failure_not_billable' in result.reasons
