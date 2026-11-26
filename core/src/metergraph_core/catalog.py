@@ -34,6 +34,8 @@ _PROVIDER_ALIASES = {
 _DIRECT_CHANNEL_BY_PROVIDER = {
     "anthropic": "anthropic-api",
     "openai": "openai-api",
+    # Generic Azure traffic has no channel: its deployment SKU must be known.
+    "azure-foundry-global-standard": "azure-foundry-global-standard",
     "google": "google-api",
     "vercel": "vercel-ai-gateway",
     "openrouter": "openrouter-api",

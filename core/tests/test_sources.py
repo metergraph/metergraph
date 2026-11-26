@@ -374,12 +374,13 @@ def test_aws_registers_both_bedrock_channels_on_one_page_and_not_low_risk():
     assert all(s.catalog_channel for s in bedrock)
 
 
-def test_azure_and_nvidia_use_registry_only_channels():
+def test_foundry_catalog_channel_and_nvidia_registry_only_channel():
     registry = load_source_registry()
-    for provider in ("azure", "nvidia"):
-        [source] = [s for s in registry.sources if s.provider == provider]
-        assert source.catalog_channel is False
-        assert source.low_risk.eligible is False
+    [foundry] = [s for s in registry.sources if s.provider == "azure"]
+    [nvidia] = [s for s in registry.sources if s.provider == "nvidia"]
+    assert (foundry.channel, foundry.catalog_channel) == ("azure-foundry-global-standard", True)
+    assert nvidia.catalog_channel is False
+    assert not foundry.low_risk.eligible and not nvidia.low_risk.eligible
 
 
 def test_google_registers_vertex_ai_as_reviewed_discovery_only():
