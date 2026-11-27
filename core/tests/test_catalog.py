@@ -28,7 +28,7 @@ def test_prices_yaml_parses():
     assert VERSION
     assert DOC["models"]
     assert LOADED.currency == "USD"
-    assert LOADED.pricing_verified_at.isoformat() == "2026-11-26"
+    assert LOADED.pricing_verified_at.isoformat() == "2026-11-27"
 
 
 def test_mai_thinking_global_standard_price_and_cache_split():
