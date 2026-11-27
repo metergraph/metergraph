@@ -28,7 +28,20 @@ def test_prices_yaml_parses():
     assert VERSION
     assert DOC["models"]
     assert LOADED.currency == "USD"
-    assert LOADED.pricing_verified_at.isoformat() == "2026-11-25"
+    assert LOADED.pricing_verified_at.isoformat() == "2026-11-26"
+
+
+def test_mai_thinking_global_standard_price_and_cache_split():
+    result = SNAPSHOT.cost(
+        provider="azure_foundry",
+        model="MAI-Thinking-1",
+        at=_at("2026-11-26"),
+        input_tokens=1_000_000,
+        output_tokens=100_000,
+        cache_read_tokens=100_000,
+    )
+    assert result.status == "priced"
+    assert result.cost_usd == Decimal("2.62")
 
 
 @pytest.mark.parametrize("model,version,cost", [
@@ -207,7 +220,7 @@ def test_current_catalog_prices_more_than_one_thousand_provider_model_pairs():
 
     # Includes claude-3-5-haiku-20241022 at its last known price, and the six
     # gateway spellings of typesafe-ai/jev-1.13.0 added with its later rows.
-    assert len(pairs) == 1180
+    assert len(pairs) == 1181
     assert sum(provider == "vercel" for provider, _ in pairs) == 192
     assert sum(provider == "openrouter" for provider, _ in pairs) == 212
 

@@ -21,11 +21,12 @@ EXECUTION_PROFILES = frozenset({"default", "bedrock"})
 # "moonshotai", the name its catalog aliases carry ("moonshot" is only an
 # input alias the catalog normalizes).
 ROUTE_PROVIDERS = frozenset(
-    {"anthropic", "bedrock", "fireworks", "mistral", "moonshotai", "openai", "tinker", "vercel"}
+    {"anthropic", "azure_foundry", "bedrock", "fireworks", "mistral", "moonshotai", "openai", "tinker", "vercel"}
 )
 ROUTE_PROVIDER_CHANNELS = MappingProxyType(
     {
         "anthropic": "anthropic-api",
+        "azure_foundry": "azure-foundry-global-standard",
         "bedrock": "aws-bedrock",
         "fireworks": "fireworks-api",
         "mistral": "mistral-api",
@@ -38,6 +39,7 @@ ROUTE_PROVIDER_CHANNELS = MappingProxyType(
 OFFER_GROUP_PROFILES = MappingProxyType(
     {
         "gateway": "default",
+        "azure-foundry-direct": "default",
         "fireworks": "default",
         "openai-direct": "default",
         "anthropic-direct": "default",
@@ -50,6 +52,7 @@ OFFER_GROUP_PROFILES = MappingProxyType(
 OFFER_GROUP_CREDENTIALS = MappingProxyType(
     {
         "gateway": "AI_GATEWAY_API_KEY",
+        "azure-foundry-direct": "AZURE_FOUNDRY_API_KEY",
         "fireworks": "FIREWORKS_API_KEY",
         "openai-direct": "OPENAI_API_KEY",
         "anthropic-direct": "ANTHROPIC_API_KEY",
@@ -62,6 +65,7 @@ OFFER_GROUP_CREDENTIALS = MappingProxyType(
 OFFER_GROUP_PROVIDERS = MappingProxyType(
     {
         "gateway": "vercel",
+        "azure-foundry-direct": "azure_foundry",
         "fireworks": "fireworks",
         "openai-direct": "openai",
         "anthropic-direct": "anthropic",

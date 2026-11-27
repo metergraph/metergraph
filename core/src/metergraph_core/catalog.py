@@ -36,6 +36,7 @@ _DIRECT_CHANNEL_BY_PROVIDER = {
     "openai": "openai-api",
     # Generic Azure traffic has no channel: its deployment SKU must be known.
     "azure-foundry-global-standard": "azure-foundry-global-standard",
+    "azure_foundry": "azure-foundry-global-standard",
     "google": "google-api",
     "vercel": "vercel-ai-gateway",
     "openrouter": "openrouter-api",
