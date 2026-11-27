@@ -4,6 +4,11 @@ version: '2026-11-26'
 # follows its own terms, never the model publisher's. No policy verifies an
 # account's configuration, opt-ins or separate agreements.
 provider_defaults:
+  azure_foundry:
+    azure-foundry-global-standard:
+      training_policy:
+        training_on_customer_data: prohibited
+        source: https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/data-privacy
   anthropic:
     anthropic-api:
       training_policy:
