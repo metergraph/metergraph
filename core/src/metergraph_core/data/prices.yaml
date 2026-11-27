@@ -6,10 +6,24 @@
 #
 # Community updates welcome: add an alias or price entry with its provider
 # source_url and open a PR. CI validates structure and date overlaps.
-version: "2026-11-25.1"
+version: "2026-11-26.1"
 currency: USD
-pricing_verified_at: "2026-11-25"
+pricing_verified_at: "2026-11-26"
 models:
+  - canonical_id: microsoft/mai-thinking-1
+    publisher: microsoft
+    aliases:
+      - {provider: azure_foundry, alias: MAI-Thinking-1, channel: azure-foundry-global-standard}
+    prices:
+      - channel: azure-foundry-global-standard
+        region: global
+        effective_from: "2026-08-01"
+        input_per_mtok: 2.00
+        output_per_mtok: 8.00
+        cache_read_per_mtok: 0.20
+        rules: {input_includes_cache_read: true}
+        source_url: https://prices.azure.com/api/retail/prices
+
   - canonical_id: openai/gpt-6-sol
     publisher: openai
     family: {id: openai/gpt-sol, display_name: GPT Sol}

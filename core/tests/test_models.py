@@ -73,6 +73,15 @@ def test_registry_version_accepts_a_same_day_revision():
     assert parse_model_registry(value).version == "2026-09-25.2"
 
 
+def test_mai_thinking_is_only_in_direct_foundry_offer():
+    registry = load_model_registry()
+    routes = registry.candidates("azure-foundry-direct")
+    assert [route.id for route in routes] == ["azure_foundry:MAI-Thinking-1"]
+    assert routes[0].model_id == "MAI-Thinking-1"
+    assert routes[0].pricing_channel == "azure-foundry-global-standard"
+    assert "azure_foundry:MAI-Thinking-1" not in [route.id for route in registry.candidates("gateway")]
+
+
 @pytest.mark.parametrize(
     "version",
     ["2026-09-25.0", "2026-09-25.01", "2026-09-25.next", "2026-09-25.1.1"],
@@ -224,7 +233,7 @@ def test_registry_document_shape_is_required(mutation):
 
 def test_bundled_registry_preserves_current_execution_and_product_fields():
     registry = load_model_registry()
-    assert registry.version == "2026-11-20"
+    assert registry.version == "2026-11-26"
     existing_gateway_ids = [
         "anthropic/claude-sonnet-5",
         "anthropic/claude-opus-5",
@@ -325,7 +334,7 @@ def test_bundled_registry_preserves_current_execution_and_product_fields():
         "deepseek/deepseek-v3.2",
         "deepseek/deepseek-v3.1",
     ]
-    assert len(registry.routes_for_execution_profile("default")) == 89
+    assert len(registry.routes_for_execution_profile("default")) == 90
     assert len(registry.routes_for_execution_profile("bedrock")) == 8
 
 
